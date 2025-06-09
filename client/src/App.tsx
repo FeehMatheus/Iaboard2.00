@@ -24,7 +24,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        {isAuthenticated ? <AIDashboard /> : <Landing />}
+        {isAuthenticated ? <Dashboard /> : <Landing />}
       </Route>
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/ai" component={AIDashboard} />

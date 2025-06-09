@@ -50,6 +50,15 @@ export default function Dashboard() {
     );
   };
 
+  // Fetch user funnels and tools
+  const { data: userFunnels = [], isLoading: funnelsLoading } = useQuery({
+    queryKey: ['/api/funnels']
+  });
+
+  const { data: userToolsData = [], isLoading: toolsLoading } = useQuery({
+    queryKey: ['/api/tools']
+  });
+
   const handleToolSelect = (tool: Tool) => {
     if (tool.name === "IA Board V2 - Criador de Funis") {
       // Navigate to funnel creator
@@ -197,9 +206,9 @@ export default function Dashboard() {
               <BarChart3 className="h-4 w-4 text-indigo-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{funnels.length}</div>
+              <div className="text-2xl font-bold text-white">{Array.isArray(userFunnels) ? userFunnels.length : 0}</div>
               <p className="text-xs text-gray-400">
-                {user.planLimits?.funnels === -1 ? 'Ilimitados' : `${user.planLimits?.funnels || 3} disponíveis`}
+                {user?.planLimits?.funnels === -1 ? 'Ilimitados' : `${user?.planLimits?.funnels || 3} disponíveis`}
               </p>
             </CardContent>
           </Card>
@@ -212,7 +221,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold text-white">0</div>
               <p className="text-xs text-gray-400">
-                {user.planLimits?.aiGenerations === -1 ? 'Ilimitadas' : `${user.planLimits?.aiGenerations || 50} disponíveis`}
+                {user?.planLimits?.aiGenerations === -1 ? 'Ilimitadas' : `${user?.planLimits?.aiGenerations || 50} disponíveis`}
               </p>
             </CardContent>
           </Card>
