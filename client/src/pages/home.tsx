@@ -6,12 +6,17 @@ import WelcomeSection from "@/components/WelcomeSection";
 import FlowSteps from "@/components/FlowSteps";
 import AIStatusPanel from "@/components/AIStatusPanel";
 import ExportOptions from "@/components/ExportOptions";
+import FunnelGenerator from "@/components/FunnelGenerator";
+import ContentGenerator from "@/components/ContentGenerator";
 import ProductTypeModal from "@/components/ProductTypeModal";
 import StepProcessingModal from "@/components/StepProcessingModal";
 
 export default function Home() {
   const [showProductModal, setShowProductModal] = useState(false);
   const [showProcessingModal, setShowProcessingModal] = useState(false);
+  const [showFunnelGenerator, setShowFunnelGenerator] = useState(false);
+  const [showContentGenerator, setShowContentGenerator] = useState(false);
+  const [generatedFunnel, setGeneratedFunnel] = useState(null);
   
   const {
     steps,

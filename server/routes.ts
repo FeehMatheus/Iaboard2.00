@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { AIFunnelGenerator, ContentGenerator } from "./ai-services";
@@ -6,6 +6,13 @@ import { insertFunnelSchema, insertAIGenerationSchema, insertUserSchema } from "
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import session from "express-session";
+
+// Extend session interface
+declare module 'express-session' {
+  interface SessionData {
+    userId: string;
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   

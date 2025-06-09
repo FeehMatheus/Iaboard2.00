@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
+import AIDashboard from "@/pages/ai-dashboard";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 
