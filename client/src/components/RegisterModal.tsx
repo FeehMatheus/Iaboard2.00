@@ -31,7 +31,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       onSuccess: () => {
         toast({
           title: "Conta criada com sucesso!",
-          description: "Bem-vindo ao IA Board V2. Comece a criar seus funis agora!",
+          description: "Redirecionando para o dashboard...",
         });
         onClose();
       },
@@ -51,126 +51,158 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 border-0 max-w-none">
-        <div className="glass-effect rounded-3xl max-w-md w-full p-8 animate-slide-up">
-          <DialogHeader className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <UserPlus className="w-10 h-10 text-white" />
-            </div>
-            <DialogTitle className="text-3xl font-bold text-white mb-2">Criar Conta Grátis</DialogTitle>
-            <p className="text-gray-300">Comece a criar funis inteligentes hoje</p>
-          </DialogHeader>
+      <DialogContent className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 border-0 max-w-none">
+        <div className="relative">
+          {/* Background Effects */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-indigo-500/20 to-blue-500/20 rounded-3xl blur-xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-3xl"></div>
           
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-white font-semibold">Nome</Label>
-                <Input
-                  id="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => handleInputChange("firstName", e.target.value)}
-                  placeholder="Seu nome"
-                  className="glass-dark border-white/20 text-white placeholder-gray-400 focus:border-indigo-500"
-                  required
-                />
+          <div className="relative glass-effect rounded-3xl max-w-md w-full p-8 border border-white/20 shadow-2xl">
+            <DialogHeader className="text-center mb-8">
+              <div className="relative w-24 h-24 mx-auto mb-6">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-700 rounded-2xl shadow-2xl transform -rotate-3 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800 rounded-2xl shadow-xl flex items-center justify-center">
+                  <UserPlus className="w-12 h-12 text-white drop-shadow-lg" />
+                </div>
+              </div>
+              <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-white via-purple-100 to-indigo-100 bg-clip-text text-transparent mb-3">
+                Crie Sua Conta
+              </DialogTitle>
+              <p className="text-gray-300 text-lg">Junte-se a milhares de criadores de funis</p>
+            </DialogHeader>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName" className="text-white font-semibold">Nome</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange("firstName", e.target.value)}
+                    placeholder="Seu nome"
+                    className="glass-dark border-white/20 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="lastName" className="text-white font-semibold">Sobrenome</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange("lastName", e.target.value)}
+                    placeholder="Sobrenome"
+                    className="glass-dark border-white/20 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                    required
+                  />
+                </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-white font-semibold">Sobrenome</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange("lastName", e.target.value)}
-                  placeholder="Sobrenome"
-                  className="glass-dark border-white/20 text-white placeholder-gray-400 focus:border-indigo-500"
-                  required
-                />
+                <Label htmlFor="username" className="text-white font-semibold">Nome de usuário</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="username"
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => handleInputChange("username", e.target.value)}
+                    placeholder="seuusuario"
+                    className="pl-12 glass-dark border-white/20 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-white font-semibold">Nome de usuário</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => handleInputChange("username", e.target.value)}
-                  placeholder="seuusuario"
-                  className="pl-12 glass-dark border-white/20 text-white placeholder-gray-400 focus:border-indigo-500"
-                  required
-                />
+              
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white font-semibold">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                    placeholder="seu@email.com"
+                    className="pl-12 glass-dark border-white/20 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white font-semibold">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="seu@email.com"
-                  className="pl-12 glass-dark border-white/20 text-white placeholder-gray-400 focus:border-indigo-500"
-                  required
-                />
+              
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-white font-semibold">Senha</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    placeholder="Mínimo 8 caracteres"
+                    className="pl-12 pr-12 glass-dark border-white/20 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                    minLength={8}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white font-semibold">Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                  placeholder="Mínimo 8 caracteres"
-                  className="pl-12 pr-12 glass-dark border-white/20 text-white placeholder-gray-400 focus:border-indigo-500"
-                  minLength={8}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
 
-            {registerError && (
-              <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
-                <p className="text-red-300 text-sm">{registerError.message}</p>
+              {/* Features Preview */}
+              <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/30 rounded-lg p-4">
+                <p className="text-sm text-purple-300 font-medium mb-2">✨ Incluído no plano gratuito:</p>
+                <ul className="text-xs text-gray-300 space-y-1">
+                  <li>• 3 funis por mês</li>
+                  <li>• 50 gerações de IA</li>
+                  <li>• Ferramentas básicas</li>
+                  <li>• Suporte por email</li>
+                </ul>
               </div>
-            )}
-            
-            <Button 
-              type="submit"
-              disabled={isRegistering}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 h-auto rounded-xl transition-all duration-300"
-            >
-              {isRegistering ? "Criando conta..." : "Criar Conta Grátis"}
-            </Button>
-          </form>
-          
-          <div className="mt-8 text-center">
-            <p className="text-gray-300">
-              Já tem uma conta?{" "}
-              <button 
-                onClick={onSwitchToLogin}
-                className="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+
+              {registerError && (
+                <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+                  <p className="text-red-300 text-sm">{registerError.message}</p>
+                </div>
+              )}
+              
+              <Button 
+                type="submit"
+                disabled={isRegistering}
+                className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-3 h-auto rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
-                Fazer login
-              </button>
-            </p>
+                {isRegistering ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Criando conta...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <UserPlus className="w-5 h-5" />
+                    <span>Criar Conta Grátis</span>
+                  </div>
+                )}
+              </Button>
+            </form>
+            
+            <div className="mt-8 text-center">
+              <p className="text-gray-300">
+                Já tem uma conta?{" "}
+                <button 
+                  onClick={onSwitchToLogin}
+                  className="text-purple-400 hover:text-purple-300 font-semibold transition-colors underline decoration-purple-400/50 hover:decoration-purple-300"
+                >
+                  Fazer login
+                </button>
+              </p>
+            </div>
           </div>
         </div>
       </DialogContent>

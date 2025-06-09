@@ -63,6 +63,10 @@ export function useAuth() {
     onSuccess: (userData) => {
       authCache = { user: userData, lastChecked: Date.now() };
       setUser(userData);
+      // Redirect to dashboard after successful login
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
     },
   });
 
@@ -74,6 +78,10 @@ export function useAuth() {
     onSuccess: (userData) => {
       authCache = { user: userData, lastChecked: Date.now() };
       setUser(userData);
+      // Redirect to dashboard after successful registration
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
     },
   });
 
