@@ -155,6 +155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Save to database
       const newFunnel = await storage.createFunnel({
         userId: req.session.userId,
+        name: generatedFunnel.title,
         title: generatedFunnel.title,
         description: generatedFunnel.description,
         productType,

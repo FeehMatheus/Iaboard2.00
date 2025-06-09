@@ -35,7 +35,10 @@ export const funnels = pgTable("funnels", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id),
   name: text("name").notNull(),
+  title: text("title"),
+  description: text("description"),
   productType: text("product_type").notNull(), // digital, physical, service, ai-decide
+  targetAudience: text("target_audience"),
   currentStep: integer("current_step").default(0),
   isCompleted: boolean("is_completed").default(false),
   stepData: jsonb("step_data").default({}),
@@ -46,10 +49,11 @@ export const funnels = pgTable("funnels", {
 export const aiGenerations = pgTable("ai_generations", {
   id: serial("id").primaryKey(),
   funnelId: integer("funnel_id").notNull(),
-  step: integer("step").notNull(),
-  aiProvider: text("ai_provider").notNull(), // openai, anthropic, google
+  stepNumber: integer("step_number").notNull(),
+  provider: text("provider").notNull(), // openai, anthropic, google
   prompt: text("prompt").notNull(),
   response: text("response").notNull(),
+  tokensUsed: integer("tokens_used").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
