@@ -30,9 +30,10 @@ interface Connection {
 interface InfiniteCanvasProps {
   onExport?: (data: any) => void;
   onSave?: (data: any) => void;
+  powerfulAIMode?: boolean;
 }
 
-export default function InfiniteCanvas({ onExport, onSave }: InfiniteCanvasProps) {
+export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: InfiniteCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(1);
   const [panX, setPanX] = useState(0);

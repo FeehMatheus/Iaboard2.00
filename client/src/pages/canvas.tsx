@@ -29,12 +29,13 @@ export default function CanvasPage() {
       });
 
       // Create ZIP file with all content
-      const zip = await import('https://cdn.skypack.dev/jszip');
-      const zipFile = new zip.default();
+      const JSZip = (await import('jszip')).default;
+      const zipFile = new JSZip();
       
       // Add all files from the response
-      if (response.files) {
-        Object.entries(response.files).forEach(([filename, content]) => {
+      const responseData = response as any;
+      if (responseData.files) {
+        Object.entries(responseData.files).forEach(([filename, content]) => {
           zipFile.file(filename, content as string);
         });
       }
@@ -54,7 +55,7 @@ export default function CanvasPage() {
 
       toast({
         title: "Download Concluído",
-        description: `Pacote completo com ${Object.keys(response.files || {}).length} arquivos baixado com sucesso`
+        description: `Pacote completo com ${Object.keys(responseData.files || {}).length} arquivos baixado com sucesso`
       });
     } catch (error) {
       console.error('Export error:', error);
@@ -84,10 +85,16 @@ export default function CanvasPage() {
   };
 
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {isPowerfulAIMode && (
+        <div className="absolute top-4 left-4 z-50 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+          🧠 IA Pensamento Poderoso Ativa
+        </div>
+      )}
       <InfiniteCanvas 
         onExport={handleExport}
         onSave={handleSave}
+        powerfulAIMode={isPowerfulAIMode}
       />
     </div>
   );
