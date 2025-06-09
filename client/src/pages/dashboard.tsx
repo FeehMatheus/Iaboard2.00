@@ -37,7 +37,7 @@ export default function Dashboard() {
     return iconMap[iconName] || Zap;
   };
 
-  const getUserTools = () => {
+  const getUserTools = (): Tool[] => {
     if (!user?.planLimits?.tools) return tools.filter((tool: Tool) => tool.planRequired === 'free');
     
     const planTools = user.planLimits.tools as string[];
@@ -163,7 +163,7 @@ export default function Dashboard() {
               </Button>
               
               <Button 
-                onClick={() => logout()}
+                onClick={handleLogout}
                 variant="ghost"
                 className="glass-effect hover:bg-red-500/20 transition-all duration-300 text-white border-white/20 hover:border-red-500/30"
               >
