@@ -58,6 +58,12 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
     onClose();
   };
 
+  const handleWorkflowComplete = (result: any) => {
+    setShowWorkflow(false);
+    onConfirm('ai-decide');
+    onClose();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black/50 backdrop-blur-sm z-50 p-0 border-0 scrollbar-hide">
@@ -78,7 +84,7 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
                   key={product.type}
                   onClick={() => {
                     if (product.type === 'ai-decide') {
-                      handleAIDecide();
+                      setShowWorkflow(true);
                     } else {
                       setSelectedType(product.type);
                     }
@@ -112,6 +118,13 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
           </div>
         </div>
       </DialogContent>
+
+      <SequentialWorkflowModal
+        isOpen={showWorkflow}
+        onClose={() => setShowWorkflow(false)}
+        onComplete={handleWorkflowComplete}
+        productType="IA Decision"
+      />
     </Dialog>
   );
 }
