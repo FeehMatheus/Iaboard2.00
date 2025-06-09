@@ -3,7 +3,7 @@ import { CreditCard, Lock, Crown, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
@@ -86,7 +86,9 @@ export default function PaymentModal({ isOpen, onClose, selectedPlan }: PaymentM
               <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-white via-emerald-100 to-blue-100 bg-clip-text text-transparent mb-3">
                 Finalizar Pagamento
               </DialogTitle>
-              <p className="text-gray-300 text-lg">Assine o plano {selectedPlan.name} e desbloqueie todo o potencial</p>
+              <DialogDescription className="text-gray-300 text-lg">
+                Assine o plano {selectedPlan.name} e desbloqueie todo o potencial
+              </DialogDescription>
             </DialogHeader>
 
             {/* Plan Summary */}

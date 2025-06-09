@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Zap, Star, Crown, ArrowRight, Brain, Target, TrendingUp, Users, Shield, Sparkles, LogIn, UserPlus, Eye, Video, FileText } from "lucide-react";
+import { Check, Zap, Star, Crown, ArrowRight, Brain, Target, TrendingUp, Users, Shield, Sparkles, LogIn, UserPlus, Eye, Video, FileText, CheckCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import LoginModal from "@/components/LoginModal";
 import RegisterModal from "@/components/RegisterModal";
@@ -312,12 +312,29 @@ export default function Landing() {
         {/* Pricing Section */}
         <div className="mb-20">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Planos para Todo Tamanho
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Planos que Aceleram Seus Resultados
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Escolha o plano ideal para suas necessidades. Upgrade ou downgrade a qualquer momento.
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
+              Mais de <span className="text-emerald-400 font-bold">2.847 empresários</span> já escolheram nossos planos para <span className="text-blue-400 font-semibold">triplicar suas vendas</span>. 
+              Cancele quando quiser, sem taxa.
             </p>
+            
+            {/* Value propositions */}
+            <div className="flex flex-wrap justify-center gap-6 mb-8">
+              <div className="flex items-center space-x-2 bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-400/30">
+                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                <span className="text-emerald-300 text-sm font-medium">7 dias grátis</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-blue-500/10 px-4 py-2 rounded-full border border-blue-400/30">
+                <Shield className="w-4 h-4 text-blue-400" />
+                <span className="text-blue-300 text-sm font-medium">Garantia 30 dias</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-purple-500/10 px-4 py-2 rounded-full border border-purple-400/30">
+                <Zap className="w-4 h-4 text-purple-400" />
+                <span className="text-purple-300 text-sm font-medium">Setup instantâneo</span>
+              </div>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

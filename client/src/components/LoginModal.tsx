@@ -3,7 +3,7 @@ import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -59,7 +59,9 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }: Logi
               <DialogTitle className="text-3xl font-bold bg-gradient-to-r from-white via-indigo-100 to-purple-100 bg-clip-text text-transparent mb-3">
                 Bem-vindo de Volta
               </DialogTitle>
-              <p className="text-gray-300 text-lg">Entre e continue criando funis inteligentes</p>
+              <DialogDescription className="text-gray-300 text-lg">
+                Entre e continue criando funis inteligentes
+              </DialogDescription>
             </DialogHeader>
             
             <form onSubmit={handleSubmit} className="space-y-6">
