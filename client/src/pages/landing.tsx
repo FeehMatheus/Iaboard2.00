@@ -176,66 +176,94 @@ export default function Landing() {
             🚀 Nova versão com IA avançada
           </Badge>
           
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            <span className="text-white">Crie Funis que</span>
+          <h1 className="text-6xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tight">
+            <span className="text-white drop-shadow-2xl">Crie Funis que</span>
             <br />
-            <span className="bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-emerald-400 via-blue-500 to-purple-600 bg-clip-text text-transparent drop-shadow-xl">
               Convertem 347%
             </span>
             <br />
-            <span className="text-white">mais em 8 Minutos</span>
+            <span className="text-white drop-shadow-2xl">mais em 8 Minutos</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-            🚀 <strong className="text-white">Revolucione suas vendas</strong> com a única plataforma que combina 
-            <span className="text-blue-400 font-semibold"> GPT-4o, Claude Sonnet e Gemini</span> para criar funis
+          <p className="text-xl md:text-3xl text-gray-200 mb-8 max-w-5xl mx-auto leading-relaxed font-medium">
+            🚀 <strong className="text-white font-bold">Revolucione suas vendas</strong> com a única plataforma que combina 
+            <span className="text-blue-400 font-bold"> GPT-4o, Claude Sonnet e Gemini</span> para criar funis
             <span className="text-emerald-400 font-bold"> que realmente vendem</span>.
           </p>
 
           {/* Key Benefits Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 max-w-4xl mx-auto">
-            <div className="glass-effect rounded-xl p-4 border border-white/10 transform hover:scale-105 transition-all duration-300">
-              <Zap className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-              <p className="text-white font-bold">Setup em 8 min</p>
-              <p className="text-gray-400 text-sm">Funil completo automatizado</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
+            <div className="glass-effect rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl group">
+              <div className="relative w-16 h-16 mx-auto mb-4">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center h-full">
+                  <Zap className="w-8 h-8 text-white drop-shadow-lg" />
+                </div>
+              </div>
+              <p className="text-white font-bold text-lg mb-1">Setup em 8 min</p>
+              <p className="text-gray-300 text-sm">Funil completo automatizado</p>
             </div>
-            <div className="glass-effect rounded-xl p-4 border border-white/10 transform hover:scale-105 transition-all duration-300">
-              <TrendingUp className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-              <p className="text-white font-bold">+347% conversão</p>
-              <p className="text-gray-400 text-sm">Resultado médio comprovado</p>
+            <div className="glass-effect rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl group">
+              <div className="relative w-16 h-16 mx-auto mb-4">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative bg-gradient-to-br from-emerald-400 to-green-500 rounded-2xl flex items-center justify-center h-full">
+                  <TrendingUp className="w-8 h-8 text-white drop-shadow-lg" />
+                </div>
+              </div>
+              <p className="text-white font-bold text-lg mb-1">+347% conversão</p>
+              <p className="text-gray-300 text-sm">Resultado médio comprovado</p>
             </div>
-            <div className="glass-effect rounded-xl p-4 border border-white/10 transform hover:scale-105 transition-all duration-300">
-              <Brain className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-              <p className="text-white font-bold">3 IAs trabalhando</p>
-              <p className="text-gray-400 text-sm">Máxima inteligência artificial</p>
+            <div className="glass-effect rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl group">
+              <div className="relative w-16 h-16 mx-auto mb-4">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative bg-gradient-to-br from-purple-400 to-indigo-500 rounded-2xl flex items-center justify-center h-full">
+                  <Brain className="w-8 h-8 text-white drop-shadow-lg" />
+                </div>
+              </div>
+              <p className="text-white font-bold text-lg mb-1">3 IAs trabalhando</p>
+              <p className="text-gray-300 text-sm">Máxima inteligência artificial</p>
             </div>
           </div>
 
           {/* Demo Account Info */}
-          <div className="glass-effect rounded-2xl p-6 mb-12 max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-white mb-3">🎯 Conta Demo Disponível</h3>
-            <div className="text-left space-y-2 text-gray-300">
-              <p><strong>Email:</strong> demo@iaboard.com</p>
-              <p><strong>Senha:</strong> demo123</p>
-              <p className="text-sm text-indigo-400">Acesso completo às ferramentas Pro</p>
+          <div className="glass-effect rounded-3xl p-8 mb-12 max-w-lg mx-auto border border-white/20 shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-2xl mb-4">
+                <Eye className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">🎯 Teste Gratuitamente</h3>
+              <p className="text-gray-300">Acesso completo às ferramentas Pro</p>
+            </div>
+            <div className="bg-black/30 rounded-2xl p-6 border border-white/10">
+              <div className="space-y-3 text-gray-200">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Email:</span>
+                  <code className="bg-white/10 px-3 py-1 rounded-lg text-emerald-300 font-mono">demo@iaboard.com</code>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Senha:</span>
+                  <code className="bg-white/10 px-3 py-1 rounded-lg text-emerald-300 font-mono">demo123</code>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
             <Button 
               onClick={() => setIsRegisterOpen(true)}
-              className="bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-bold px-10 py-4 text-lg h-auto rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl"
+              className="bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-bold px-12 py-6 text-xl h-auto rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-emerald-500/25"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
+              <Sparkles className="w-6 h-6 mr-3" />
               🎯 Começar Grátis - 7 Dias
             </Button>
             
             <Button 
               onClick={() => setIsLoginOpen(true)}
               variant="outline"
-              className="glass-effect hover:bg-white/10 text-white border-white/30 font-semibold px-8 py-4 text-lg h-auto rounded-xl transition-all duration-300"
+              className="glass-effect hover:bg-white/10 text-white border-2 border-white/30 font-semibold px-10 py-6 text-xl h-auto rounded-2xl transition-all duration-300 hover:border-white/50"
             >
-              <Eye className="w-5 h-5 mr-2" />
+              <Eye className="w-6 h-6 mr-3" />
               Testar Demo
             </Button>
           </div>
@@ -287,11 +315,13 @@ export default function Landing() {
 
         {/* Features Grid */}
         <div className="mb-20">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-4">
-            Por que escolher o IA Board V2?
+          <h2 className="text-4xl md:text-6xl font-black text-center text-white mb-6 tracking-tight">
+            Por que Empresários Escolhem o
+            <span className="bg-gradient-to-r from-emerald-400 to-blue-500 bg-clip-text text-transparent"> IA Board V2</span>?
           </h2>
-          <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
-            A única plataforma que combina múltiplas inteligências artificiais para criar funis de alta conversão
+          <p className="text-xl md:text-2xl text-gray-300 text-center mb-16 max-w-4xl mx-auto font-medium leading-relaxed">
+            A única plataforma que combina <span className="text-blue-400 font-bold">múltiplas inteligências artificiais</span> para criar funis de 
+            <span className="text-emerald-400 font-bold"> alta conversão automaticamente</span>
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
