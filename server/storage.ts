@@ -135,9 +135,13 @@ export class MemStorage implements IStorage {
     const id = `user_${this.currentUserId++}`;
     const now = new Date();
     const user: User = { 
-      ...insertUser, 
       id,
+      email: insertUser.email || null,
+      firstName: insertUser.firstName || null,
+      lastName: insertUser.lastName || null,
       profileImageUrl: null,
+      username: insertUser.username || null,
+      password: insertUser.password || null,
       plan: "free",
       subscriptionStatus: "inactive",
       subscriptionId: null,
@@ -168,7 +172,11 @@ export class MemStorage implements IStorage {
       return updatedUser;
     } else {
       const newUser: User = {
-        ...userData,
+        id: userData.id,
+        email: userData.email || null,
+        firstName: userData.firstName || null,
+        lastName: userData.lastName || null,
+        profileImageUrl: userData.profileImageUrl || null,
         username: null,
         password: null,
         plan: "free",
