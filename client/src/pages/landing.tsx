@@ -6,11 +6,14 @@ import { Check, Zap, Star, Crown, ArrowRight, Brain, Target, TrendingUp, Users, 
 import { useAuth } from "@/hooks/useAuth";
 import LoginModal from "@/components/LoginModal";
 import RegisterModal from "@/components/RegisterModal";
+import PaymentModal from "@/components/PaymentModal";
 import Logo from "@/components/Logo";
 
 export default function Landing() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const { isAuthenticated } = useAuth();
 
   // Redirect if already authenticated
@@ -315,7 +318,14 @@ export default function Landing() {
                         ? 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white'
                         : 'glass-effect hover:bg-white/10 text-white border-white/30'
                     }`}
-                    onClick={() => setIsRegisterOpen(true)}
+                    onClick={() => {
+                      if (plan.name === 'Free') {
+                        setIsRegisterOpen(true);
+                      } else {
+                        setSelectedPlan(plan);
+                        setIsPaymentOpen(true);
+                      }
+                    }}
                   >
                     {plan.cta}
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -384,6 +394,12 @@ export default function Landing() {
           setIsRegisterOpen(false);
           setIsLoginOpen(true);
         }}
+      />
+
+      <PaymentModal
+        isOpen={isPaymentOpen}
+        onClose={() => setIsPaymentOpen(false)}
+        selectedPlan={selectedPlan}
       />
     </div>
   );
