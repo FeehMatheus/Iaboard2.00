@@ -59,8 +59,9 @@ export class MemStorage implements IStorage {
     this.currentToolId = 1;
     this.currentAnalyticsId = 1;
 
-    // Initialize default tools
+    // Initialize default tools and demo account
     this.initializeDefaultTools();
+    this.createDemoAccount();
   }
 
   private async initializeDefaultTools() {
@@ -111,6 +112,39 @@ export class MemStorage implements IStorage {
 
     for (const tool of defaultTools) {
       await this.createTool(tool);
+    }
+  }
+
+  private async createDemoAccount() {
+    try {
+      const bcrypt = await import('bcrypt');
+      const hashedPassword = await bcrypt.hash('demo123', 10);
+      
+      const demoUser: User = {
+        id: 'demo_user_001',
+        email: 'demo@iaboard.com',
+        firstName: 'Usuario',
+        lastName: 'Demo',
+        profileImageUrl: null,
+        username: 'demo_user',
+        password: hashedPassword,
+        plan: "pro",
+        subscriptionStatus: "active",
+        subscriptionId: "demo_subscription",
+        customerId: "demo_customer",
+        planLimits: {
+          funnels: -1,
+          aiGenerations: -1,
+          tools: ["all"]
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      this.users.set('demo_user_001', demoUser);
+      console.log('Demo account created: demo@iaboard.com / demo123');
+    } catch (error) {
+      console.error('Error creating demo account:', error);
     }
   }
 
