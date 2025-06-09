@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Zap, Eye, Video, TrendingUp, FileText, Folder, Plus, LogOut, Settings, Crown, BarChart3, Users } from "lucide-react";
+import { Zap, Eye, Video, TrendingUp, FileText, Folder, Plus, LogOut, Settings, Crown, BarChart3, Users, Grid3x3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -210,6 +210,33 @@ export default function Dashboard() {
             Escolha uma ferramenta abaixo para começar a criar conteúdo inteligente 
             com o poder da inteligência artificial.
           </p>
+          
+          {/* Quick Action Bar */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <Button 
+              onClick={() => setShowProductModal(true)}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Criar Novo Produto
+            </Button>
+            
+            <Button 
+              onClick={() => window.location.href = '/canvas'}
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
+            >
+              <Grid3x3 className="w-5 h-5" />
+              Canvas Infinito
+            </Button>
+            
+            <Button 
+              onClick={handleCreateNewFunnel}
+              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
+            >
+              <TrendingUp className="w-5 h-5" />
+              Funil Tradicional
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
