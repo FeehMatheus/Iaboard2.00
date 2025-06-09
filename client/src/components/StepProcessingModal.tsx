@@ -50,8 +50,8 @@ export default function StepProcessingModal({
 
   return (
     <Dialog open={isOpen}>
-      <DialogContent className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 border-0 max-w-none">
-        <div className="glass-effect rounded-3xl max-w-lg w-full p-8 text-center">
+      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-lg max-h-[90vh] overflow-y-auto bg-black/50 backdrop-blur-sm z-50 p-0 border-0">
+        <div className="glass-effect rounded-3xl w-full p-8 text-center">
           <div className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse">
             <Brain className="w-10 h-10 text-white" />
           </div>
