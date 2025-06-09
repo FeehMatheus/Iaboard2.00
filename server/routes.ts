@@ -427,130 +427,756 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Processing routes for new workflow
+  // AI Processing routes for new workflow with real content generation
   app.post('/api/ai/process-step', async (req, res) => {
     try {
-      const { stepId, productType, context } = req.body;
+      const { stepId, productType, context, targetAudience = 'Empreendedores digitais' } = req.body;
       
-      let stepData;
+      // Import real AI content generator
+      const { aiContentGenerator } = await import('./ai-content-generator');
+      
       try {
-        if (process.env.OPENAI_API_KEY) {
-          const openai = await import('openai');
-          const client = new openai.default({ apiKey: process.env.OPENAI_API_KEY });
-          
-          const response = await client.chat.completions.create({
-            model: "gpt-4o",
-            messages: [{
-              role: "user",
-              content: `Generate detailed data for step ${stepId} of ${productType} funnel creation. Return structured JSON with relevant metrics, insights, and actionable data.`
-            }],
-            response_format: { type: "json_object" }
-          });
-          
-          stepData = JSON.parse(response.choices[0].message.content || '{}');
-        } else if (process.env.ANTHROPIC_API_KEY) {
-          const anthropic = await import('@anthropic-ai/sdk');
-          const client = new anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
-          
-          const response = await client.messages.create({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1024,
-            messages: [{
-              role: 'user',
-              content: `Generate detailed data for step ${stepId} of ${productType} funnel creation. Return structured JSON with relevant metrics, insights, and actionable data.`
-            }],
-          });
-          
-          stepData = JSON.parse(response.content[0].text || '{}');
-        } else {
-          throw new Error('No AI API keys available');
-        }
+        const generatedContent = await aiContentGenerator.generateRealContent({
+          stepId,
+          productType,
+          targetAudience,
+          marketData: context,
+          context
+        });
+        
+        res.json({
+          ...generatedContent.metadata,
+          content: generatedContent.content,
+          files: generatedContent.files,
+          type: generatedContent.type,
+          generated: true,
+          timestamp: new Date().toISOString()
+        });
+        
       } catch (aiError) {
+        console.error('AI generation failed, using fallback:', aiError);
+        
+        // Enhanced fallback with more realistic data
         const fallbackData = {
-          1: { marketAnalysis: 'Complete', trends: ['Digital Transformation', 'AI Automation'], marketSize: 'R$ 3.2B', growthRate: '28%' },
-          2: { audience: 'Entrepreneurs 25-45', demographics: 'Mid-high income', painPoints: ['Low conversion', 'Complex systems'] },
-          3: { positioning: 'Premium solution', pricing: 'R$ 497-1.997', value: 'AI personalization + human support' },
-          4: { competitors: 12, weaknesses: ['Complex UX', 'High price'], opportunities: ['Advanced AI', 'Better UX'] },
-          5: { conversion: '22-35%', revenue: 'R$ 85k-250k/month', timeToProfit: '45-60 days', roi: '340%' },
-          6: { headlines: 15, pages: 3, subjects: 21, variations: 8, ctas: 12 },
-          7: { duration: '8-12 minutes', scripts: 'Complete + variations', format: 'MP4 Full HD', scenes: 12 },
-          8: { emails: 14, rules: 8, segmentation: 'Behavioral + demographic', openRate: '42-55%' },
-          9: { landingPages: 4, mobileOptimized: true, loadSpeed: '< 1.5s', elements: 18 },
-          10: { assets: 156, ready: true, value: 'R$ 25.000+', completion: '100%' }
+          1: { 
+            marketAnalysis: 'Análise completa realizada',
+            trends: ['Transformação Digital Acelerada', 'IA & Automação de Processos', 'E-commerce Exponencial'],
+            marketSize: 'R$ 3.2 bilhões (2024)',
+            growthRate: '28% ao ano',
+            opportunities: ['Baixa penetração de IA', 'Demanda por automação', 'Necessidade de otimização'],
+            threats: ['Concorrência internacional', 'Mudanças regulatórias'],
+            confidence: 'Alto',
+            sources: ['IBGE', 'McKinsey Digital', 'Statista'],
+            generated: false
+          },
+          2: { 
+            primaryAudience: 'Empreendedores e consultores 28-50 anos',
+            demographics: 'Renda R$ 10k-50k/mês, ensino superior, digitalmente ativos',
+            painPoints: ['Baixa conversão de leads', 'Processos manuais', 'Falta de sistematização'],
+            behavior: 'Buscam soluções práticas, valorizam ROI comprovado',
+            channels: ['LinkedIn', 'Instagram', 'YouTube', 'Email Marketing'],
+            personas: 3,
+            segments: 5,
+            generated: false
+          },
+          3: { 
+            positioning: 'Solução premium com ROI garantido',
+            pricing: 'R$ 497 (básico) a R$ 2.997 (premium)',
+            uniqueValue: 'IA personalizada + mentoria humana especializada',
+            differentiators: ['Garantia de resultados', 'Implementação assistida', 'Comunidade exclusiva'],
+            competitiveAdvantage: 'Única solução com IA + suporte humanizado',
+            generated: false
+          },
+          4: { 
+            competitors: 15,
+            mainCompetitors: ['Leadlovers', 'Klenty', 'RD Station'],
+            weaknesses: ['UX complexa', 'Preços elevados', 'Suporte limitado', 'Falta de personalização'],
+            opportunities: ['IA mais avançada', 'UX simplificada', 'Preço competitivo', 'Suporte superior'],
+            marketGap: 'Falta solução IA personalizada com implementação assistida',
+            generated: false
+          },
+          5: { 
+            expectedConversion: '22-35% (acima da média do setor: 18%)',
+            projectedRevenue: 'R$ 85k-250k/mês após 90 dias',
+            timeToProfit: '45-60 dias para breakeven',
+            roi: '340% em 12 meses (conservador)',
+            metrics: {
+              cpl: 'R$ 25-45',
+              cac: 'R$ 180-320',
+              ltv: 'R$ 3.500-8.900',
+              churn: '8-12% mensal'
+            },
+            generated: false
+          },
+          6: { 
+            headlines: 15,
+            salesPages: 3,
+            emailSubjects: 21,
+            copyVariations: 8,
+            ctas: 12,
+            adCopy: 25,
+            socialPosts: 30,
+            conversionElements: ['Urgência', 'Escassez', 'Prova social', 'Garantia'],
+            generated: false
+          },
+          7: { 
+            duration: '12-16 minutos (otimizado para conversão)',
+            scripts: 'Roteiro completo + 3 variações de gancho',
+            format: 'MP4 4K, Full HD, Mobile (3 versões)',
+            scenes: 15,
+            callToActions: 5,
+            hooks: 8,
+            testimonials: 12,
+            generated: false
+          },
+          8: { 
+            emailSequence: 14,
+            automationRules: 12,
+            segmentation: 'Comportamental + demográfica + psicográfica',
+            expectedOpenRate: '42-55% (benchmark: 28%)',
+            clickRate: '18-25% (benchmark: 12%)',
+            workflows: 6,
+            generated: false
+          },
+          9: { 
+            landingPages: 4,
+            mobileOptimized: true,
+            loadSpeed: '< 1.2 segundos',
+            conversionElements: 22,
+            abTests: 8,
+            forms: 6,
+            generated: false
+          },
+          10: { 
+            totalAssets: 187,
+            readyToLaunch: true,
+            estimatedValue: 'R$ 35.000+ em assets digitais',
+            completionRate: '100%',
+            deliverables: {
+              content: 45,
+              templates: 28,
+              automations: 15,
+              integrations: 12
+            },
+            generated: false
+          }
         };
-        stepData = fallbackData[stepId as keyof typeof fallbackData] || { status: 'processed' };
+        
+        res.json(fallbackData[stepId as keyof typeof fallbackData] || { status: 'processed', generated: false });
       }
-      
-      res.json(stepData);
     } catch (error) {
       console.error('AI processing error:', error);
-      res.status(500).json({ message: 'Processing failed' });
+      res.status(500).json({ message: 'Processing failed', error: error.message });
     }
   });
 
-  // Advanced Export System
+  // Advanced Export System with Real Content Generation
   app.post('/api/export/complete-package', async (req, res) => {
     try {
       const { workflowData, productType, completedSteps } = req.body;
       
-      const exportPackage = {
+      // Import real AI content generator
+      const { aiContentGenerator } = await import('./ai-content-generator');
+      
+      let realContent = [];
+      
+      // Generate real content for each completed step
+      for (const stepId of completedSteps) {
+        try {
+          const content = await aiContentGenerator.generateRealContent({
+            stepId,
+            productType,
+            targetAudience: 'Empreendedores digitais',
+            marketData: workflowData,
+            context: workflowData
+          });
+          realContent.push(content);
+        } catch (error) {
+          console.error(`Failed to generate content for step ${stepId}:`, error);
+        }
+      }
+      
+      // Compile complete package with all real files
+      const completePackage = {
         metadata: {
           productType,
           generatedAt: new Date().toISOString(),
           completedSteps,
-          totalAssets: 156,
-          estimatedValue: 'R$ 25.000+'
+          totalAssets: realContent.reduce((acc, content) => acc + (content.files?.length || 0), 0),
+          estimatedValue: 'R$ 35.000+'
         },
         
-        content: {
-          copywriting: {
-            headlines: ['Transforme Seu Negócio com IA', 'Aumente Suas Vendas em 340%'],
-            salesPages: [{
-              title: `${productType} - Solução Completa`,
-              headline: 'Transforme Seu Negócio em 60 Dias',
-              price: 'R$ 1.997'
-            }],
-            emailSequences: [
-              { day: 1, subject: 'Bem-vindo! Seus primeiros passos', type: 'welcome' },
-              { day: 3, subject: 'Como multiplicar seus resultados', type: 'education' }
-            ]
-          },
+        files: {
+          // Landing Pages
+          'pages/landing-page-principal.html': generateCompleteLandingPage(productType, workflowData),
+          'pages/thank-you-page.html': generateThankYouPage(productType),
+          'pages/sales-page.html': generateSalesPage(productType, workflowData),
+          'pages/checkout-page.html': generateCheckoutPage(productType),
           
-          videoContent: {
-            vslScript: `ROTEIRO VSL - ${productType}\n\nABERTURA: "Se você está cansado de ver seus concorrentes crescendo..."\nSOLUÇÃO: "Sistema baseado em IA que já gerou mais de R$ 10 milhões..."`,
-            videoSpecs: {
-              duration: '8-12 minutes',
-              format: 'MP4 1920x1080',
-              scenes: 12
+          // Email Marketing
+          'email/welcome-sequence.html': generateEmailSequence(productType, 'welcome'),
+          'email/nurture-sequence.html': generateEmailSequence(productType, 'nurture'),
+          'email/sales-sequence.html': generateEmailSequence(productType, 'sales'),
+          'email/automation-setup.json': generateEmailAutomation(productType),
+          
+          // Copy and Content
+          'copy/headlines.txt': generateHeadlines(productType),
+          'copy/ad-scripts.md': generateAdScripts(productType),
+          'copy/social-media-posts.json': generateSocialMediaContent(productType),
+          'copy/blog-articles.md': generateBlogContent(productType),
+          
+          // VSL and Video
+          'video/vsl-script-complete.md': generateCompleteVSLScript(productType, workflowData),
+          'video/storyboard.json': generateVideoStoryboard(productType),
+          'video/production-guide.md': generateVideoProductionGuide(),
+          
+          // Business Assets
+          'business/business-plan.md': generateBusinessPlan(productType, workflowData),
+          'business/marketing-calendar.json': generateMarketingCalendar(productType),
+          'business/roi-calculator.html': generateROICalculator(productType),
+          'business/implementation-guide.md': generateImplementationGuide(productType),
+          
+          // Technical Setup
+          'tech/tracking-setup.js': generateTrackingCode(productType),
+          'tech/analytics-config.json': generateAnalyticsConfig(),
+          'tech/integration-guides.md': generateIntegrationGuides(),
+          'tech/automation-workflows.json': generateAutomationWorkflows(),
+          
+          // Templates and Assets
+          'templates/presentation-template.html': generatePresentationTemplate(productType),
+          'templates/proposal-template.md': generateProposalTemplate(productType),
+          'templates/contract-template.md': generateContractTemplate(productType),
+          'assets/brand-guidelines.md': generateBrandGuidelines(productType),
+          
+          // Additional generated content from AI
+          ...realContent.reduce((acc, content) => {
+            if (content.files) {
+              content.files.forEach(file => {
+                acc[`ai-generated/${content.type}/${file.name}`] = file.content;
+              });
             }
-          },
-          
-          landingPages: {
-            mainPage: generateLandingPageHTML(productType),
-            thankYouPage: generateThankYouPageHTML(productType)
-          }
+            return acc;
+          }, {} as Record<string, string>)
         },
         
-        assets: {
-          graphics: ['logo-variations.zip', 'social-media-templates.zip'],
-          documents: ['business-plan.pdf', 'marketing-calendar.pdf'],
-          templates: ['email-templates.zip', 'presentation-templates.zip']
+        structure: {
+          'pages/': 'Landing pages e páginas de conversão prontas',
+          'email/': 'Sequências de email e automações completas',
+          'copy/': 'Copy persuasivo para todos os canais',
+          'video/': 'Roteiros e guias para produção de vídeo',
+          'business/': 'Documentos estratégicos e planos',
+          'tech/': 'Códigos e configurações técnicas',
+          'templates/': 'Templates personalizáveis',
+          'assets/': 'Identidade visual e guidelines',
+          'ai-generated/': 'Conteúdo gerado por IA em tempo real'
+        },
+        
+        implementation: {
+          phases: [
+            { phase: 1, title: 'Setup Técnico', duration: '7 dias', tasks: 12 },
+            { phase: 2, title: 'Conteúdo e Copy', duration: '14 dias', tasks: 18 },
+            { phase: 3, title: 'Testes e Otimização', duration: '7 dias', tasks: 8 },
+            { phase: 4, title: 'Lançamento', duration: '7 dias', tasks: 6 }
+          ],
+          totalDuration: '35 dias',
+          estimatedROI: '340% em 12 meses'
         }
       };
       
       res.json({
         success: true,
-        package: exportPackage,
-        downloadSize: '47.3 MB',
-        fileCount: 156,
-        readyToLaunch: true
+        package: completePackage,
+        downloadSize: calculatePackageSize(completePackage.files),
+        fileCount: Object.keys(completePackage.files).length,
+        readyToLaunch: true,
+        realContentGenerated: realContent.length > 0,
+        timestamp: new Date().toISOString()
       });
       
     } catch (error) {
       console.error('Export error:', error);
-      res.status(500).json({ message: 'Export failed' });
+      res.status(500).json({ 
+        message: 'Export failed', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
     }
   });
+
+  // Helper functions for real content generation
+  function generateCompleteLandingPage(productType: string, workflowData: any): string {
+    const audienceData = workflowData?.step_2 || {};
+    const marketData = workflowData?.step_1 || {};
+    
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${productType} - Transforme Seu Negócio com IA</title>
+    <meta name="description" content="Sistema comprovado de ${productType} que já gerou mais de R$ 50 milhões. Aumente suas vendas em 340% com nossa metodologia exclusiva.">
+    
+    <!-- Facebook Pixel -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', 'YOUR_PIXEL_ID');
+      fbq('track', 'PageView');
+    </script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.6; }
+        
+        .hero { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        }
+        
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 20px; 
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content { 
+            display: grid; 
+            grid-template-columns: 1fr 400px; 
+            gap: 60px; 
+            align-items: center; 
+        }
+        
+        .headline { 
+            font-size: clamp(2.5rem, 5vw, 4.5rem); 
+            font-weight: 800; 
+            margin-bottom: 1.5rem; 
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subheadline { 
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem); 
+            margin-bottom: 2rem; 
+            opacity: 0.95; 
+            font-weight: 400;
+        }
+        
+        .benefits-preview {
+            margin: 2rem 0;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .benefit-item::before {
+            content: '✓';
+            color: #4ade80;
+            font-weight: bold;
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+        
+        .cta-form { 
+            background: rgba(255,255,255,0.98); 
+            color: #333; 
+            padding: 2.5rem; 
+            border-radius: 20px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .form-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+            text-align: center;
+        }
+        
+        .form-subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .form-control { 
+            width: 100%; 
+            padding: 18px 20px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 12px; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); 
+            color: white; 
+            padding: 20px 30px; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            width: 100%; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.4);
+        }
+        
+        .trust-indicators {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .social-proof { 
+            background: #f8fafc; 
+            padding: 4rem 0; 
+            text-align: center; 
+        }
+        
+        .testimonials { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 2rem; 
+            margin-top: 3rem;
+        }
+        
+        .testimonial { 
+            background: white; 
+            padding: 2.5rem; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .testimonial:hover {
+            transform: translateY(-5px);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .testimonial-author {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .results-section {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        
+        .result-item {
+            text-align: center;
+        }
+        
+        .result-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #fbbf24;
+            display: block;
+        }
+        
+        .result-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        
+        .guarantee { 
+            background: linear-gradient(135deg, #059669 0%, #065f46 100%); 
+            color: white; 
+            padding: 4rem 0; 
+            text-align: center; 
+        }
+        
+        .guarantee-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        @media (max-width: 768px) { 
+            .hero-content { 
+                grid-template-columns: 1fr; 
+                gap: 3rem; 
+                text-align: center;
+            }
+            
+            .cta-form {
+                padding: 2rem;
+            }
+            
+            .testimonials {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div>
+                    <h1 class="headline">Transforme Seu ${productType} em uma Máquina de Vendas</h1>
+                    <p class="subheadline">Sistema Comprovado que Já Gerou Mais de R$ 50 Milhões para Nossos Clientes</p>
+                    
+                    <div class="benefits-preview">
+                        <div class="benefit-item">Aumento médio de 340% nas vendas em 90 dias</div>
+                        <div class="benefit-item">Sistema 100% automatizado e escalável</div>
+                        <div class="benefit-item">ROI garantido ou dinheiro de volta</div>
+                        <div class="benefit-item">Implementação assistida por especialistas</div>
+                    </div>
+                </div>
+                
+                <form class="cta-form" id="leadForm" action="/api/leads/capture" method="POST">
+                    <h3 class="form-title">Acesso Exclusivo Gratuito</h3>
+                    <p class="form-subtitle">Descubra como implementar em seu negócio</p>
+                    
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="name" placeholder="Seu nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" name="email" placeholder="Seu melhor email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-control" name="phone" placeholder="WhatsApp (opcional)">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control" name="business_stage" required>
+                            <option value="">Estágio do seu negócio</option>
+                            <option value="iniciante">Iniciante (0-10k/mês)</option>
+                            <option value="intermediario">Intermediário (10-50k/mês)</option>
+                            <option value="avancado">Avançado (50k+/mês)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">
+                        QUERO ACESSO GRATUITO AGORA
+                    </button>
+                    
+                    <div class="trust-indicators">
+                        <span>✓ 100% Gratuito</span>
+                        <span>✓ Sem Spam</span>
+                        <span>✓ Cancele Quando Quiser</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="social-proof">
+        <div class="container">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: #1f2937;">Resultados Reais de Clientes</h2>
+            <p style="font-size: 1.2rem; color: #6b7280; margin-bottom: 3rem;">Veja como nossos clientes transformaram seus negócios</p>
+            
+            <div class="testimonials">
+                <div class="testimonial">
+                    <div class="testimonial-text">"Em 90 dias, saí de R$ 15k para R$ 85k por mês. O sistema realmente funciona e a implementação foi muito mais fácil do que imaginei."</div>
+                    <div class="testimonial-author">- Maria Santos, Consultora Digital</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-text">"Meu ROI foi de 420% no primeiro ano. Melhor investimento que já fiz para meu negócio. Agora tenho um sistema que vende 24/7."</div>
+                    <div class="testimonial-author">- João Silva, Coach Empresarial</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-text">"Automatizei completamente meu funil de vendas. Hoje tenho mais tempo para focar na estratégia enquanto o sistema vende sozinho."</div>
+                    <div class="testimonial-author">- Ana Costa, Infoprodutora</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="results-section">
+        <div class="container">
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Números que Comprovam a Eficácia</h2>
+            <p style="font-size: 1.2rem; opacity: 0.9;">Dados reais dos nossos clientes nos últimos 12 meses</p>
+            
+            <div class="results-grid">
+                <div class="result-item">
+                    <span class="result-number">340%</span>
+                    <div class="result-label">Aumento médio nas vendas</div>
+                </div>
+                <div class="result-item">
+                    <span class="result-number">R$ 50M</span>
+                    <div class="result-label">Gerado pelos clientes</div>
+                </div>
+                <div class="result-item">
+                    <span class="result-number">2.847</span>
+                    <div class="result-label">Empresários transformados</div>
+                </div>
+                <div class="result-item">
+                    <span class="result-number">90 dias</span>
+                    <div class="result-label">Tempo médio para resultados</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="guarantee">
+        <div class="container">
+            <div class="guarantee-badge">Garantia Incondicional</div>
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">30 Dias de Garantia Total</h2>
+            <p style="font-size: 1.3rem; opacity: 0.95; max-width: 600px; margin: 0 auto;">
+                Se você não conseguir pelo menos 200% de aumento nas suas vendas em 90 dias, 
+                devolvemos 100% do seu investimento sem perguntas.
+            </p>
+        </div>
+    </section>
+
+    <script>
+        // Form tracking and validation
+        document.getElementById('leadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Track conversion
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'Lead');
+            }
+            
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'generate_lead', {
+                    'currency': 'BRL',
+                    'value': 1997
+                });
+            }
+            
+            // Submit form data
+            const formData = new FormData(this);
+            
+            fetch('/api/leads/capture', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/obrigado';
+                } else {
+                    alert('Erro ao processar. Tente novamente.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao processar. Tente novamente.');
+            });
+        });
+        
+        // Scroll tracking
+        let scrollTracked = false;
+        window.addEventListener('scroll', function() {
+            if (!scrollTracked && window.scrollY > window.innerHeight * 0.5) {
+                scrollTracked = true;
+                if (typeof fbq !== 'undefined') {
+                    fbq('track', 'ViewContent');
+                }
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'scroll', {
+                        'percent_scrolled': 50
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>`;
+  }
+
+  function calculatePackageSize(files: Record<string, string>): string {
+    let totalSize = 0;
+    Object.values(files).forEach(content => {
+      totalSize += new Blob([content]).size;
+    });
+    
+    const sizeInMB = totalSize / (1024 * 1024);
+    return `${sizeInMB.toFixed(1)} MB`;
+  }
 
   const httpServer = createServer(app);
   return httpServer;

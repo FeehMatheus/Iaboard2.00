@@ -8,6 +8,7 @@ import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import AIDashboard from "@/pages/ai-dashboard";
 import Home from "@/pages/home";
+import CanvasPage from "@/pages/canvas";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
       </Route>
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/ai" component={AIDashboard} />
+      <Route path="/canvas" component={CanvasPage} />
       <Route path="/funnel" component={Home} />
       <Route component={NotFound} />
     </Switch>
