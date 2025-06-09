@@ -140,26 +140,28 @@ export default function Landing() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 p-6">
-        <nav className="glass-effect rounded-2xl p-4 max-w-7xl mx-auto">
+      <header className="relative z-10 p-4 md:p-6">
+        <nav className="glass-effect rounded-2xl p-3 md:p-4 max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <Logo size="md" />
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-3">
               <Button 
                 onClick={() => setIsLoginOpen(true)}
                 variant="ghost" 
-                className="glass-effect hover:bg-white/20 transition-all duration-300 text-white border-white/20"
+                size="sm"
+                className="glass-effect hover:bg-white/20 transition-all duration-300 text-white border border-white/20 px-4 py-2 h-auto rounded-lg text-sm font-medium"
               >
-                <LogIn className="w-4 h-4 mr-2" />
+                <LogIn className="w-4 h-4 mr-1.5" />
                 Entrar
               </Button>
               
               <Button 
                 onClick={() => setIsRegisterOpen(true)}
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-xl transition-all duration-300"
+                size="sm"
+                className="bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white font-semibold px-4 py-2 h-auto rounded-lg text-sm transition-all duration-300 shadow-lg"
               >
-                <UserPlus className="w-4 h-4 mr-2" />
+                <UserPlus className="w-4 h-4 mr-1.5" />
                 Criar Conta
               </Button>
             </div>
