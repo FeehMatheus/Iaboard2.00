@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Monitor, Package, Users, BrainCircuit, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import SequentialWorkflowModal from './SequentialWorkflowModal';
 
 interface ProductTypeModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface ProductTypeModalProps {
 
 export default function ProductTypeModal({ isOpen, onClose, onConfirm }: ProductTypeModalProps) {
   const [selectedType, setSelectedType] = useState<string>('');
+  const [showWorkflow, setShowWorkflow] = useState(false);
 
   const productTypes = [
     {

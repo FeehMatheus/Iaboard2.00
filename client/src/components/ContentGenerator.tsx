@@ -40,7 +40,7 @@ export default function ContentGenerator({ productType = '' }: ContentGeneratorP
   const handleInputChange = (tab: string, field: string, value: string | number) => {
     setInputs(prev => ({
       ...prev,
-      [tab]: { ...prev[tab], [field]: value }
+      [tab]: { ...prev[tab as keyof typeof prev], [field]: value }
     }));
   };
 
