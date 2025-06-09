@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Monitor, Package, Users, BrainCircuit, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import SequentialWorkflowModal from './SequentialWorkflowModal';
+import OptimizedWorkflowModal from './OptimizedWorkflowModal';
 
 interface ProductTypeModalProps {
   isOpen: boolean;
@@ -119,7 +119,7 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
         </div>
       </DialogContent>
 
-      <SequentialWorkflowModal
+      <OptimizedWorkflowModal
         isOpen={showWorkflow}
         onClose={() => setShowWorkflow(false)}
         onComplete={handleWorkflowComplete}

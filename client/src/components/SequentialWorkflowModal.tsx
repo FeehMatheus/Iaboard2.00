@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Brain, Target, Rocket, Users, TrendingUp, FileText, Video, Mail, Download, CheckCircle } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 
 interface WorkflowStep {
   id: number;
@@ -28,9 +29,10 @@ export default function SequentialWorkflowModal({
   productType 
 }: SequentialWorkflowModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [workflowData, setWorkflowData] = useState<any>({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingSpeed, setProcessingSpeed] = useState(800); // Otimizado para fluidez
 
   // Define the workflow steps with specific positions for the requested layout
   const steps: WorkflowStep[] = [
@@ -134,17 +136,17 @@ export default function SequentialWorkflowModal({
     }
   }, [isOpen]);
 
-  const startWorkflow = async () => {
+  const startWorkflow = useCallback(async () => {
     setIsProcessing(true);
     
-    // Process each step sequentially with realistic timing
+    // Process steps with optimized timing for better UX
     for (let i = 0; i < workflowSteps.length; i++) {
       await processStep(i + 1);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Pause between steps
+      await new Promise(resolve => setTimeout(resolve, processingSpeed));
     }
     
     setIsProcessing(false);
-  };
+  }, [workflowSteps.length, processingSpeed]);
 
   const processStep = async (stepId: number) => {
     setCurrentStep(stepId);
@@ -168,7 +170,7 @@ export default function SequentialWorkflowModal({
     }));
 
     // Mark step as completed
-    setCompletedSteps(prev => new Set([...prev, stepId]));
+    setCompletedSteps(prev => [...prev, stepId]);
     setWorkflowSteps(prev => 
       prev.map(step => 
         step.id === stepId 
@@ -257,7 +259,7 @@ export default function SequentialWorkflowModal({
   };
 
   const getStepStatus = (stepId: number) => {
-    if (completedSteps.has(stepId)) return 'completed';
+    if (completedSteps.includes(stepId)) return 'completed';
     if (currentStep === stepId) return 'active';
     return 'pending';
   };
