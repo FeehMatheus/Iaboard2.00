@@ -51,13 +51,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 border-0 max-w-none">
-        <div className="relative">
+      <DialogContent className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 border-0 max-w-none overflow-y-auto">
+        <div className="relative w-full max-w-md mx-auto my-8">
           {/* Background Effects */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-indigo-500/20 to-blue-500/20 rounded-3xl blur-xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-indigo-500/20 to-blue-500/20 rounded-3xl blur-xl transform scale-110"></div>
           <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-3xl"></div>
           
-          <div className="relative glass-effect rounded-3xl max-w-md w-full p-8 border border-white/20 shadow-2xl">
+          <div className="relative glass-effect rounded-3xl w-full p-8 border border-white/20 shadow-2xl">
             <DialogHeader className="text-center mb-8">
               <div className="relative w-24 h-24 mx-auto mb-6">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-700 rounded-2xl shadow-2xl transform -rotate-3 animate-pulse"></div>
