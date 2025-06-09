@@ -52,7 +52,7 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black/50 backdrop-blur-sm z-50 p-0 border-0">
+      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black/50 backdrop-blur-sm z-50 p-0 border-0 scrollbar-hide">
         <div className="glass-effect rounded-3xl w-full p-8 animate-slide-up">
           <div className="text-center mb-8">
             <div className="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">

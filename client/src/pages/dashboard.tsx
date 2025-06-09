@@ -9,10 +9,14 @@ import { apiRequest } from "@/lib/queryClient";
 import type { Tool, Funnel } from "@shared/schema";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import Logo from "@/components/Logo";
+import ProductTypeModal from "@/components/ProductTypeModal";
+import FunnelGenerator from "@/components/FunnelGenerator";
 
 export default function Dashboard() {
   const { user, logout, isLoading } = useAuth();
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [showFunnelGenerator, setShowFunnelGenerator] = useState(false);
 
   const { data: tools = [] } = useQuery<Tool[]>({
     queryKey: ['/api/tools'],
