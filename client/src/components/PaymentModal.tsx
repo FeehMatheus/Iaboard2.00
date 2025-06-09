@@ -69,8 +69,8 @@ export default function PaymentModal({ isOpen, onClose, selectedPlan }: PaymentM
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 border-0 max-w-none">
-        <div className="relative w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto">
+      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-lg max-h-[90vh] overflow-y-auto bg-black/80 backdrop-blur-md z-50 p-0 border-0">
+        <div className="relative w-full max-w-lg mx-auto">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-blue-500/20 to-purple-500/20 rounded-3xl blur-xl transform scale-110"></div>
           <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-3xl"></div>
