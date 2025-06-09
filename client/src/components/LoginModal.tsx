@@ -42,7 +42,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }: Logi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md max-h-[90vh] overflow-y-auto bg-black/80 backdrop-blur-md z-50 p-0 border-0">
+      <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md max-h-[90vh] overflow-y-auto bg-black/80 backdrop-blur-md z-50 p-0 border-0 scrollbar-hide">
         <div className="relative w-full max-w-md mx-auto">
           {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-blue-500/20 rounded-3xl blur-xl transform scale-110"></div>

@@ -65,8 +65,7 @@ export default function Dashboard() {
 
   const handleToolSelect = (tool: Tool) => {
     if (tool.name === "IA Board V2 - Criador de Funis") {
-      // Navigate to funnel creator
-      window.location.href = '/funnel';
+      setShowProductModal(true);
     } else {
       setSelectedTool(tool);
       // Implement tool-specific functionality based on tool type
@@ -87,6 +86,17 @@ export default function Dashboard() {
           console.log(`Launching ${tool.name}...`);
       }
     }
+  };
+
+  const handleProductTypeConfirm = (productType: string) => {
+    setShowProductModal(false);
+    setShowFunnelGenerator(true);
+  };
+
+  const handleFunnelComplete = (funnel: any) => {
+    setShowFunnelGenerator(false);
+    // Handle funnel completion
+    console.log("Funnel completed:", funnel);
   };
 
   const handleCreateNewFunnel = () => {
@@ -366,6 +376,19 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {/* Modal Components */}
+      <ProductTypeModal
+        isOpen={showProductModal}
+        onClose={() => setShowProductModal(false)}
+        onConfirm={handleProductTypeConfirm}
+      />
+
+      <FunnelGenerator
+        isOpen={showFunnelGenerator}
+        onClose={() => setShowFunnelGenerator(false)}
+        onComplete={handleFunnelComplete}
+      />
     </div>
   );
 }
