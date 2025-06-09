@@ -211,30 +211,22 @@ export default function Dashboard() {
             com o poder da inteligência artificial.
           </p>
           
-          {/* Quick Action Bar */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {/* Main Action Buttons */}
+          <div className="flex flex-wrap justify-center gap-8 mb-12">
             <Button 
               onClick={() => setShowProductModal(true)}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-12 py-6 rounded-xl font-bold text-lg shadow-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-300"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-6 h-6" />
               Criar Novo Produto
             </Button>
             
             <Button 
-              onClick={() => window.location.href = '/canvas'}
-              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
+              onClick={() => window.location.href = '/canvas?mode=powerful-ai'}
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-12 py-6 rounded-xl font-bold text-lg shadow-2xl flex items-center gap-3 transform hover:scale-105 transition-all duration-300"
             >
-              <Grid3x3 className="w-5 h-5" />
-              Canvas Infinito
-            </Button>
-            
-            <Button 
-              onClick={handleCreateNewFunnel}
-              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center gap-2"
-            >
-              <TrendingUp className="w-5 h-5" />
-              Funil Tradicional
+              <Zap className="w-6 h-6" />
+              IA Pensamento Poderoso
             </Button>
           </div>
         </div>

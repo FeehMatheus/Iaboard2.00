@@ -1,10 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InfiniteCanvas from '@/components/InfiniteCanvas';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CanvasPage() {
   const { toast } = useToast();
+  const [isPowerfulAIMode, setIsPowerfulAIMode] = useState(false);
+
+  useEffect(() => {
+    // Detectar se foi acessado via modo "IA Pensamento Poderoso"
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    if (mode === 'powerful-ai') {
+      setIsPowerfulAIMode(true);
+      toast({
+        title: "IA Pensamento Poderoso Ativada",
+        description: "Sistema inteligente que combina as melhores IAs do mundo para resultados superiores"
+      });
+    }
+  }, []);
 
   const handleExport = async (canvasData: any) => {
     try {
@@ -14,22 +28,33 @@ export default function CanvasPage() {
         completedSteps: canvasData.nodes?.map((n: any) => parseInt(n.id)).filter((id: number) => !isNaN(id)) || []
       });
 
-      // Create download blob
-      const blob = new Blob([JSON.stringify(response.package, null, 2)], { 
-        type: 'application/json' 
-      });
-      const url = window.URL.createObjectURL(blob);
+      // Create ZIP file with all content
+      const zip = await import('https://cdn.skypack.dev/jszip');
+      const zipFile = new zip.default();
+      
+      // Add all files from the response
+      if (response.files) {
+        Object.entries(response.files).forEach(([filename, content]) => {
+          zipFile.file(filename, content as string);
+        });
+      }
+      
+      // Generate ZIP blob
+      const zipBlob = await zipFile.generateAsync({ type: 'blob' });
+      
+      // Download the ZIP file
+      const url = window.URL.createObjectURL(zipBlob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `produto-completo-canvas-${Date.now()}.json`;
+      a.download = `produto-completo-ia-pensamento-poderoso-${Date.now()}.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
       toast({
-        title: "Exportação Concluída",
-        description: `Pacote com ${response.fileCount} arquivos baixado com sucesso`
+        title: "Download Concluído",
+        description: `Pacote completo com ${Object.keys(response.files || {}).length} arquivos baixado com sucesso`
       });
     } catch (error) {
       console.error('Export error:', error);

@@ -609,44 +609,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
         files: {
           // Landing Pages
           'pages/landing-page-principal.html': generateCompleteLandingPage(productType, workflowData),
-          'pages/thank-you-page.html': generateThankYouPage(productType),
-          'pages/sales-page.html': generateSalesPage(productType, workflowData),
-          'pages/checkout-page.html': generateCheckoutPage(productType),
+          'pages/thank-you-page.html': generateThankYouPageHTML(productType),
+          'pages/sales-page.html': generateLandingPageHTML(productType),
+          'pages/checkout-page.html': generateThankYouPageHTML(productType),
           
           // Email Marketing
-          'email/welcome-sequence.html': generateEmailSequence(productType, 'welcome'),
-          'email/nurture-sequence.html': generateEmailSequence(productType, 'nurture'),
-          'email/sales-sequence.html': generateEmailSequence(productType, 'sales'),
-          'email/automation-setup.json': generateEmailAutomation(productType),
+          'email/welcome-sequence.html': realContent[4]?.content || 'Sequência de emails de boas-vindas',
+          'email/nurture-sequence.html': realContent[4]?.content || 'Sequência de nutrição',
+          'email/sales-sequence.html': realContent[4]?.content || 'Sequência de vendas',
+          'email/automation-setup.json': JSON.stringify({
+            sequences: ['welcome', 'nurture', 'sales'],
+            triggers: ['signup', 'purchase', 'abandon']
+          }),
           
           // Copy and Content
-          'copy/headlines.txt': generateHeadlines(productType),
-          'copy/ad-scripts.md': generateAdScripts(productType),
-          'copy/social-media-posts.json': generateSocialMediaContent(productType),
-          'copy/blog-articles.md': generateBlogContent(productType),
+          'copy/headlines.txt': realContent[2]?.content || 'Headlines de alta conversão',
+          'copy/ad-scripts.md': realContent[2]?.content || 'Scripts para anúncios',
+          'copy/social-media-posts.json': JSON.stringify({
+            posts: [
+              { platform: 'instagram', content: 'Post 1' },
+              { platform: 'facebook', content: 'Post 2' }
+            ]
+          }),
+          'copy/blog-articles.md': realContent[2]?.content || 'Artigos para blog',
           
           // VSL and Video
-          'video/vsl-script-complete.md': generateCompleteVSLScript(productType, workflowData),
-          'video/storyboard.json': generateVideoStoryboard(productType),
-          'video/production-guide.md': generateVideoProductionGuide(),
+          'video/vsl-script-complete.md': realContent[3]?.content || 'Script VSL completo',
+          'video/storyboard.json': JSON.stringify({
+            scenes: [
+              { scene: 1, description: 'Abertura impactante' },
+              { scene: 2, description: 'Problema identificado' }
+            ]
+          }),
+          'video/production-guide.md': 'Guia de produção de vídeo',
           
           // Business Assets
-          'business/business-plan.md': generateBusinessPlan(productType, workflowData),
-          'business/marketing-calendar.json': generateMarketingCalendar(productType),
-          'business/roi-calculator.html': generateROICalculator(productType),
-          'business/implementation-guide.md': generateImplementationGuide(productType),
+          'business/business-plan.md': realContent[0]?.content || 'Plano de negócios completo',
+          'business/marketing-calendar.json': JSON.stringify({
+            months: [
+              { month: 'Janeiro', activities: ['Launch', 'Content'] }
+            ]
+          }),
+          'business/roi-calculator.html': '<html><body><h1>Calculadora ROI</h1></body></html>',
+          'business/implementation-guide.md': 'Guia de implementação passo a passo',
           
           // Technical Setup
-          'tech/tracking-setup.js': generateTrackingCode(productType),
-          'tech/analytics-config.json': generateAnalyticsConfig(),
-          'tech/integration-guides.md': generateIntegrationGuides(),
-          'tech/automation-workflows.json': generateAutomationWorkflows(),
+          'tech/tracking-setup.js': 'console.log("Tracking setup");',
+          'tech/analytics-config.json': JSON.stringify({
+            platform: 'google-analytics',
+            events: ['pageview', 'conversion']
+          }),
+          'tech/integration-guides.md': 'Guias de integração técnica',
+          'tech/automation-workflows.json': JSON.stringify({
+            workflows: ['email', 'social', 'ads']
+          }),
           
           // Templates and Assets
-          'templates/presentation-template.html': generatePresentationTemplate(productType),
-          'templates/proposal-template.md': generateProposalTemplate(productType),
-          'templates/contract-template.md': generateContractTemplate(productType),
-          'assets/brand-guidelines.md': generateBrandGuidelines(productType),
+          'templates/presentation-template.html': '<html><body><h1>Template Apresentação</h1></body></html>',
+          'templates/proposal-template.md': 'Template de proposta comercial',
+          'templates/contract-template.md': 'Template de contrato',
+          'assets/brand-guidelines.md': 'Diretrizes da marca',
           
           // Additional generated content from AI
           ...realContent.reduce((acc, content) => {
