@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { AIFunnelGenerator, ContentGenerator } from "./ai-services";
 import { insertFunnelSchema, insertAIGenerationSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -126,7 +127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create a new funnel
+  // Create a new funnel with AI generation
   app.post("/api/funnels", requireAuth, async (req: any, res) => {
     try {
       const data = insertFunnelSchema.parse({ ...req.body, userId: req.session.userId });
@@ -134,6 +135,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(funnel);
     } catch (error: any) {
       res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Generate funnel with AI
+  app.post("/api/funnels/generate", requireAuth, async (req: any, res) => {
+    try {
+      const { productType, targetAudience, mainGoal, budget, timeline } = req.body;
+      
+      // Generate funnel using AI
+      const generatedFunnel = await AIFunnelGenerator.generateFunnel({
+        productType,
+        targetAudience,
+        mainGoal,
+        budget,
+        timeline
+      });
+
+      // Save to database
+      const newFunnel = await storage.createFunnel({
+        userId: req.session.userId,
+        title: generatedFunnel.title,
+        description: generatedFunnel.description,
+        productType,
+        targetAudience,
+        currentStep: 1,
+        stepData: generatedFunnel.steps,
+        isCompleted: false
+      });
+
+      // Log AI generation
+      await storage.createAIGeneration({
+        funnelId: newFunnel.id,
+        stepNumber: 0,
+        provider: 'openai',
+        prompt: `Generate funnel for ${productType}`,
+        response: JSON.stringify(generatedFunnel),
+        tokensUsed: 2000
+      });
+
+      res.json({ funnel: newFunnel, generatedContent: generatedFunnel });
+    } catch (error: any) {
+      console.error('Funnel generation error:', error);
+      res.status(500).json({ message: "Error generating funnel", error: error.message });
+    }
+  });
+
+  // Generate specific content with AI
+  app.post("/api/ai/generate-copy", requireAuth, async (req: any, res) => {
+    try {
+      const { type, context } = req.body;
+      const generatedCopy = await AIFunnelGenerator.generateCopy(type, context);
+      
+      res.json({ content: generatedCopy });
+    } catch (error: any) {
+      console.error('Copy generation error:', error);
+      res.status(500).json({ message: "Error generating copy", error: error.message });
+    }
+  });
+
+  // Competitor analysis
+  app.post("/api/ai/analyze-competitor", requireAuth, async (req: any, res) => {
+    try {
+      const { competitorUrl, productType } = req.body;
+      const analysis = await AIFunnelGenerator.analyzeCompetitor(competitorUrl, productType);
+      
+      res.json(analysis);
+    } catch (error: any) {
+      console.error('Competitor analysis error:', error);
+      res.status(500).json({ message: "Error analyzing competitor", error: error.message });
+    }
+  });
+
+  // Generate VSL
+  app.post("/api/ai/generate-vsl", requireAuth, async (req: any, res) => {
+    try {
+      const { productInfo, duration } = req.body;
+      const vsl = await AIFunnelGenerator.generateVSL(productInfo, duration);
+      
+      res.json(vsl);
+    } catch (error: any) {
+      console.error('VSL generation error:', error);
+      res.status(500).json({ message: "Error generating VSL", error: error.message });
+    }
+  });
+
+  // Generate landing page
+  app.post("/api/ai/generate-landing", requireAuth, async (req: any, res) => {
+    try {
+      const { productInfo } = req.body;
+      const landingPage = await ContentGenerator.generateLandingPage(productInfo);
+      
+      res.json({ html: landingPage });
+    } catch (error: any) {
+      console.error('Landing page generation error:', error);
+      res.status(500).json({ message: "Error generating landing page", error: error.message });
+    }
+  });
+
+  // Generate email sequence
+  app.post("/api/ai/generate-emails", requireAuth, async (req: any, res) => {
+    try {
+      const { productInfo, sequenceLength } = req.body;
+      const emails = await ContentGenerator.generateEmailSequence(productInfo, sequenceLength);
+      
+      res.json({ emails });
+    } catch (error: any) {
+      console.error('Email generation error:', error);
+      res.status(500).json({ message: "Error generating emails", error: error.message });
+    }
+  });
+
+  // Download funnel as HTML/PDF
+  app.get("/api/funnels/:id/download/:format", requireAuth, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const format = req.params.format;
+      
+      const funnel = await storage.getFunnel(id);
+      if (!funnel || funnel.userId !== req.session.userId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      if (format === 'html') {
+        const htmlContent = await ContentGenerator.generateLandingPage(
+          `${funnel.title}: ${funnel.description}`
+        );
+        
+        res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Content-Disposition', `attachment; filename="${funnel.title}-funnel.html"`);
+        res.send(htmlContent);
+      } else {
+        res.status(400).json({ message: "Unsupported format" });
+      }
+    } catch (error: any) {
+      console.error('Download error:', error);
+      res.status(500).json({ message: "Error generating download", error: error.message });
     }
   });
 

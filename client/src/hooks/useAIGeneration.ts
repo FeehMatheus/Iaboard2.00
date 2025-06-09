@@ -46,14 +46,12 @@ export function useAIGeneration() {
       productType: string;
       previousSteps: any;
     }) => {
-      const aiProvider = selectBestAIProvider(step);
-      const response = await apiRequest('POST', '/api/ai/generate', {
-        step,
-        funnelId,
+      const response = await apiRequest('POST', '/api/funnels/generate', {
         productType,
-        previousSteps,
-        aiProvider,
-        prompt: `Generate content for step ${step}`
+        targetAudience: 'Público interessado em ' + productType,
+        mainGoal: 'Aumentar vendas e conversões',
+        budget: 'R$ 5.000 - R$ 20.000',
+        timeline: '30 dias'
       });
       return response.json();
     },
