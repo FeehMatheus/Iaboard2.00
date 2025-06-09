@@ -50,10 +50,9 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
     }
   };
 
-  const handleAIDecide = () => {
-    // Auto-select a product type and immediately start generation
-    const aiSelectedType = 'produto-digital'; // AI chooses digital product as default
-    onConfirm(aiSelectedType);
+  const handleAIDecide = async () => {
+    // Let AI research and decide the best product type based on market analysis
+    onConfirm('ai-decide');
     onClose();
   };
 
