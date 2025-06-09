@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import type { User } from '@shared/schema';
 
@@ -16,23 +16,53 @@ interface RegisterData {
   lastName: string;
 }
 
-export function useAuth() {
-  const queryClient = useQueryClient();
+let authCache: { user: User | null; lastChecked: number } = { user: null, lastChecked: 0 };
 
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['/api/auth/user'],
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+export function useAuth() {
+  const [user, setUser] = useState<User | null>(authCache.user);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const now = Date.now();
+      // Only check auth if cache is older than 30 seconds
+      if (now - authCache.lastChecked < 30000) {
+        setUser(authCache.user);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/auth/user');
+        if (response.ok) {
+          const userData = await response.json();
+          authCache = { user: userData, lastChecked: now };
+          setUser(userData);
+        } else {
+          authCache = { user: null, lastChecked: now };
+          setUser(null);
+        }
+      } catch (err) {
+        authCache = { user: null, lastChecked: now };
+        setUser(null);
+        setError(err as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const loginMutation = useMutation({
     mutationFn: async (loginData: LoginData) => {
       const response = await apiRequest('POST', '/api/auth/login', loginData);
       return response.json();
     },
-    onSuccess: (user) => {
-      queryClient.setQueryData(['/api/auth/user'], user);
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    onSuccess: (userData) => {
+      authCache = { user: userData, lastChecked: Date.now() };
+      setUser(userData);
     },
   });
 
@@ -41,9 +71,9 @@ export function useAuth() {
       const response = await apiRequest('POST', '/api/auth/register', registerData);
       return response.json();
     },
-    onSuccess: (user) => {
-      queryClient.setQueryData(['/api/auth/user'], user);
-      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    onSuccess: (userData) => {
+      authCache = { user: userData, lastChecked: Date.now() };
+      setUser(userData);
     },
   });
 
@@ -52,13 +82,13 @@ export function useAuth() {
       await apiRequest('POST', '/api/auth/logout', {});
     },
     onSuccess: () => {
-      queryClient.setQueryData(['/api/auth/user'], null);
-      queryClient.clear();
+      authCache = { user: null, lastChecked: Date.now() };
+      setUser(null);
     },
   });
 
   return {
-    user: user as User | null,
+    user,
     isLoading,
     isAuthenticated: !!user,
     error,
