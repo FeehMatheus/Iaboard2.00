@@ -24,9 +24,10 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        {isAuthenticated ? <Dashboard /> : <Landing />}
+        {isAuthenticated ? <AIDashboard /> : <Landing />}
       </Route>
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/ai" component={AIDashboard} />
       <Route path="/funnel" component={Home} />
       <Route component={NotFound} />
     </Switch>
