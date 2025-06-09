@@ -50,6 +50,13 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
     }
   };
 
+  const handleAIDecide = () => {
+    // Auto-select a product type and immediately start generation
+    const aiSelectedType = 'produto-digital'; // AI chooses digital product as default
+    onConfirm(aiSelectedType);
+    onClose();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black/50 backdrop-blur-sm z-50 p-0 border-0 scrollbar-hide">
@@ -68,7 +75,13 @@ export default function ProductTypeModal({ isOpen, onClose, onConfirm }: Product
               return (
                 <button
                   key={product.type}
-                  onClick={() => setSelectedType(product.type)}
+                  onClick={() => {
+                    if (product.type === 'ai-decide') {
+                      handleAIDecide();
+                    } else {
+                      setSelectedType(product.type);
+                    }
+                  }}
                   className={`glass-dark hover:bg-white/15 transition-all duration-300 p-6 rounded-2xl text-left group ${
                     selectedType === product.type ? 'ring-2 ring-indigo-500' : ''
                   }`}

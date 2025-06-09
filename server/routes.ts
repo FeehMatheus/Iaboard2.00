@@ -265,17 +265,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      if (format === 'html') {
-        const htmlContent = await ContentGenerator.generateLandingPage(
-          `${funnel.title}: ${funnel.description}`
-        );
-        
-        res.setHeader('Content-Type', 'text/html');
-        res.setHeader('Content-Disposition', `attachment; filename="${funnel.title}-funnel.html"`);
-        res.send(htmlContent);
-      } else {
-        res.status(400).json({ message: "Unsupported format" });
+      let content = '';
+      let filename = `${funnel.name?.replace(/[^a-zA-Z0-9]/g, '_') || 'funnel'}.${format}`;
+      let contentType = 'text/plain';
+
+      switch (format) {
+        case 'html':
+          content = generateHTMLContent(funnel);
+          contentType = 'text/html';
+          break;
+        case 'pdf':
+          content = generatePDFContent(funnel);
+          contentType = 'text/plain';
+          filename = filename.replace('.pdf', '.txt');
+          break;
+        case 'json':
+          content = JSON.stringify(funnel, null, 2);
+          contentType = 'application/json';
+          break;
+        case 'txt':
+          content = generateTextContent(funnel);
+          contentType = 'text/plain';
+          break;
+        default:
+          return res.status(400).json({ message: "Unsupported format. Use: html, pdf, json, txt" });
       }
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(content);
     } catch (error: any) {
       console.error('Download error:', error);
       res.status(500).json({ message: "Error generating download", error: error.message });
@@ -411,4 +429,167 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+function generateHTMLContent(funnel: any): string {
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${funnel.name || 'Funil de Vendas'}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; background: #f8f9fa; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px; }
+        .step { margin: 30px 0; padding: 25px; border: 2px solid #e9ecef; border-radius: 12px; background: #fff; }
+        .step-title { color: #333; font-size: 1.8em; margin-bottom: 15px; font-weight: bold; }
+        .step-content { margin: 15px 0; line-height: 1.8; }
+        .cta { background: #007bff; color: white; padding: 15px 30px; border-radius: 8px; display: inline-block; text-decoration: none; font-weight: bold; margin: 10px 0; }
+        .design-info { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .recommendations { background: #e8f5e8; padding: 20px; border-radius: 10px; margin-top: 30px; }
+        .conversion { background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>${funnel.name || 'Funil de Vendas'}</h1>
+            <p><strong>Produto:</strong> ${funnel.productType || 'Não especificado'}</p>
+            <p><strong>Status:</strong> ${funnel.isCompleted ? 'Concluído' : 'Em desenvolvimento'}</p>
+            <p><strong>Criado em:</strong> ${new Date(funnel.createdAt || Date.now()).toLocaleDateString('pt-BR')}</p>
+        </div>
+        
+        <h2 style="color: #333; border-bottom: 3px solid #667eea; padding-bottom: 10px;">Estrutura do Funil</h2>
+        
+        ${funnel.generatedContent?.steps?.map((step: any) => `
+            <div class="step">
+                <h3 class="step-title">Etapa ${step.stepNumber}: ${step.title}</h3>
+                <p><strong>Descrição:</strong> ${step.description}</p>
+                <div class="step-content">
+                    <strong>Conteúdo:</strong><br>
+                    ${step.content.replace(/\n/g, '<br>')}
+                </div>
+                <div class="cta">${step.cta}</div>
+                <div class="design-info">
+                    <strong>Design:</strong><br>
+                    Layout: ${step.design?.layout || 'Padrão'}<br>
+                    Cores: ${step.design?.colors?.join(', ') || 'Não especificado'}<br>
+                    Elementos: ${step.design?.elements?.join(', ') || 'Não especificado'}
+                </div>
+            </div>
+        `).join('') || '<p>Nenhum conteúdo de etapas disponível</p>'}
+        
+        ${funnel.generatedContent?.estimatedConversion ? `
+            <div class="conversion">
+                <h3>Taxa de Conversão Estimada</h3>
+                <p style="font-size: 1.5em; font-weight: bold; color: #28a745;">${funnel.generatedContent.estimatedConversion}</p>
+            </div>
+        ` : ''}
+        
+        ${funnel.generatedContent?.recommendations?.length ? `
+            <div class="recommendations">
+                <h3 style="color: #155724;">Recomendações para Otimização</h3>
+                <ul>
+                    ${funnel.generatedContent.recommendations.map((rec: string) => `<li>${rec}</li>`).join('')}
+                </ul>
+            </div>
+        ` : ''}
+        
+        <div style="margin-top: 40px; text-align: center; color: #666; border-top: 1px solid #ddd; padding-top: 20px;">
+            <p>Relatório gerado pelo IA Board V2 em ${new Date().toLocaleString('pt-BR')}</p>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+function generatePDFContent(funnel: any): string {
+  return `RELATÓRIO COMPLETO DO FUNIL DE VENDAS
+${'='.repeat(50)}
+
+INFORMAÇÕES GERAIS
+${'-'.repeat(20)}
+Nome: ${funnel.name || 'Não especificado'}
+Produto/Serviço: ${funnel.productType || 'Não especificado'}
+Status: ${funnel.isCompleted ? 'Concluído' : 'Em desenvolvimento'}
+Data de criação: ${new Date(funnel.createdAt || Date.now()).toLocaleDateString('pt-BR')}
+Última atualização: ${new Date(funnel.updatedAt || Date.now()).toLocaleDateString('pt-BR')}
+
+DESCRIÇÃO DO FUNIL
+${'-'.repeat(20)}
+${funnel.generatedContent?.description || funnel.description || 'Descrição não disponível'}
+
+ESTRUTURA DETALHADA DO FUNIL
+${'-'.repeat(30)}
+${funnel.generatedContent?.steps?.map((step: any) => `
+ETAPA ${step.stepNumber}: ${step.title.toUpperCase()}
+${'~'.repeat(40)}
+
+Descrição da Etapa:
+${step.description}
+
+Conteúdo Detalhado:
+${step.content}
+
+Call-to-Action Principal:
+"${step.cta}"
+
+Especificações de Design:
+- Layout: ${step.design?.layout || 'Não especificado'}
+- Paleta de cores: ${step.design?.colors?.join(', ') || 'Não especificado'}
+- Elementos principais: ${step.design?.elements?.join(', ') || 'Não especificado'}
+
+${'_'.repeat(50)}
+`).join('') || 'Estrutura de etapas não disponível'}
+
+ANÁLISE DE PERFORMANCE
+${'-'.repeat(25)}
+Taxa de conversão estimada: ${funnel.generatedContent?.estimatedConversion || 'Não calculada'}
+
+RECOMENDAÇÕES ESTRATÉGICAS
+${'-'.repeat(30)}
+${funnel.generatedContent?.recommendations?.map((rec: string, index: number) => `${index + 1}. ${rec}`).join('\n\n') || 'Nenhuma recomendação disponível'}
+
+PRÓXIMOS PASSOS
+${'-'.repeat(18)}
+1. Implementar as etapas do funil conforme especificado
+2. Realizar testes A/B nos elementos principais
+3. Monitorar métricas de conversão
+4. Otimizar baseado nos resultados obtidos
+5. Expandir o funil com novas etapas se necessário
+
+${'='.repeat(50)}
+Relatório técnico gerado automaticamente pelo IA Board V2
+Data/Hora: ${new Date().toLocaleString('pt-BR')}
+${'='.repeat(50)}`;
+}
+
+function generateTextContent(funnel: any): string {
+  return `FUNIL: ${funnel.name || 'Sem nome'}
+
+INFORMAÇÕES BÁSICAS:
+- Produto: ${funnel.productType || 'Não especificado'}
+- Status: ${funnel.isCompleted ? 'Concluído' : 'Em desenvolvimento'}
+- Criado: ${new Date(funnel.createdAt || Date.now()).toLocaleDateString('pt-BR')}
+
+DESCRIÇÃO:
+${funnel.generatedContent?.description || funnel.description || 'Sem descrição'}
+
+ESTRUTURA DO FUNIL:
+${funnel.generatedContent?.steps?.map((step: any) => `
+${step.stepNumber}. ${step.title}
+   Descrição: ${step.description}
+   CTA: "${step.cta}"
+   Layout: ${step.design?.layout || 'Padrão'}
+`).join('') || 'Estrutura não disponível'}
+
+CONVERSÃO ESTIMADA: ${funnel.generatedContent?.estimatedConversion || 'Não calculada'}
+
+RECOMENDAÇÕES:
+${funnel.generatedContent?.recommendations?.map((rec: string, index: number) => `${index + 1}. ${rec}`).join('\n') || 'Nenhuma recomendação'}
+
+---
+Gerado em: ${new Date().toLocaleString('pt-BR')}
+IA Board V2`;
 }
