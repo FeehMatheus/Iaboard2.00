@@ -16,12 +16,6 @@ export default function Landing() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const { isAuthenticated } = useAuth();
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    window.location.href = '/dashboard';
-    return null;
-  }
-
   const plans = [
     {
       name: "Free",

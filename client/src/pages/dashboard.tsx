@@ -8,17 +8,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import type { Tool, Funnel } from "@shared/schema";
 import AnimatedBackground from "@/components/AnimatedBackground";
+import Logo from "@/components/Logo";
 
 export default function Dashboard() {
   const { user, logout, isLoading } = useAuth();
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
 
-  const { data: tools = [] } = useQuery({
+  const { data: tools = [] } = useQuery<Tool[]>({
     queryKey: ['/api/tools'],
     refetchOnWindowFocus: false,
   });
 
-  const { data: funnels = [] } = useQuery({
+  const { data: funnels = [] } = useQuery<Funnel[]>({
     queryKey: ['/api/funnels'],
     refetchOnWindowFocus: false,
   });
@@ -39,12 +40,13 @@ export default function Dashboard() {
   const getUserTools = () => {
     if (!user?.planLimits?.tools) return tools.filter((tool: Tool) => tool.planRequired === 'free');
     
-    if (user.planLimits.tools.includes('all')) {
+    const planTools = user.planLimits.tools as string[];
+    if (planTools.includes('all')) {
       return tools;
     }
     
     return tools.filter((tool: Tool) => 
-      user.planLimits.tools.includes(tool.name) || tool.planRequired === 'free'
+      planTools.includes(tool.name) || tool.planRequired === 'free'
     );
   };
 
@@ -54,8 +56,39 @@ export default function Dashboard() {
       window.location.href = '/funnel';
     } else {
       setSelectedTool(tool);
-      // Here you would implement tool-specific functionality
+      // Implement tool-specific functionality based on tool type
+      switch (tool.name) {
+        case "IA Espiã v2":
+          // Start competitor analysis
+          console.log("Starting IA Espiã v2 analysis...");
+          break;
+        case "VSL Automático":
+          // Start VSL creation
+          console.log("Starting VSL creation...");
+          break;
+        case "Copy Inteligente":
+          // Start copy generation
+          console.log("Starting copy generation...");
+          break;
+        default:
+          console.log(`Launching ${tool.name}...`);
+      }
     }
+  };
+
+  const handleCreateNewFunnel = () => {
+    // Navigate to funnel creation page
+    window.location.href = '/funnel';
+  };
+
+  const handleUpgradePlan = () => {
+    // Show upgrade modal or navigate to pricing
+    alert("Upgrade feature coming soon! Contact support for immediate upgrade.");
+  };
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/';
   };
 
   const getPlanBadgeColor = (plan: string) => {
@@ -102,7 +135,12 @@ export default function Dashboard() {
                       {user.plan?.toUpperCase() || 'FREE'}
                     </Badge>
                     {user.plan !== 'enterprise' && (
-                      <Button size="sm" variant="outline" className="text-xs h-6 px-2 text-indigo-400 border-indigo-400 hover:bg-indigo-400 hover:text-white">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-xs h-6 px-2 text-indigo-400 border-indigo-400 hover:bg-indigo-400 hover:text-white"
+                        onClick={handleUpgradePlan}
+                      >
                         <Crown className="w-3 h-3 mr-1" />
                         Upgrade
                       </Button>
