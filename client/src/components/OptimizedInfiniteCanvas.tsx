@@ -626,28 +626,64 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   };
 
   const renderConnections = () => {
-    return connections.map((connection, index) => {
+    const connectionPairs: Connection[] = [];
+    
+    nodes.forEach(node => {
+      node.connections.forEach(targetId => {
+        const targetNode = nodes.find(n => n.id === targetId);
+        if (targetNode) {
+          connectionPairs.push({
+            from: node.id,
+            to: targetId,
+            type: 'flow'
+          });
+        }
+      });
+    });
+
+    return connectionPairs.map((connection, index) => {
       const fromNode = nodes.find(n => n.id === connection.from);
       const toNode = nodes.find(n => n.id === connection.to);
       
       if (!fromNode || !toNode) return null;
 
-      const fromX = fromNode.x + (fromNode.width || 180) / 2;
-      const fromY = fromNode.y + (fromNode.height || 100);
-      const toX = toNode.x + (toNode.width || 180) / 2;
-      const toY = toNode.y;
+      // Use uniform node dimensions for connection points
+      const fromX = fromNode.x + 110; // Center of 220px width
+      const fromY = fromNode.y + 180; // Bottom of 180px height
+      const toX = toNode.x + 110;
+      const toY = toNode.y; // Top of target node
+
+      // Calculate curved path for professional appearance
+      const midX = (fromX + toX) / 2;
+      const curvature = Math.abs(toY - fromY) * 0.3;
 
       return (
-        <line
-          key={index}
-          x1={fromX}
-          y1={fromY}
-          x2={toX}
-          y2={toY}
-          stroke="#4f46e5"
-          strokeWidth="2"
-          markerEnd="url(#arrowhead)"
-        />
+        <g key={`${connection.from}-${connection.to}-${index}`}>
+          <defs>
+            <linearGradient id={`conn-gradient-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.9 }} />
+              <stop offset="50%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.8 }} />
+              <stop offset="100%" style={{ stopColor: '#06b6d4', stopOpacity: 0.7 }} />
+            </linearGradient>
+          </defs>
+          
+          {/* Animated connection path */}
+          <motion.path
+            d={`M ${fromX} ${fromY} Q ${midX} ${fromY + curvature} ${toX} ${toY}`}
+            stroke={`url(#conn-gradient-${index})`}
+            strokeWidth="3"
+            fill="none"
+            markerEnd="url(#arrowhead)"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ 
+              duration: 1.0, 
+              delay: index * 0.2,
+              ease: "easeInOut"
+            }}
+            className="drop-shadow-sm"
+          />
+        </g>
       );
     });
   };
@@ -747,14 +783,14 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
               <h3 className="text-sm font-semibold text-gray-600 mb-2">Exportação</h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => {if(onSave) onSave(); setShowSidebar(false);}}
+                  onClick={() => {if(onSave) onSave(nodes); setShowSidebar(false);}}
                   className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   <Save className="w-4 h-4 text-green-500" />
                   <span className="text-sm">Salvar Projeto</span>
                 </button>
                 <button
-                  onClick={() => {if(onExport) onExport(); setShowSidebar(false);}}
+                  onClick={() => {if(onExport) onExport(nodes); setShowSidebar(false);}}
                   className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   <Download className="w-4 h-4 text-purple-500" />
