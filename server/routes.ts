@@ -16,6 +16,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ROTAS DE USUÁRIO E AUTENTICAÇÃO
   // ================================
 
+  // Login de usuário
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email e senha são obrigatórios" });
+      }
+
+      // Simulação de autenticação (em produção, verificar hash da senha)
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ message: "Credenciais inválidas" });
+      }
+
+      // Retornar dados do usuário (sem senha)
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ 
+        success: true, 
+        user: userWithoutPassword,
+        message: "Login realizado com sucesso"
+      });
+    } catch (error) {
+      console.error("Error during login:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Registro de usuário
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { name, email, password, plan } = req.body;
+      
+      if (!name || !email || !password) {
+        return res.status(400).json({ message: "Todos os campos são obrigatórios" });
+      }
+
+      // Verificar se usuário já existe
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Usuário já cadastrado com este email" });
+      }
+
+      // Criar novo usuário
+      const newUser = await storage.createUser({
+        name,
+        email,
+        password, // Em produção, fazer hash da senha
+        plan: plan || 'pro',
+        subscriptionStatus: 'active',
+        furionCredits: plan === 'premium' ? 1000 : plan === 'pro' ? 500 : 100,
+      });
+
+      // Retornar dados do usuário (sem senha)
+      const { password: _, ...userWithoutPassword } = newUser;
+      res.json({ 
+        success: true, 
+        user: userWithoutPassword,
+        message: "Conta criada com sucesso"
+      });
+    } catch (error) {
+      console.error("Error during registration:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Obter dados do usuário atual
   app.get('/api/user', authenticateDemo, async (req: any, res) => {
     try {

@@ -3,9 +3,9 @@ import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import MaquinaMilionaria from '@/pages/MaquinaMilionaria';
+import LoginPage from '@/pages/LoginPage';
 import Dashboard from '@/pages/Dashboard';
 import FurionAI from '@/components/FurionAI';
-import { useAuth } from '@/hooks/useAuth';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,6 +18,8 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const [showFurion, setShowFurion] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard'>('home');
+  const [user, setUser] = useState<any>(null);
 
   const handleOpenFurion = () => {
     setShowFurion(true);
@@ -27,43 +29,55 @@ function AppContent() {
     setShowFurion(false);
   };
 
-  const handleAccessPlatform = () => {
-    window.location.href = '/dashboard';
+  const handleOpenLogin = () => {
+    setCurrentPage('login');
   };
 
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+  };
+
+  const handleLogin = (userData: any) => {
+    setUser(userData);
+    setCurrentPage('dashboard');
+  };
+
+  const handleAccessPlatform = () => {
+    if (user) {
+      setCurrentPage('dashboard');
+    } else {
+      setCurrentPage('login');
+    }
+  };
+
+  if (currentPage === 'login') {
+    return (
+      <div>
+        <LoginPage 
+          onLogin={handleLogin}
+          onBack={handleBackToHome}
+        />
+        <Toaster />
+      </div>
+    );
+  }
+
+  if (currentPage === 'dashboard') {
+    return (
+      <div>
+        <Dashboard />
+        <Toaster />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Switch>
-        <Route path="/">
-          <MaquinaMilionaria 
-            onOpenFurion={handleOpenFurion}
-            onAccessPlatform={handleAccessPlatform}
-          />
-        </Route>
-        
-        <Route path="/dashboard">
-          <Dashboard />
-        </Route>
-        
-        <Route>
-          <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                404 - Página não encontrada
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mb-8">
-                A página que você está procurando não existe.
-              </p>
-              <button
-                onClick={() => window.location.href = '/'}
-                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-3 rounded-lg font-semibold"
-              >
-                Voltar ao Início
-              </button>
-            </div>
-          </div>
-        </Route>
-      </Switch>
+    <div className="min-h-screen">
+      <MaquinaMilionaria 
+        onOpenFurion={handleOpenFurion}
+        onAccessPlatform={handleAccessPlatform}
+        onOpenLogin={handleOpenLogin}
+      />
 
       {/* Furion AI Modal */}
       {showFurion && (

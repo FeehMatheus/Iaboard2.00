@@ -6,9 +6,10 @@ import { motion } from 'framer-motion';
 interface MaquinaMilionariaProps {
   onOpenFurion: () => void;
   onAccessPlatform: () => void;
+  onOpenLogin: () => void;
 }
 
-export default function MaquinaMilionaria({ onOpenFurion, onAccessPlatform }: MaquinaMilionariaProps) {
+export default function MaquinaMilionaria({ onOpenFurion, onAccessPlatform, onOpenLogin }: MaquinaMilionariaProps) {
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   return (
@@ -117,6 +118,7 @@ export default function MaquinaMilionaria({ onOpenFurion, onAccessPlatform }: Ma
               </div>
               
               <Button 
+                onClick={onOpenLogin}
                 size="lg" 
                 className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-16 py-8 text-2xl font-bold rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-300"
               >
@@ -340,6 +342,7 @@ export default function MaquinaMilionaria({ onOpenFurion, onAccessPlatform }: Ma
             Por apenas <span className="font-bold">12X de R$309,96</span>
           </div>
           <Button 
+            onClick={onOpenLogin}
             size="lg" 
             className="bg-black hover:bg-gray-900 text-white px-16 py-6 text-xl font-bold rounded-xl"
           >
