@@ -1,151 +1,121 @@
-import { 
-  users, funnels, aiGenerations, tools, userAnalytics,
-  type User, type InsertUser, type UpsertUser, type Funnel, type InsertFunnel, 
-  type AIGeneration, type InsertAIGeneration, type Tool, type InsertTool,
-  type UserAnalytics, type InsertAnalytics
+import {
+  users,
+  projects,
+  furionSessions,
+  campaigns,
+  analytics,
+  payments,
+  type User,
+  type UpsertUser,
+  type Project,
+  type InsertProject,
+  type FurionSession,
+  type InsertFurionSession,
+  type Campaign,
+  type InsertCampaign,
+  type Analytics,
+  type InsertAnalytics,
+  type Payment,
+  type InsertPayment,
 } from "@shared/schema";
 
+// Interface completa para todas as operações do sistema
 export interface IStorage {
-  // User operations for authentication
+  // User operations
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
-  updateUserPlan(id: string, plan: string, subscriptionData: any): Promise<User>;
+  updateUserCredits(id: string, credits: number): Promise<User>;
   
-  // Funnel operations
-  createFunnel(funnel: InsertFunnel): Promise<Funnel>;
-  getFunnel(id: number): Promise<Funnel | undefined>;
-  getAllFunnels(): Promise<Funnel[]>;
-  getFunnelsByUser(userId: string): Promise<Funnel[]>;
-  updateFunnelStep(id: number, currentStep: number, stepData: any): Promise<Funnel>;
+  // Project operations
+  createProject(project: InsertProject): Promise<Project>;
+  getProject(id: number): Promise<Project | undefined>;
+  getUserProjects(userId: string): Promise<Project[]>;
+  updateProject(id: number, data: Partial<Project>): Promise<Project>;
+  updateProjectPhase(id: number, phase: number): Promise<Project>;
   
-  // AI Generation operations
-  createAIGeneration(generation: InsertAIGeneration): Promise<AIGeneration>;
-  getAIGenerationsByFunnel(funnelId: number): Promise<AIGeneration[]>;
+  // Furion operations
+  createFurionSession(session: InsertFurionSession): Promise<FurionSession>;
+  getUserFurionSessions(userId: string): Promise<FurionSession[]>;
+  getProjectFurionSessions(projectId: number): Promise<FurionSession[]>;
   
-  // Tool operations
-  getAllTools(): Promise<Tool[]>;
-  getToolsByCategory(category: string): Promise<Tool[]>;
-  createTool(tool: InsertTool): Promise<Tool>;
+  // Campaign operations
+  createCampaign(campaign: InsertCampaign): Promise<Campaign>;
+  getUserCampaigns(userId: string): Promise<Campaign[]>;
+  getProjectCampaigns(projectId: number): Promise<Campaign[]>;
+  updateCampaign(id: number, data: Partial<Campaign>): Promise<Campaign>;
   
   // Analytics operations
-  logUserAction(analytics: InsertAnalytics): Promise<UserAnalytics>;
-  getUserAnalytics(userId: string): Promise<UserAnalytics[]>;
+  logAnalytics(analytics: InsertAnalytics): Promise<Analytics>;
+  getUserAnalytics(userId: string): Promise<Analytics[]>;
+  getProjectAnalytics(projectId: number): Promise<Analytics[]>;
+  
+  // Payment operations
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getUserPayments(userId: string): Promise<Payment[]>;
+  updatePaymentStatus(id: number, status: string): Promise<Payment>;
 }
 
+// Implementação usando MemStorage para desenvolvimento
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private funnels: Map<number, Funnel>;
-  private aiGenerations: Map<number, AIGeneration>;
-  private tools: Map<number, Tool>;
-  private analytics: Map<number, UserAnalytics>;
-  private currentUserId: number;
-  private currentFunnelId: number;
-  private currentGenerationId: number;
-  private currentToolId: number;
-  private currentAnalyticsId: number;
+  private users: Map<string, User> = new Map();
+  private projects: Map<number, Project> = new Map();
+  private furionSessions: Map<number, FurionSession> = new Map();
+  private campaigns: Map<number, Campaign> = new Map();
+  private analytics: Map<number, Analytics> = new Map();
+  private payments: Map<number, Payment> = new Map();
+  
+  private currentProjectId = 1;
+  private currentFurionId = 1;
+  private currentCampaignId = 1;
+  private currentAnalyticsId = 1;
+  private currentPaymentId = 1;
 
   constructor() {
-    this.users = new Map();
-    this.funnels = new Map();
-    this.aiGenerations = new Map();
-    this.tools = new Map();
-    this.analytics = new Map();
-    this.currentUserId = 1;
-    this.currentFunnelId = 1;
-    this.currentGenerationId = 1;
-    this.currentToolId = 1;
-    this.currentAnalyticsId = 1;
-
-    // Initialize default tools and demo account
-    this.initializeDefaultTools();
-    this.createDemoAccount();
+    this.initializeDemo();
   }
 
-  private async initializeDefaultTools() {
-    const defaultTools: InsertTool[] = [
-      {
-        name: "IA Board V2 - Criador de Funis",
-        description: "Crie funis completos com 8 etapas usando múltiplas IAs",
-        icon: "Zap",
-        category: "funnel",
-        planRequired: "free"
+  private async initializeDemo() {
+    // Criando usuário demo para acesso direto
+    const demoUser: User = {
+      id: "demo-user",
+      email: "demo@maquinamilionaria.com",
+      firstName: "Usuário",
+      lastName: "Demo",
+      profileImageUrl: null,
+      plan: "premium",
+      subscriptionStatus: "active",
+      subscriptionData: {
+        planType: "premium",
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       },
-      {
-        name: "IA Espiã v2",
-        description: "Análise avançada de concorrentes e templates prontos",
-        icon: "Eye",
-        category: "spy",
-        planRequired: "starter"
-      },
-      {
-        name: "IA Vídeo Avançado",
-        description: "Geração de roteiros e estruturas de vídeo profissionais",
-        icon: "Video",
-        category: "video",
-        planRequired: "pro"
-      },
-      {
-        name: "IA Tráfego Master",
-        description: "Campanhas com segmentação comportamental avançada",
-        icon: "TrendingUp",
-        category: "traffic",
-        planRequired: "pro"
-      },
-      {
-        name: "IA Copy & Headlines",
-        description: "Copy de alta conversão baseado em dados reais",
-        icon: "FileText",
-        category: "copywriting",
-        planRequired: "starter"
-      },
-      {
-        name: "Gerenciador de Funis",
-        description: "Organização e gestão de múltiplos projetos",
-        icon: "Folder",
-        category: "management",
-        planRequired: "free"
-      }
-    ];
+      furionCredits: 100,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    this.users.set(demoUser.id, demoUser);
 
-    for (const tool of defaultTools) {
-      await this.createTool(tool);
-    }
-  }
-
-  private async createDemoAccount() {
-    try {
-      const bcrypt = await import('bcrypt');
-      const hashedPassword = await bcrypt.hash('demo123', 10);
-      
-      const demoUser: User = {
-        id: 'demo_user_001',
-        email: 'demo@iaboard.com',
-        firstName: 'Usuario',
-        lastName: 'Demo',
-        profileImageUrl: null,
-        username: 'demo_user',
-        password: hashedPassword,
-        plan: "pro",
-        subscriptionStatus: "active",
-        subscriptionId: "demo_subscription",
-        customerId: "demo_customer",
-        planLimits: {
-          funnels: -1,
-          aiGenerations: -1,
-          tools: ["all"]
-        },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      
-      this.users.set('demo_user_001', demoUser);
-      console.log('Demo account created: demo@iaboard.com / demo123');
-    } catch (error) {
-      console.error('Error creating demo account:', error);
-    }
+    // Criando projeto demo
+    const demoProject: Project = {
+      id: 1,
+      userId: "demo-user",
+      name: "Meu Primeiro Produto Digital",
+      type: "infoproduto",
+      phase: 1,
+      status: "active",
+      data: {
+        description: "Curso online sobre marketing digital",
+        targetAudience: "Empreendedores iniciantes",
+        priceRange: "R$ 197 - R$ 497",
+      },
+      furionResults: {},
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    this.projects.set(1, demoProject);
   }
 
   // User operations
@@ -153,219 +123,197 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email === email,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = `user_${this.currentUserId++}`;
-    const now = new Date();
-    const user: User = { 
-      id,
-      email: insertUser.email || null,
-      firstName: insertUser.firstName || null,
-      lastName: insertUser.lastName || null,
-      profileImageUrl: null,
-      username: insertUser.username || null,
-      password: insertUser.password || null,
-      plan: "free",
-      subscriptionStatus: "inactive",
-      subscriptionId: null,
-      customerId: null,
-      planLimits: {
-        funnels: 3,
-        aiGenerations: 50,
-        tools: ["IA Board V2 - Criador de Funis", "Gerenciador de Funis"]
-      },
-      createdAt: now,
-      updatedAt: now,
-    };
-    this.users.set(id, user);
-    return user;
+    return Array.from(this.users.values()).find(user => user.email === email);
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
     const existingUser = this.users.get(userData.id);
-    const now = new Date();
     
     if (existingUser) {
       const updatedUser: User = {
         ...existingUser,
         ...userData,
-        updatedAt: now,
+        updatedAt: new Date(),
       };
       this.users.set(userData.id, updatedUser);
       return updatedUser;
     } else {
       const newUser: User = {
-        id: userData.id,
-        email: userData.email || null,
-        firstName: userData.firstName || null,
-        lastName: userData.lastName || null,
-        profileImageUrl: userData.profileImageUrl || null,
-        username: null,
-        password: null,
-        plan: "free",
-        subscriptionStatus: "inactive",
-        subscriptionId: null,
-        customerId: null,
-        planLimits: {
-          funnels: 3,
-          aiGenerations: 50,
-          tools: ["IA Board V2 - Criador de Funis", "Gerenciador de Funis"]
-        },
-        createdAt: now,
-        updatedAt: now,
+        ...userData,
+        plan: userData.plan || "free",
+        subscriptionStatus: userData.subscriptionStatus || "inactive",
+        subscriptionData: userData.subscriptionData || null,
+        furionCredits: userData.furionCredits || 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       this.users.set(userData.id, newUser);
       return newUser;
     }
   }
 
-  async updateUserPlan(id: string, plan: string, subscriptionData: any): Promise<User> {
+  async updateUserCredits(id: string, credits: number): Promise<User> {
     const user = this.users.get(id);
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const planLimits = {
-      free: { funnels: 3, aiGenerations: 50, tools: ["IA Board V2 - Criador de Funis", "Gerenciador de Funis"] },
-      starter: { funnels: 10, aiGenerations: 500, tools: ["IA Board V2 - Criador de Funis", "Gerenciador de Funis", "IA Espiã v2", "IA Copy & Headlines"] },
-      pro: { funnels: 50, aiGenerations: 2000, tools: ["IA Board V2 - Criador de Funis", "Gerenciador de Funis", "IA Espiã v2", "IA Copy & Headlines", "IA Vídeo Avançado", "IA Tráfego Master"] },
-      enterprise: { funnels: -1, aiGenerations: -1, tools: ["all"] }
-    };
-
+    if (!user) throw new Error("User not found");
+    
     const updatedUser: User = {
       ...user,
-      plan,
-      subscriptionStatus: subscriptionData.status || "active",
-      subscriptionId: subscriptionData.subscriptionId || null,
-      customerId: subscriptionData.customerId || null,
-      planLimits: planLimits[plan as keyof typeof planLimits] || planLimits.free,
+      furionCredits: credits,
       updatedAt: new Date(),
     };
-
+    
     this.users.set(id, updatedUser);
     return updatedUser;
   }
 
-  // Funnel operations
-  async createFunnel(insertFunnel: InsertFunnel): Promise<Funnel> {
-    const id = this.currentFunnelId++;
-    const now = new Date();
-    const funnel: Funnel = {
-      ...insertFunnel,
-      userId: insertFunnel.userId || null,
-      id,
-      currentStep: 0,
-      isCompleted: false,
-      stepData: {},
-      createdAt: now,
-      updatedAt: now,
-    };
-    this.funnels.set(id, funnel);
-    return funnel;
-  }
-
-  async getFunnel(id: number): Promise<Funnel | undefined> {
-    return this.funnels.get(id);
-  }
-
-  async getAllFunnels(): Promise<Funnel[]> {
-    return Array.from(this.funnels.values());
-  }
-
-  async getFunnelsByUser(userId: string): Promise<Funnel[]> {
-    return Array.from(this.funnels.values()).filter(
-      (funnel) => funnel.userId === userId
-    );
-  }
-
-  async updateFunnelStep(id: number, currentStep: number, stepData: any): Promise<Funnel> {
-    const funnel = this.funnels.get(id);
-    if (!funnel) {
-      throw new Error("Funnel not found");
-    }
-
-    const updatedFunnel: Funnel = {
-      ...funnel,
-      currentStep,
-      stepData: { ...(funnel.stepData as object), ...stepData },
-      isCompleted: currentStep >= 8,
+  // Project operations
+  async createProject(projectData: InsertProject): Promise<Project> {
+    const project: Project = {
+      id: this.currentProjectId++,
+      ...projectData,
+      createdAt: new Date(),
       updatedAt: new Date(),
     };
-
-    this.funnels.set(id, updatedFunnel);
-    return updatedFunnel;
+    
+    this.projects.set(project.id, project);
+    return project;
   }
 
-  // AI Generation operations
-  async createAIGeneration(insertGeneration: InsertAIGeneration): Promise<AIGeneration> {
-    const id = this.currentGenerationId++;
-    const generation: AIGeneration = {
-      ...insertGeneration,
-      id,
+  async getProject(id: number): Promise<Project | undefined> {
+    return this.projects.get(id);
+  }
+
+  async getUserProjects(userId: string): Promise<Project[]> {
+    return Array.from(this.projects.values()).filter(p => p.userId === userId);
+  }
+
+  async updateProject(id: number, data: Partial<Project>): Promise<Project> {
+    const project = this.projects.get(id);
+    if (!project) throw new Error("Project not found");
+    
+    const updatedProject: Project = {
+      ...project,
+      ...data,
+      updatedAt: new Date(),
+    };
+    
+    this.projects.set(id, updatedProject);
+    return updatedProject;
+  }
+
+  async updateProjectPhase(id: number, phase: number): Promise<Project> {
+    return this.updateProject(id, { phase });
+  }
+
+  // Furion operations
+  async createFurionSession(sessionData: InsertFurionSession): Promise<FurionSession> {
+    const session: FurionSession = {
+      id: this.currentFurionId++,
+      ...sessionData,
       createdAt: new Date(),
     };
-    this.aiGenerations.set(id, generation);
-    return generation;
+    
+    this.furionSessions.set(session.id, session);
+    return session;
   }
 
-  async getAIGenerationsByFunnel(funnelId: number): Promise<AIGeneration[]> {
-    return Array.from(this.aiGenerations.values()).filter(
-      (generation) => generation.funnelId === funnelId
-    );
+  async getUserFurionSessions(userId: string): Promise<FurionSession[]> {
+    return Array.from(this.furionSessions.values())
+      .filter(s => s.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  // Tool operations
-  async getAllTools(): Promise<Tool[]> {
-    return Array.from(this.tools.values());
+  async getProjectFurionSessions(projectId: number): Promise<FurionSession[]> {
+    return Array.from(this.furionSessions.values())
+      .filter(s => s.projectId === projectId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
-  async getToolsByCategory(category: string): Promise<Tool[]> {
-    return Array.from(this.tools.values()).filter(
-      (tool) => tool.category === category
-    );
-  }
-
-  async createTool(insertTool: InsertTool): Promise<Tool> {
-    const id = this.currentToolId++;
-    const tool: Tool = {
-      ...insertTool,
-      id,
-      planRequired: insertTool.planRequired || "free",
-      isActive: true,
+  // Campaign operations
+  async createCampaign(campaignData: InsertCampaign): Promise<Campaign> {
+    const campaign: Campaign = {
+      id: this.currentCampaignId++,
+      ...campaignData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
-    this.tools.set(id, tool);
-    return tool;
+    
+    this.campaigns.set(campaign.id, campaign);
+    return campaign;
+  }
+
+  async getUserCampaigns(userId: string): Promise<Campaign[]> {
+    return Array.from(this.campaigns.values()).filter(c => c.userId === userId);
+  }
+
+  async getProjectCampaigns(projectId: number): Promise<Campaign[]> {
+    return Array.from(this.campaigns.values()).filter(c => c.projectId === projectId);
+  }
+
+  async updateCampaign(id: number, data: Partial<Campaign>): Promise<Campaign> {
+    const campaign = this.campaigns.get(id);
+    if (!campaign) throw new Error("Campaign not found");
+    
+    const updatedCampaign: Campaign = {
+      ...campaign,
+      ...data,
+      updatedAt: new Date(),
+    };
+    
+    this.campaigns.set(id, updatedCampaign);
+    return updatedCampaign;
   }
 
   // Analytics operations
-  async logUserAction(insertAnalytics: InsertAnalytics): Promise<UserAnalytics> {
-    const id = this.currentAnalyticsId++;
-    const analytics: UserAnalytics = {
-      ...insertAnalytics,
-      id,
-      userId: insertAnalytics.userId || null,
-      metadata: insertAnalytics.metadata || {},
+  async logAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
+    const analytics: Analytics = {
+      id: this.currentAnalyticsId++,
+      ...analyticsData,
       createdAt: new Date(),
     };
-    this.analytics.set(id, analytics);
+    
+    this.analytics.set(analytics.id, analytics);
     return analytics;
   }
 
-  async getUserAnalytics(userId: string): Promise<UserAnalytics[]> {
-    return Array.from(this.analytics.values()).filter(
-      (analytics) => analytics.userId === userId
-    );
+  async getUserAnalytics(userId: string): Promise<Analytics[]> {
+    return Array.from(this.analytics.values()).filter(a => a.userId === userId);
+  }
+
+  async getProjectAnalytics(projectId: number): Promise<Analytics[]> {
+    return Array.from(this.analytics.values()).filter(a => a.projectId === projectId);
+  }
+
+  // Payment operations
+  async createPayment(paymentData: InsertPayment): Promise<Payment> {
+    const payment: Payment = {
+      id: this.currentPaymentId++,
+      ...paymentData,
+      createdAt: new Date(),
+    };
+    
+    this.payments.set(payment.id, payment);
+    return payment;
+  }
+
+  async getUserPayments(userId: string): Promise<Payment[]> {
+    return Array.from(this.payments.values())
+      .filter(p => p.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async updatePaymentStatus(id: number, status: string): Promise<Payment> {
+    const payment = this.payments.get(id);
+    if (!payment) throw new Error("Payment not found");
+    
+    const updatedPayment: Payment = {
+      ...payment,
+      status,
+    };
+    
+    this.payments.set(id, updatedPayment);
+    return updatedPayment;
   }
 }
 

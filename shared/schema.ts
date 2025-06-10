@@ -1,128 +1,157 @@
-import { pgTable, text, serial, integer, boolean, jsonb, timestamp, varchar, index } from "drizzle-orm/pg-core";
+import { 
+  pgTable, 
+  text, 
+  varchar, 
+  timestamp, 
+  integer, 
+  boolean, 
+  jsonb,
+  serial 
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for authentication
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
-// Enhanced users table for authentication and subscriptions
+// Usuários da plataforma
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
+  id: varchar("id").primaryKey(),
+  email: varchar("email").unique().notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
-  username: text("username").unique(),
-  password: text("password"),
-  plan: text("plan").default("free"), // free, starter, pro, enterprise
-  subscriptionStatus: text("subscription_status").default("inactive"), // active, inactive, canceled
-  subscriptionId: text("subscription_id"),
-  customerId: text("customer_id"),
-  planLimits: jsonb("plan_limits").default({}),
+  plan: varchar("plan").default("free"), // free, basic, pro, premium
+  subscriptionStatus: varchar("subscription_status").default("inactive"),
+  subscriptionData: jsonb("subscription_data"),
+  furionCredits: integer("furion_credits").default(3), // Créditos para usar Furion
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const funnels = pgTable("funnels", {
+// Projetos criados pelos usuários
+export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
-  name: text("name").notNull(),
-  title: text("title"),
-  description: text("description"),
-  productType: text("product_type").notNull(), // digital, physical, service, ai-decide
-  targetAudience: text("target_audience"),
-  currentStep: integer("current_step").default(0),
-  isCompleted: boolean("is_completed").default(false),
-  stepData: jsonb("step_data").default({}),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  name: varchar("name").notNull(),
+  type: varchar("type").notNull(), // produto, servico, infoproduto, curso
+  phase: integer("phase").default(1), // Fase atual do método (1-5)
+  status: varchar("status").default("active"), // active, completed, archived
+  data: jsonb("data"), // Dados específicos do projeto
+  furionResults: jsonb("furion_results"), // Resultados gerados pelo Furion
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const aiGenerations = pgTable("ai_generations", {
+// Interações com Furion.AI
+export const furionSessions = pgTable("furion_sessions", {
   id: serial("id").primaryKey(),
-  funnelId: integer("funnel_id").notNull(),
-  stepNumber: integer("step_number").notNull(),
-  provider: text("provider").notNull(), // openai, anthropic, google
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  projectId: integer("project_id").references(() => projects.id),
+  type: varchar("type").notNull(), // produto, copy, anuncio, funil, estrategia
   prompt: text("prompt").notNull(),
-  response: text("response").notNull(),
-  tokensUsed: integer("tokens_used").default(0),
+  response: jsonb("response").notNull(),
+  metadata: jsonb("metadata"), // Dados adicionais da sessão
+  creditsUsed: integer("credits_used").default(1),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// New tables for tools and analytics
-export const tools = pgTable("tools", {
+// Campanhas de marketing criadas
+export const campaigns = pgTable("campaigns", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  icon: text("icon").notNull(),
-  category: text("category").notNull(), // funnel, spy, traffic, etc
-  planRequired: text("plan_required").default("free"),
-  isActive: boolean("is_active").default(true),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  projectId: integer("project_id").references(() => projects.id).notNull(),
+  name: varchar("name").notNull(),
+  type: varchar("type").notNull(), // meta_ads, google_ads, email, organic
+  platform: varchar("platform"), // facebook, instagram, google, etc
+  budget: varchar("budget"),
+  status: varchar("status").default("draft"), // draft, active, paused, completed
+  data: jsonb("data"), // Dados específicos da campanha
+  results: jsonb("results"), // Resultados e métricas
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const userAnalytics = pgTable("user_analytics", {
+// Analytics e métricas
+export const analytics = pgTable("analytics", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
-  toolUsed: text("tool_used").notNull(),
-  action: text("action").notNull(),
-  metadata: jsonb("metadata").default({}),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  projectId: integer("project_id").references(() => projects.id),
+  campaignId: integer("campaign_id").references(() => campaigns.id),
+  event: varchar("event").notNull(), // view, click, conversion, sale
+  data: jsonb("data"),
+  value: varchar("value"), // Valor monetário se aplicável
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Schema validations
-export const insertUserSchema = createInsertSchema(users).pick({
-  email: true,
-  username: true,
-  password: true,
-  firstName: true,
-  lastName: true,
+// Pagamentos e assinaturas
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  amount: varchar("amount").notNull(),
+  currency: varchar("currency").default("BRL"),
+  status: varchar("status").notNull(), // pending, completed, failed, refunded
+  method: varchar("method"), // pix, card, boleto
+  planType: varchar("plan_type"), // basic, pro, premium
+  installments: integer("installments").default(1),
+  stripeSessionId: varchar("stripe_session_id"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const upsertUserSchema = createInsertSchema(users).pick({
-  id: true,
-  email: true,
-  firstName: true,
-  lastName: true,
-  profileImageUrl: true,
+// Sessões para autenticação
+export const sessions = pgTable("sessions", {
+  sid: varchar("sid").primaryKey(),
+  sess: jsonb("sess").notNull(),
+  expire: timestamp("expire").notNull(),
 });
 
-export const insertFunnelSchema = createInsertSchema(funnels).omit({
+// Schemas de inserção e tipos
+export const insertUserSchema = createInsertSchema(users).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProjectSchema = createInsertSchema(projects).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertAIGenerationSchema = createInsertSchema(aiGenerations).omit({
+export const insertFurionSessionSchema = createInsertSchema(furionSessions).omit({
   id: true,
   createdAt: true,
 });
 
-export const insertToolSchema = createInsertSchema(tools).omit({
+export const insertCampaignSchema = createInsertSchema(campaigns).omit({
   id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
-export const insertAnalyticsSchema = createInsertSchema(userAnalytics).omit({
+export const insertAnalyticsSchema = createInsertSchema(analytics).omit({
   id: true,
   createdAt: true,
 });
 
-// Type exports
-export type UpsertUser = z.infer<typeof upsertUserSchema>;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Tipos TypeScript
 export type User = typeof users.$inferSelect;
-export type InsertFunnel = z.infer<typeof insertFunnelSchema>;
-export type Funnel = typeof funnels.$inferSelect;
-export type InsertAIGeneration = z.infer<typeof insertAIGenerationSchema>;
-export type AIGeneration = typeof aiGenerations.$inferSelect;
-export type InsertTool = z.infer<typeof insertToolSchema>;
-export type Tool = typeof tools.$inferSelect;
+export type UpsertUser = z.infer<typeof insertUserSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export type FurionSession = typeof furionSessions.$inferSelect;
+export type InsertFurionSession = z.infer<typeof insertFurionSessionSchema>;
+
+export type Campaign = typeof campaigns.$inferSelect;
+export type InsertCampaign = z.infer<typeof insertCampaignSchema>;
+
+export type Analytics = typeof analytics.$inferSelect;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
-export type UserAnalytics = typeof userAnalytics.$inferSelect;
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
