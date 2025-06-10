@@ -146,11 +146,11 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const [selectedProductType, setSelectedProductType] = useState<string>('');
 
   const createProductSelectionPopup = () => {
-    // Position initial popup in right-center of canvas
+    // Position initial popup in center-right as user specified
     const canvasWidth = window.innerWidth;
     const canvasHeight = window.innerHeight;
-    const initialX = canvasWidth * 0.7; // Right side
-    const initialY = canvasHeight * 0.4; // Center vertically
+    const initialX = canvasWidth * 0.65; // Adjusted to center-right position
+    const initialY = canvasHeight * 0.35; // Slightly higher center position
     
     const productPopup: CanvasNode = {
       id: 'product-selection',
@@ -169,11 +169,8 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
 
     setNodes([productPopup]);
     
-    // Center camera on this popup
-    const targetX = -productPopup.x * zoom + window.innerWidth / 2;
-    const targetY = -productPopup.y * zoom + window.innerHeight / 2;
-    setPanX(targetX);
-    setPanY(targetY);
+    // Don't auto-center camera, let user see it in the specified position
+    // This keeps the popup where the user positioned it
   };
 
   const handleProductTypeSelection = async (productType: string) => {
@@ -195,12 +192,15 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const generateWorkflowPopups = async (productType: string) => {
     setIsAnimating(true);
     
-    // Calculate grid positions for 4x3 layout (4 wide, 3 high)
+    // Calculate grid positions for 4x3 layout starting from user's preferred position
     const gridCols = 4;
     const gridRows = 3;
     const nodeSpacing = 280; // Space between nodes
-    const startX = 150; // Starting X position
-    const startY = 100; // Starting Y position
+    const canvasWidth = window.innerWidth;
+    const canvasHeight = window.innerHeight;
+    // Start grid from slightly left of the initial popup position
+    const startX = (canvasWidth * 0.65) - (nodeSpacing * 1.5); // Center the grid around initial position
+    const startY = (canvasHeight * 0.35) + 100; // Start below the initial popup
     
     // Define the workflow structure in 4x3 grid
     const workflowSteps = [
