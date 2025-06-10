@@ -20,6 +20,9 @@ interface CanvasNode {
   data?: any;
   width?: number;
   height?: number;
+  minWidth?: number;
+  minHeight?: number;
+  autoResize?: boolean;
 }
 
 interface Connection {
@@ -50,6 +53,40 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const [detailedLogs, setDetailedLogs] = useState<{[key: string]: string[]}>({});
 
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
+
+  // Function to calculate optimal node dimensions based on content
+  const calculateNodeDimensions = (node: CanvasNode): { width: number; height: number } => {
+    const baseWidth = 180;
+    const baseHeight = 120;
+    
+    // Special handling for product selection popup
+    if (node.id === 'product-selection' && node.status === 'active') {
+      return { width: 320, height: 260 };
+    }
+    
+    // Calculate width based on title and description length
+    const titleLength = node.title.length;
+    const descriptionLength = node.description.length;
+    
+    let width = Math.max(baseWidth, Math.min(titleLength * 8 + 40, 300));
+    let height = baseHeight;
+    
+    // Adjust height based on description length
+    if (descriptionLength > 50) {
+      height += Math.floor(descriptionLength / 50) * 20;
+    }
+    
+    // Add space for data content if completed
+    if (node.status === 'completed' && node.data) {
+      height += 60;
+    }
+    
+    // Ensure minimum dimensions
+    width = Math.max(width, node.minWidth || baseWidth);
+    height = Math.max(height, node.minHeight || baseHeight);
+    
+    return { width, height };
+  };
 
   const [connections, setConnections] = useState<Connection[]>([]);
 
@@ -139,8 +176,8 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       status: 'active',
       type: 'step',
       connections: [],
-      width: 280,
-      height: 160
+      width: 320,
+      height: 240
     };
 
     setNodes([productPopup]);
@@ -282,8 +319,8 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       status: 'active',
       type: 'step',
       connections: [],
-      width: 180,
-      height: 110
+      width: 200,
+      height: 140
     };
 
     setNodes(prev => [...prev, newNode]);
