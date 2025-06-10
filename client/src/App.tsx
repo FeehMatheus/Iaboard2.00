@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import SupremaLanding from "@/pages/suprema-landing";
 import SuperiorLanding from "@/pages/superior-landing";
+import MaquinaMilionariaPage from "@/pages/maquina-milionaria";
 import Dashboard from "@/pages/dashboard";
 import AIDashboard from "@/pages/ai-dashboard";
 import Home from "@/pages/home";

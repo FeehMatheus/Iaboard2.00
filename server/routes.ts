@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { AIFunnelGenerator, ContentGenerator } from "./ai-services-clean";
 import { iaSupremaServices } from "./ai-suprema-services";
+import { furionAI } from "./furion-ai";
 import { insertFunnelSchema, insertAIGenerationSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -2022,6 +2023,70 @@ ADAPTAÇÕES POR CANAL:
         success: false,
         error: 'Erro na execução do workflow',
         message: error.message
+      });
+    }
+  });
+
+  // Furion AI Routes - Máquina Milionária
+  app.post('/api/furion/processar', async (req: Request, res: Response) => {
+    try {
+      const { prompt, tipo, contexto, nicho, avatarCliente } = req.body;
+      
+      if (!prompt || !tipo) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Prompt e tipo são obrigatórios' 
+        });
+      }
+
+      console.log(`🤖 Furion AI processando: ${tipo} - ${prompt.substring(0, 50)}...`);
+      
+      const resultado = await furionAI.processar({
+        prompt,
+        tipo,
+        contexto,
+        nicho,
+        avatarCliente
+      });
+
+      res.json(resultado);
+    } catch (error) {
+      console.error('Erro no Furion AI:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Erro interno do Furion AI' 
+      });
+    }
+  });
+
+  // Método específico para criar produto completo
+  app.post('/api/furion/criar-produto', async (req: Request, res: Response) => {
+    try {
+      const { ideiaProduto, nicho, avatarCliente, precoDesejado } = req.body;
+      
+      const resultado = await furionAI.processar({
+        prompt: `Criar produto digital: ${ideiaProduto}. Preço target: ${precoDesejado || 'R$ 497-997'}`,
+        tipo: 'produto',
+        contexto: `Nicho: ${nicho}, Avatar: ${avatarCliente}`,
+        nicho,
+        avatarCliente
+      });
+
+      res.json({
+        ...resultado,
+        metodoCompleto: {
+          fase1: 'Produto criado pelo Furion',
+          fase2: 'IA configurada e funcionando', 
+          fase3: 'Sistema de vendas estruturado',
+          fase4: 'Campanhas de tráfego prontas',
+          fase5: 'Estratégia de escala definida'
+        }
+      });
+    } catch (error) {
+      console.error('Erro ao criar produto:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Erro ao criar produto' 
       });
     }
   });
