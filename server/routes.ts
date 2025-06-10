@@ -1517,8 +1517,10 @@ ADAPTAÇÕES POR CANAL:
     return `${sizeInMB.toFixed(1)} MB`;
   }
 
-  // Import IA Suprema Services
+  // Import IA Suprema Services and Advanced Modules
   const { iaSupremaServices } = await import('./ai-suprema-services');
+  const { videoAIModule } = await import('./video-ai-module');
+  const { trafficAIModule } = await import('./traffic-ai-module');
 
   // IA Board Suprema API Routes
   app.post("/api/ai/suprema/execute-module", async (req, res) => {
@@ -1679,6 +1681,313 @@ ADAPTAÇÕES POR CANAL:
       res.status(500).json({
         success: false,
         error: 'Erro ao carregar módulos'
+      });
+    }
+  });
+
+  // Video AI Module Routes
+  app.post("/api/ai/video/generate", async (req, res) => {
+    try {
+      const { produto, avatar, oferta, nicho, objetivo, formato, duracao } = req.body;
+      
+      console.log(`🎬 Video AI - Gerando roteiro para ${produto}`);
+      
+      const videoContent = await videoAIModule.generateVideoContent({
+        produto,
+        avatar,
+        oferta,
+        nicho,
+        objetivo: objetivo || 'venda_direta',
+        formato: formato || 'reels',
+        duracao: duracao || '30s'
+      });
+      
+      res.json({
+        success: true,
+        video: videoContent,
+        moduleType: 'video-ai',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro no Video AI:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na geração de vídeo',
+        message: error.message
+      });
+    }
+  });
+
+  app.post("/api/ai/video/variations", async (req, res) => {
+    try {
+      const { baseVideo, count } = req.body;
+      
+      console.log(`🎬 Video AI - Gerando ${count} variações A/B`);
+      
+      const variations = await videoAIModule.generateVideoVariations(baseVideo, count);
+      
+      res.json({
+        success: true,
+        variations,
+        count: variations.length,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro nas variações de vídeo:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na geração de variações',
+        message: error.message
+      });
+    }
+  });
+
+  app.post("/api/ai/video/analyze-competitors", async (req, res) => {
+    try {
+      const { nicho, produto } = req.body;
+      
+      console.log(`🕵️ Video AI - Analisando concorrentes em ${nicho}`);
+      
+      const analysis = await videoAIModule.analyzeCompetitorVideos(nicho, produto);
+      
+      res.json({
+        success: true,
+        analysis,
+        nicho,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro na análise de concorrentes:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na análise competitiva',
+        message: error.message
+      });
+    }
+  });
+
+  // Traffic AI Module Routes
+  app.post("/api/ai/traffic/generate", async (req, res) => {
+    try {
+      const { produto, avatar, oferta, nicho, orcamento, objetivo, plataforma, publico } = req.body;
+      
+      console.log(`📈 Traffic AI - Gerando campanha para ${plataforma}`);
+      
+      const campaigns = await trafficAIModule.generateTrafficCampaign({
+        produto,
+        avatar,
+        oferta,
+        nicho,
+        orcamento: orcamento || 3000,
+        objetivo: objetivo || 'vendas',
+        plataforma: plataforma || 'meta',
+        publico: publico || {
+          idade: '25-45',
+          genero: 'todos',
+          interesses: ['empreendedorismo'],
+          comportamentos: ['compradores online'],
+          localizacao: 'Brasil'
+        }
+      });
+      
+      res.json({
+        success: true,
+        campaigns,
+        totalCampaigns: campaigns.length,
+        moduleType: 'traffic-ai',
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro no Traffic AI:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na geração de campanhas',
+        message: error.message
+      });
+    }
+  });
+
+  app.post("/api/ai/traffic/analyze-performance", async (req, res) => {
+    try {
+      const { campaignData, actualMetrics } = req.body;
+      
+      console.log(`📊 Traffic AI - Analisando performance da campanha`);
+      
+      const analysis = await trafficAIModule.analyzeCampaignPerformance(campaignData, actualMetrics);
+      
+      res.json({
+        success: true,
+        analysis,
+        insights: analysis.otimizacoes || [],
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro na análise de performance:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na análise de performance',
+        message: error.message
+      });
+    }
+  });
+
+  app.post("/api/ai/traffic/spy-competitors", async (req, res) => {
+    try {
+      const { nicho, plataforma } = req.body;
+      
+      console.log(`🕵️ Traffic AI - Espionando anúncios em ${nicho} - ${plataforma}`);
+      
+      const spyAnalysis = await trafficAIModule.generateCompetitorAdsAnalysis(nicho, plataforma);
+      
+      res.json({
+        success: true,
+        spyData: spyAnalysis,
+        nicho,
+        plataforma,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro na espionagem de anúncios:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na análise competitiva',
+        message: error.message
+      });
+    }
+  });
+
+  // Enhanced Workflow API - Integrates all AI modules
+  app.post("/api/ai/workflow/complete", async (req, res) => {
+    try {
+      const { projectData, includeVideo, includeTraffic, mode } = req.body;
+      
+      console.log(`🚀 IA Board - Executando workflow completo em modo ${mode}`);
+      
+      const results: any = {
+        projectData,
+        modules: [],
+        exports: {},
+        timestamp: new Date().toISOString()
+      };
+
+      // Execute core IA Suprema modules
+      const coreModules = ['ia-espia', 'ia-branding', 'ia-copywriting', 'ia-landing'];
+      
+      for (const moduleId of coreModules) {
+        try {
+          const moduleResult = await iaSupremaServices.executeModule(moduleId, projectData, mode === 'learning');
+          results.modules.push({
+            moduleId,
+            success: moduleResult.success,
+            data: moduleResult.data
+          });
+          
+          if (moduleResult.success) {
+            projectData[moduleId] = moduleResult.data;
+          }
+        } catch (error) {
+          console.error(`Erro no módulo ${moduleId}:`, error);
+        }
+      }
+
+      // Generate Video AI content if requested
+      if (includeVideo && projectData.produto) {
+        try {
+          const videoContent = await videoAIModule.generateVideoContent({
+            produto: projectData.produto,
+            avatar: projectData.avatar || 'empreendedores',
+            oferta: projectData.oferta || 'transformação garantida',
+            nicho: projectData.nicho || 'desenvolvimento',
+            objetivo: 'venda_direta',
+            formato: 'reels',
+            duracao: '30s'
+          });
+          
+          results.modules.push({
+            moduleId: 'video-ai',
+            success: true,
+            data: videoContent
+          });
+          
+          results.exports.videoScript = videoContent;
+        } catch (error) {
+          console.error('Erro no Video AI:', error);
+        }
+      }
+
+      // Generate Traffic AI campaigns if requested
+      if (includeTraffic && projectData.produto) {
+        try {
+          const campaigns = await trafficAIModule.generateTrafficCampaign({
+            produto: projectData.produto,
+            avatar: projectData.avatar || 'empreendedores',
+            oferta: projectData.oferta || 'transformação garantida',
+            nicho: projectData.nicho || 'desenvolvimento',
+            orcamento: 5000,
+            objetivo: 'vendas',
+            plataforma: 'todas',
+            publico: {
+              idade: '25-45',
+              genero: 'todos',
+              interesses: ['empreendedorismo', 'marketing digital'],
+              comportamentos: ['compradores online'],
+              localizacao: 'Brasil'
+            }
+          });
+          
+          results.modules.push({
+            moduleId: 'traffic-ai',
+            success: true,
+            data: campaigns
+          });
+          
+          results.exports.trafficCampaigns = campaigns;
+        } catch (error) {
+          console.error('Erro no Traffic AI:', error);
+        }
+      }
+
+      // Generate complete export package
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
+
+      // Add all generated content to ZIP
+      zip.file("README.md", `# IA Board Suprema - Projeto Completo\n\nGerado em: ${new Date().toLocaleDateString('pt-BR')}\nMódulos executados: ${results.modules.length}\n\n## Conteúdo:\n- Análise estratégica\n- Copy persuasivo\n- Landing pages\n${includeVideo ? '- Roteiros de vídeo\n' : ''}${includeTraffic ? '- Campanhas de tráfego\n' : ''}`);
+
+      // Add module results
+      results.modules.forEach((module: any) => {
+        if (module.success && module.data) {
+          zip.file(`${module.moduleId}.json`, JSON.stringify(module.data, null, 2));
+        }
+      });
+
+      // Add exports
+      if (results.exports.videoScript) {
+        zip.file("video-roteiro.json", JSON.stringify(results.exports.videoScript, null, 2));
+      }
+
+      if (results.exports.trafficCampaigns) {
+        zip.file("campanhas-trafego.json", JSON.stringify(results.exports.trafficCampaigns, null, 2));
+      }
+
+      const zipBuffer = await zip.generateAsync({ type: 'buffer' });
+
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', 'attachment; filename="ia-board-suprema-completo.zip"');
+      res.send(zipBuffer);
+
+    } catch (error: any) {
+      console.error('Erro no workflow completo:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na execução do workflow',
+        message: error.message
       });
     }
   });

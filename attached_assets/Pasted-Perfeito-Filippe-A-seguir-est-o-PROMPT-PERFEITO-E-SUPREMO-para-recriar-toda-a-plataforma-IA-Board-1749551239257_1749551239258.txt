@@ -1,0 +1,224 @@
+Perfeito, Filippe. A seguir está o PROMPT PERFEITO E SUPREMO para recriar toda a plataforma IA Board exatamente como você pediu — com todos os recursos reais, inteligência estratégica, aparência cinematográfica e funcionalidades funcionais, pronto para colar em qualquer IA ou ferramenta que aceite prompts longos (como Replit, GPTs customizados, ou agentes autônomos):
+
+
+---
+
+🧠 PROMPT MESTRE DO IA BOARD SUPREMO by Filippe
+
+> Objetivo: Criar uma plataforma web chamada IA Board by Filippe, um software visual de automação de vendas e geração de funis com inteligência artificial real integrada. O sistema deve funcionar como um quadro infinito inteligente, com blocos pop-ups conectados por linhas animadas, IA estratégica real (OpenAI, Claude, Gemini), modo Pensamento Poderoso, módulos visuais dinâmicos e execução 100% automática.
+
+
+
+
+---
+
+🔧 TECNOLOGIAS E ESTRUTURA
+
+Frontend: Next.js + TailwindCSS + Canvas HTML5
+
+Backend: Node.js (controle) + Flask (execução IA)
+
+Integrações: OpenAI API, Claude API, Gemini API
+
+Hospedagem: Compatível com Vercel (frontend) + Render ou Railway (backend)
+
+
+
+---
+
+🔁 FUNCIONALIDADES MESTRAS
+
+1. Login inicial com acesso liberado
+
+
+2. Popup inicial flutuante (tipo de produto ou IA decide)
+
+
+3. Modo IA Total Pro+™ ativado após a escolha
+
+
+4. Geração automática de popups conectados (4x3, sem sobrepor)
+
+
+5. Canvas infinito com zoom no scroll e arrasto suave
+
+
+6. Cabeçalho superior tecnológico com botões úteis
+
+
+7. Animações cinematográficas entre conexões
+
+
+8. Redimensionamento automático dos blocos ao conteúdo
+
+
+9. Blocos inteligentes com nome, status, ícone e conteúdo editável
+
+
+10. Zoom automático para foco no passo atual
+
+
+11. Fluxo sequencial com possibilidade de reconectar blocos e alterar o caminho final
+
+
+12. No final, zoom se ajusta e mostra todo o funil na tela
+
+
+13. Botão para criar novo funil com nome criativo (gerado pela IA)
+
+
+
+
+---
+
+📦 MÓDULOS IA AVANÇADOS
+
+📽️ IA VÍDEO
+
+Prompt:
+
+Crie um vídeo promocional de alta conversão para [PRODUTO], com base no público-alvo [AVATAR] e na oferta [OFERTA]. Gere:
+- Roteiro VSL com gatilhos mentais
+- Título chamativo
+- Narração em texto
+- Sugestão de imagens e cenas
+- Versão final para exportação em MP4
+
+📊 IA TRÁFEGO
+
+Prompt:
+
+Crie uma campanha completa de tráfego pago para [PRODUTO]. Gere:
+- Segmentações ideais (interesses, comportamentos)
+- Estrutura de anúncios (criativo, headline, CTA)
+- Estratégia de verba e canais (Meta Ads, Google Ads, YouTube)
+
+🕵️ IA ESPIÃ
+
+Prompt:
+
+Vasculhe a internet por páginas de vendas mais rentáveis dentro do nicho [NICHO]. Gere:
+- Lista dos concorrentes mais relevantes
+- Template otimizado baseado nas melhores práticas
+- Comparativo entre páginas do concorrente e nossa página
+- Seleção automática do melhor modelo com opção de edição
+
+🧠 MODO MPP (Pensamento Poderoso)
+
+Prompt:
+
+Combine as inteligências da OpenAI, Claude e Gemini para gerar uma solução estratégica conjunta em [ETAPA]. Use raciocínio colaborativo, valide com dados e retorne uma resposta refinada, profunda e pronta para execução.
+
+
+---
+
+🎨 MELHORIAS VISUAIS
+
+Popups com bordas 3D animadas e gradientes tecnológicos
+
+Layout responsivo com suavidade de movimento
+
+Linhas de conexão animadas que aparecem antes de cada popup
+
+Interface profissional com ícones modernos
+
+Todos os popups têm tamanho uniforme: 220x180px
+
+Interface fluida, sem piscadas ou travamentos
+
+
+
+---
+
+🗂️ ESTRUTURA DO FUNIL (popups gerados automaticamente):
+
+1. Definir Nicho
+
+
+2. Criar Avatar
+
+
+3. Gerar Oferta
+
+
+4. Página de Vendas
+
+
+5. Produto
+
+
+6. Copy e Headlines
+
+
+7. Roteiro Vídeo
+
+
+8. Criativo de Vídeo
+
+
+9. Campanha de Tráfego
+
+
+10. IA Espiã
+
+
+11. Landing Page
+
+
+12. Produto Final + Exportações
+
+
+
+
+---
+
+🧾 EXPORTAÇÕES E RELATÓRIOS
+
+Exportar tudo como ZIP com PDFs, vídeos, páginas e relatórios .json
+
+Geração automática de pastas com o nome do funil
+
+Relatório estratégico final com IA
+
+
+
+---
+
+🛠️ FLUXO FINAL
+
+O usuário entra no site
+
+Escolhe tipo de produto (ou deixa IA pensar)
+
+IA executa todas as etapas sozinha (ou passo a passo)
+
+Cada popup aparece com conteúdo real, visual animado e conectado
+
+No final, pode salvar tudo, compartilhar, ou gerar outra versão
+
+
+
+---
+
+✅ ENTREGA FINAL
+
+Tudo deve estar:
+
+100% funcional
+
+Visualmente cinematográfico
+
+Executando IA real via API
+
+Com backend e frontend conectados
+
+Pronto para uso e testes no navegador ou como software .exe
+
+
+
+---
+
+Se quiser, posso gerar esse código diretamente em um repositório GitHub ou exportar o .zip pronto para Vercel. Deseja isso agora?
+
+Ou deseja adicionar algo ao prompt antes de usar?
+
