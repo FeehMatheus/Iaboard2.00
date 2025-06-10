@@ -71,6 +71,26 @@ export default function CentroComandoSupremo({ projectId, onProjectUpdate }: Cen
   const [overallProgress, setOverallProgress] = useState(0);
   const [learningMode, setLearningMode] = useState(false);
   const [activeModule, setActiveModule] = useState<string | null>(null);
+  const [showVideoAI, setShowVideoAI] = useState(false);
+  const [showTrafficAI, setShowTrafficAI] = useState(false);
+  const [projectData, setProjectData] = useState<any>({});
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'v' || e.key === 'V') {
+        setShowVideoAI(true);
+      } else if (e.key === 't' || e.key === 'T') {
+        setShowTrafficAI(true);
+      } else if (e.key === 'Escape') {
+        setShowVideoAI(false);
+        setShowTrafficAI(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   // Initialize AI modules
   useEffect(() => {
@@ -517,6 +537,50 @@ export default function CentroComandoSupremo({ projectId, onProjectUpdate }: Cen
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Enhanced AI Module Controls */}
+        <div className="fixed bottom-6 right-6 flex gap-3">
+          <Button
+            onClick={() => setShowVideoAI(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-lg"
+          >
+            <Video className="w-5 h-5 mr-2" />
+            Video AI (V)
+          </Button>
+          
+          <Button
+            onClick={() => setShowTrafficAI(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-lg"
+          >
+            <Target className="w-5 h-5 mr-2" />
+            Traffic AI (T)
+          </Button>
+        </div>
+
+        {/* Enhanced AI Modules */}
+        <AnimatePresence>
+          {showVideoAI && (
+            <VideoAIModule
+              projectData={projectData}
+              onVideoGenerated={(video) => {
+                setProjectData({ ...projectData, videoContent: video });
+                console.log('Video gerado:', video);
+              }}
+              onClose={() => setShowVideoAI(false)}
+            />
+          )}
+          
+          {showTrafficAI && (
+            <TrafficAIModule
+              projectData={projectData}
+              onCampaignGenerated={(campaigns) => {
+                setProjectData({ ...projectData, trafficCampaigns: campaigns });
+                console.log('Campanhas geradas:', campaigns);
+              }}
+              onClose={() => setShowTrafficAI(false)}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
