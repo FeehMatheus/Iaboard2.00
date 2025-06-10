@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
-import { Brain, Target, Rocket, Users, TrendingUp, FileText, Video, Mail, Download, CheckCircle, Plus, Trash2, Edit3, Copy, ZoomIn, ZoomOut, Grid, Settings, Save, Download as DownloadIcon, Play, Pause, RotateCcw, Link, Unlink } from 'lucide-react';
+import { Brain, Target, Rocket, Users, TrendingUp, FileText, Video, Mail, Download, CheckCircle, Plus, Trash2, Edit3, Copy, ZoomIn, ZoomOut, Grid, Settings, Save, Download as DownloadIcon, Play, Pause, RotateCcw, Link, Unlink, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -695,14 +695,14 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
               <h3 className="text-sm font-semibold text-gray-600 mb-2">Exportação</h3>
               <div className="space-y-1">
                 <button
-                  onClick={() => {onSave?.(); setShowSidebar(false);}}
+                  onClick={() => {if(onSave) onSave(); setShowSidebar(false);}}
                   className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   <Save className="w-4 h-4 text-green-500" />
                   <span className="text-sm">Salvar Projeto</span>
                 </button>
                 <button
-                  onClick={() => {onExport?.(); setShowSidebar(false);}}
+                  onClick={() => {if(onExport) onExport(); setShowSidebar(false);}}
                   className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
                 >
                   <Download className="w-4 h-4 text-purple-500" />
