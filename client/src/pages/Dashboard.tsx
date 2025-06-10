@@ -52,19 +52,24 @@ interface User {
 }
 
 interface DashboardProps {
+  user?: any;
   onOpenFurionCanvas?: () => void;
 }
 
-export default function Dashboard({ onOpenFurionCanvas }: DashboardProps) {
+export default function Dashboard({ user: currentUser, onOpenFurionCanvas }: DashboardProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activePhase, setActivePhase] = useState(1);
+  const [showVideoStudio, setShowVideoStudio] = useState(false);
   const queryClient = useQueryClient();
 
-  // Buscar dados do usuário
-  const { data: user } = useQuery<User>({
+  // Usar dados do usuário passados como prop ou buscar da API
+  const { data: apiUser } = useQuery<User>({
     queryKey: ['/api/user'],
     retry: false,
+    enabled: !currentUser
   });
+
+  const user = currentUser || apiUser;
 
   // Buscar projetos do usuário
   const { data: projects = [], isLoading: projectsLoading } = useQuery<Project[]>({

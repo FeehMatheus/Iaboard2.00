@@ -18,10 +18,11 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [showFurion, setShowFurion] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
+  const [showLogin, setShowLogin] = useState(false);
   const [showFurionCanvas, setShowFurionCanvas] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard'>('home');
-  const [user, setUser] = useState<any>(null);
 
   const handleOpenFurion = () => {
     setShowFurion(true);
@@ -32,24 +33,22 @@ function AppContent() {
   };
 
   const handleOpenLogin = () => {
-    setCurrentPage('login');
-  };
-
-  const handleBackToHome = () => {
-    setCurrentPage('home');
+    setShowLogin(true);
   };
 
   const handleLogin = (userData: any) => {
-    setUser(userData);
+    setCurrentUser(userData);
+    setShowLogin(false);
     setCurrentPage('dashboard');
   };
 
+  const handleBackToHome = () => {
+    setShowLogin(false);
+    setCurrentPage('home');
+  };
+
   const handleAccessPlatform = () => {
-    if (user) {
-      setCurrentPage('dashboard');
-    } else {
-      setCurrentPage('login');
-    }
+    setCurrentPage('dashboard');
   };
 
   const handleOpenFurionCanvas = () => {
@@ -60,18 +59,17 @@ function AppContent() {
     setShowFurionCanvas(false);
   };
 
-  if (currentPage === 'login') {
+  // Se está na tela de login
+  if (showLogin) {
     return (
       <div>
-        <LoginPage 
-          onLogin={handleLogin}
-          onBack={handleBackToHome}
-        />
+        <LoginPage onLogin={handleLogin} onBack={handleBackToHome} />
         <Toaster />
       </div>
     );
   }
 
+  // Se está no canvas do Furion
   if (showFurionCanvas) {
     return (
       <div>
@@ -81,15 +79,17 @@ function AppContent() {
     );
   }
 
+  // Se está no dashboard
   if (currentPage === 'dashboard') {
     return (
       <div>
-        <Dashboard onOpenFurionCanvas={handleOpenFurionCanvas} />
+        <Dashboard user={currentUser} onOpenFurionCanvas={handleOpenFurionCanvas} />
         <Toaster />
       </div>
     );
   }
 
+  // Página inicial
   return (
     <div className="min-h-screen">
       <MaquinaMilionaria 
