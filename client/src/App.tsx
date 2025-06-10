@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
-import LandingPage from '@/pages/LandingPage';
+import MaquinaMilionaria from '@/pages/MaquinaMilionaria';
 import Dashboard from '@/pages/Dashboard';
-import FurionInterface from '@/components/FurionInterface';
-import FurionSuprema from '@/components/FurionSuprema';
+import FurionAI from '@/components/FurionAI';
 import { useAuth } from '@/hooks/useAuth';
 
 const queryClient = new QueryClient({
@@ -19,8 +18,6 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const [showFurion, setShowFurion] = useState(false);
-  const [showFurionSuprema, setShowFurionSuprema] = useState(false);
-  const { isAuthenticated } = useAuth();
 
   const handleOpenFurion = () => {
     setShowFurion(true);
@@ -28,14 +25,6 @@ function AppContent() {
 
   const handleCloseFurion = () => {
     setShowFurion(false);
-  };
-
-  const handleOpenFurionSuprema = () => {
-    setShowFurionSuprema(true);
-  };
-
-  const handleCloseFurionSuprema = () => {
-    setShowFurionSuprema(false);
   };
 
   const handleAccessPlatform = () => {
@@ -46,9 +35,8 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Switch>
         <Route path="/">
-          <LandingPage 
+          <MaquinaMilionaria 
             onOpenFurion={handleOpenFurion}
-            onOpenFurionSuprema={handleOpenFurionSuprema}
             onAccessPlatform={handleAccessPlatform}
           />
         </Route>
@@ -77,14 +65,9 @@ function AppContent() {
         </Route>
       </Switch>
 
-      {/* Furion Interface Modal */}
+      {/* Furion AI Modal */}
       {showFurion && (
-        <FurionInterface onClose={handleCloseFurion} />
-      )}
-
-      {/* Furion Suprema Interface Modal */}
-      {showFurionSuprema && (
-        <FurionSuprema onClose={handleCloseFurionSuprema} />
+        <FurionAI onClose={handleCloseFurion} />
       )}
 
       <Toaster />
