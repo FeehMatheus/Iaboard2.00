@@ -764,34 +764,13 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       {/* Main Canvas - Full Screen with Professional Border */}
       <div 
         ref={canvasRef}
-        className="w-full h-full overflow-hidden relative shadow-2xl"
+        className="w-full h-full overflow-hidden relative shadow-2xl border-4 rounded-2xl"
         style={{ 
           marginTop: '64px',
           background: 'linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%)',
-          border: '4px solid transparent',
-          borderRadius: '16px',
-          backgroundClip: 'padding-box',
-          position: 'relative'
+          borderImage: 'linear-gradient(45deg, #3b82f6, #8b5cf6, #14b8a6) 1'
         }}
       >
-        {/* Animated Border Effect */}
-        <div 
-          className="absolute inset-0 rounded-2xl opacity-75"
-          style={{
-            background: 'linear-gradient(45deg, #3b82f6, #8b5cf6, #14b8a6, #f59e0b, #ef4444, #3b82f6)',
-            backgroundSize: '400% 400%',
-            animation: 'gradientShift 6s ease infinite',
-            zIndex: -1,
-            margin: '-4px'
-          }}
-        />
-        <style jsx>{`
-          @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-        `}</style>
         <motion.div
           className="w-full h-full relative cursor-grab active:cursor-grabbing"
           style={{
