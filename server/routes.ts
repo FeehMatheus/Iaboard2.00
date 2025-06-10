@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import { furionAI } from "./furion-ai-system";
 import { furionSupremaEngine } from "./furion-suprema-engine";
 import { exportSystem } from "./export-system";
+import { videoCreationService } from "./video-creation-service";
+import { contentCreationService } from "./content-creation-service";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -405,6 +407,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching analytics:", error);
       res.status(500).json({ message: "Failed to fetch analytics" });
+    }
+  });
+
+  // ================================
+  // ROTAS DE CRIAÇÃO DE VÍDEOS
+  // ================================
+  
+  // Criar vídeo com IA
+  app.post('/api/videos/create', authenticateDemo, async (req, res) => {
+    try {
+      const { script, style, duration, voiceType, resolution, background, music } = req.body;
+      
+      if (!script) {
+        return res.status(400).json({ message: "Script é obrigatório" });
+      }
+
+      const videoResult = await videoCreationService.createVideo({
+        script,
+        style: style || 'presentation',
+        duration: duration || 60,
+        voiceType: voiceType || 'neutral',
+        resolution: resolution || '1080p',
+        background,
+        music: music || false
+      });
+
+      res.json(videoResult);
+    } catch (error) {
+      console.error('Erro ao criar vídeo:', error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Gerar script para vídeo
+  app.post('/api/videos/generate-script', authenticateDemo, async (req, res) => {
+    try {
+      const { prompt, type } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ message: "Prompt é obrigatório" });
+      }
+
+      const script = await videoCreationService.generateVideoScript(prompt, type || 'explicativo');
+      
+      res.json({ script });
+    } catch (error) {
+      console.error('Erro ao gerar script:', error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Status do vídeo
+  app.get('/api/videos/:videoId/status', authenticateDemo, async (req, res) => {
+    try {
+      const { videoId } = req.params;
+      const status = await videoCreationService.getVideoStatus(videoId);
+      res.json(status);
+    } catch (error) {
+      console.error('Erro ao verificar status:', error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // ================================
+  // ROTAS DE CRIAÇÃO DE CONTEÚDO
+  // ================================
+  
+  // Criar conteúdo com IA
+  app.post('/api/content/create', authenticateDemo, async (req, res) => {
+    try {
+      const { type, prompt, targetAudience, product, tone, length } = req.body;
+      
+      if (!type || !prompt) {
+        return res.status(400).json({ message: "Tipo e prompt são obrigatórios" });
+      }
+
+      const contentResult = await contentCreationService.createContent({
+        type,
+        prompt,
+        targetAudience,
+        product,
+        tone: tone || 'professional',
+        length: length || 'medium'
+      });
+
+      res.json(contentResult);
+    } catch (error) {
+      console.error('Erro ao criar conteúdo:', error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Otimizar conteúdo
+  app.post('/api/content/optimize', authenticateDemo, async (req, res) => {
+    try {
+      const { content, metrics } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ message: "Conteúdo é obrigatório" });
+      }
+
+      const optimizedContent = await contentCreationService.optimizeContent(content, metrics || {});
+      
+      res.json({ content: optimizedContent });
+    } catch (error) {
+      console.error('Erro ao otimizar conteúdo:', error);
+      res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
 
