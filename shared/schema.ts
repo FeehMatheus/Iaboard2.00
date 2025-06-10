@@ -17,11 +17,12 @@ export const users = pgTable("users", {
   email: varchar("email").unique().notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
+  password: varchar("password").notNull(),
   profileImageUrl: varchar("profile_image_url"),
-  plan: varchar("plan").default("free"), // free, basic, pro, premium
-  subscriptionStatus: varchar("subscription_status").default("inactive"),
+  plan: varchar("plan").default("starter"), // starter, professional, enterprise
+  subscriptionStatus: varchar("subscription_status").default("trial"),
   subscriptionData: jsonb("subscription_data"),
-  furionCredits: integer("furion_credits").default(3), // Créditos para usar Furion
+  furionCredits: integer("furion_credits").default(1000), // Créditos para usar Furion
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
