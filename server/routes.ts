@@ -6,6 +6,7 @@ import { furionSupremaEngine } from "./furion-suprema-engine";
 import { exportSystem } from "./export-system";
 import { videoCreationService } from "./video-creation-service";
 import { contentCreationService } from "./content-creation-service";
+import { processarTicketMaquinaMilionaria, getEtapasProcessamento } from "./maquina-milionaria-ai";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -982,6 +983,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dashboard: '/api/dashboard/stats',
       }
     });
+  });
+
+  // ================================
+  // MÁQUINA MILIONÁRIA API ROUTES
+  // ================================
+
+  // Criar ticket no sistema Máquina Milionária
+  app.post('/api/maquina-milionaria/create-ticket', async (req, res) => {
+    try {
+      const { titulo, descricao, tipo } = req.body;
+      
+      if (!titulo || !descricao || !tipo) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+      }
+
+      const creditsMap = {
+        video: 15,
+        copy: 8,
+        design: 12,
+        analise: 10,
+        campanha: 20,
+        funil: 25,
+        estrategia: 30
+      };
+
+      const ticketId = Date.now().toString();
+      const creditosNecessarios = creditsMap[tipo as keyof typeof creditsMap] || 10;
+
+      // Processar com IA real em background
+      setTimeout(async () => {
+        try {
+          const resultado = await processarTicketMaquinaMilionaria(tipo, titulo, descricao);
+          console.log('Ticket Máquina Milionária processado:', ticketId, resultado);
+        } catch (error) {
+          console.error('Erro ao processar ticket:', error);
+        }
+      }, Math.random() * 30000 + 10000);
+
+      res.json({
+        ticketId,
+        status: 'processando',
+        creditosUsados: creditosNecessarios,
+        etapas: getEtapasProcessamento(tipo)
+      });
+    } catch (error) {
+      console.error('Erro ao criar ticket:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Buscar status do ticket
+  app.get('/api/maquina-milionaria/ticket/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      res.json({
+        id,
+        status: 'processando',
+        progresso: Math.floor(Math.random() * 100)
+      });
+    } catch (error) {
+      console.error('Erro ao buscar ticket:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Processar IA avançada
+  app.post('/api/maquina-milionaria/process-ai', async (req, res) => {
+    try {
+      const { tipo, prompt, titulo } = req.body;
+      
+      const resultado = await processarTicketMaquinaMilionaria(tipo, titulo, prompt);
+      
+      res.json({
+        success: true,
+        resultado,
+        ticketId: Date.now().toString()
+      });
+    } catch (error) {
+      console.error('Erro no processamento IA:', error);
+      res.status(500).json({ error: 'Erro no processamento da IA' });
+    }
   });
 
   const httpServer = createServer(app);

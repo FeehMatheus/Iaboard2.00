@@ -554,7 +554,7 @@ export class MaquinaMilionariaAI {
           max_tokens: 4000,
           messages: [{ role: 'user', content: prompt }],
         });
-        return response.content[0]?.text || '';
+        return response.content[0]?.type === 'text' ? response.content[0].text : '';
       }
 
       if (this.openai) {
