@@ -18,12 +18,15 @@ import {
   Shield,
   Clock,
   Crown,
-  ArrowRight
+  ArrowRight,
+  Settings
 } from 'lucide-react';
+import FurionInterface from './FurionInterface';
 
 export default function MaquinaMilionaria() {
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [showFurion, setShowFurion] = useState(false);
   
   const testimonials = [
     {
@@ -232,12 +235,34 @@ export default function MaquinaMilionaria() {
               </div>
             </div>
             
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-12 py-6 text-xl font-bold"
-            >
-              QUERO TER UMA MÁQUINA MILIONÁRIA
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-12 py-6 text-xl font-bold"
+              >
+                QUERO TER UMA MÁQUINA MILIONÁRIA
+              </Button>
+              
+              <Button 
+                onClick={() => setShowFurion(true)}
+                size="lg" 
+                variant="outline"
+                className="border-orange-500 text-orange-400 hover:bg-orange-500/10 px-8 py-6 text-lg font-bold"
+              >
+                <Brain className="w-5 h-5 mr-2" />
+                TESTAR FURION.AI GRÁTIS
+              </Button>
+              
+              <Button 
+                onClick={() => window.location.href = '/dashboard'}
+                size="lg" 
+                variant="outline"
+                className="border-blue-500 text-blue-400 hover:bg-blue-500/10 px-8 py-6 text-lg font-bold"
+              >
+                <Settings className="w-5 h-5 mr-2" />
+                ACESSAR PLATAFORMA
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -505,6 +530,11 @@ export default function MaquinaMilionaria() {
           </p>
         </div>
       </footer>
+
+      {/* Furion Interface Modal */}
+      {showFurion && (
+        <FurionInterface onClose={() => setShowFurion(false)} />
+      )}
     </div>
   );
 }
