@@ -29,7 +29,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        {isAuthenticated ? <Dashboard /> : <SuperiorLanding />}
+        {isAuthenticated ? <Dashboard /> : <MaquinaMilionariaPage />}
       </Route>
       <Route path="/landing" component={Landing} />
       <Route path="/suprema" component={SupremaLanding} />
@@ -38,6 +38,7 @@ function Router() {
       <Route path="/canvas" component={CanvasPage} />
       <Route path="/funnel" component={Home} />
       <Route path="/superior" component={SuperiorLanding} />
+      <Route path="/maquina-milionaria" component={MaquinaMilionariaPage} />
       <Route path="/competitor-analysis" component={CompetitorAnalysisPage} />
       <Route component={NotFound} />
     </Switch>
