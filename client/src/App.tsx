@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
+import SupremaLanding from "@/pages/suprema-landing";
 import Dashboard from "@/pages/dashboard";
 import AIDashboard from "@/pages/ai-dashboard";
 import Home from "@/pages/home";
@@ -25,8 +26,10 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        {isAuthenticated ? <Dashboard /> : <Landing />}
+        {isAuthenticated ? <Dashboard /> : <SupremaLanding />}
       </Route>
+      <Route path="/landing" component={Landing} />
+      <Route path="/suprema" component={SupremaLanding} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/ai" component={AIDashboard} />
       <Route path="/canvas" component={CanvasPage} />

@@ -439,7 +439,7 @@ Retorne código completo e estrutura em JSON.
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const landingPageData = this.extractJSONFromResponse(response.content[0].text);
+      const landingPageData = this.extractJSONFromResponse(response.content[0].type === 'text' ? response.content[0].text : JSON.stringify(response.content[0]));
       
       return {
         success: true,
@@ -624,7 +624,7 @@ Retorne análise completa estruturada em JSON.
         messages: [{ role: 'user', content: prompt }],
       });
 
-      const analyticsData = this.extractJSONFromResponse(response.content[0].text);
+      const analyticsData = this.extractJSONFromResponse(response.content[0].type === 'text' ? response.content[0].text : JSON.stringify(response.content[0]));
       
       return {
         success: true,

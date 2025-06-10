@@ -1517,6 +1517,172 @@ ADAPTAÇÕES POR CANAL:
     return `${sizeInMB.toFixed(1)} MB`;
   }
 
+  // Import IA Suprema Services
+  const { iaSupremaServices } = await import('./ai-suprema-services');
+
+  // IA Board Suprema API Routes
+  app.post("/api/ai/suprema/execute-module", async (req, res) => {
+    try {
+      const { moduleId, projectData, learningMode } = req.body;
+      
+      console.log(`🚀 IA Suprema - Executando módulo ${moduleId}`);
+      
+      const result = await iaSupremaServices.executeModule(moduleId, projectData, learningMode);
+      
+      res.json({
+        success: result.success,
+        data: result.data,
+        explanation: result.explanation,
+        estimatedImpact: result.estimatedImpact,
+        moduleId,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro no módulo IA Suprema:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro interno do módulo IA',
+        message: 'Módulo temporariamente indisponível',
+        moduleId: req.body.moduleId
+      });
+    }
+  });
+
+  // IA Suprema - Execute full sequence
+  app.post("/api/ai/suprema/execute-sequence", async (req, res) => {
+    try {
+      const { projectData, learningMode, customSequence } = req.body;
+      
+      const sequence = customSequence || [
+        'ia-espia', 'ia-branding', 'ia-copywriting', 
+        'ia-landing', 'ia-video', 'ia-trafego', 
+        'ia-persuasao', 'ia-analytics'
+      ];
+      
+      const results = [];
+      
+      for (const moduleId of sequence) {
+        console.log(`🎯 Executando módulo ${moduleId} na sequência suprema`);
+        
+        const result = await iaSupremaServices.executeModule(moduleId, projectData, learningMode);
+        results.push({
+          moduleId,
+          ...result,
+          executedAt: new Date().toISOString()
+        });
+        
+        // Update project data with results for next modules
+        if (result.success) {
+          projectData[moduleId] = result.data;
+        }
+      }
+      
+      res.json({
+        success: true,
+        results,
+        completedModules: results.filter(r => r.success).length,
+        totalModules: sequence.length,
+        projectData: projectData,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error: any) {
+      console.error('Erro na sequência IA Suprema:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na execução da sequência',
+        message: 'Falha na execução automática'
+      });
+    }
+  });
+
+  // IA Suprema - Get module status
+  app.get("/api/ai/suprema/modules", async (req, res) => {
+    try {
+      const modules = [
+        {
+          id: 'ia-espia',
+          name: 'IA Espiã Suprema',
+          description: 'Analisa concorrentes reais e extrai estratégias vencedoras',
+          category: 'analise',
+          estimatedTime: '2-3 min',
+          available: true
+        },
+        {
+          id: 'ia-branding',
+          name: 'IA Branding Master',
+          description: 'Cria nome, logo e identidade visual completa',
+          category: 'criacao',
+          estimatedTime: '3-4 min',
+          available: true
+        },
+        {
+          id: 'ia-copywriting',
+          name: 'IA Copywriter Pro',
+          description: 'Gera textos persuasivos baseados em dados reais',
+          category: 'criacao',
+          estimatedTime: '2-3 min',
+          available: true
+        },
+        {
+          id: 'ia-video',
+          name: 'IA Vídeo Mestre',
+          description: 'Cria vídeos completos com roteiro e edição',
+          category: 'criacao',
+          estimatedTime: '5-8 min',
+          available: true
+        },
+        {
+          id: 'ia-landing',
+          name: 'IA Landing Page',
+          description: 'Gera páginas de vendas com design otimizado',
+          category: 'criacao',
+          estimatedTime: '3-5 min',
+          available: true
+        },
+        {
+          id: 'ia-trafego',
+          name: 'IA Tráfego Ultra',
+          description: 'Cria campanhas para Meta Ads e Google Ads',
+          category: 'marketing',
+          estimatedTime: '4-6 min',
+          available: true
+        },
+        {
+          id: 'ia-analytics',
+          name: 'IA Analytics+',
+          description: 'Análise profunda e otimização contínua',
+          category: 'otimizacao',
+          estimatedTime: '2-3 min',
+          available: true
+        },
+        {
+          id: 'ia-persuasao',
+          name: 'IA Persuasão Neural',
+          description: 'Aplica gatilhos mentais específicos por nicho',
+          category: 'otimizacao',
+          estimatedTime: '3-4 min',
+          available: true
+        }
+      ];
+      
+      res.json({
+        modules,
+        totalModules: modules.length,
+        categories: ['analise', 'criacao', 'marketing', 'otimizacao'],
+        systemStatus: 'operational'
+      });
+      
+    } catch (error: any) {
+      console.error('Erro ao obter módulos:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro ao carregar módulos'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
