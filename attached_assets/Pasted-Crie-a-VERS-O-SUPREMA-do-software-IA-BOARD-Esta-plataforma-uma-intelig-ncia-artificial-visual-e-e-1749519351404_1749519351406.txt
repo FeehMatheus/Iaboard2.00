@@ -1,0 +1,68 @@
+Crie a VERSÃO SUPREMA do software IA BOARD. Esta plataforma é uma inteligência artificial visual e estratégica que constrói funis completos de vendas (produtos físicos, digitais e serviços), com automações reais de criação, marketing e operação — tudo em uma interface interativa, moderna e poderosa.
+
+Baseie-se no seguinte conjunto de módulos e integrações já estabelecidos:
+
+✅ IA Espiã Aprimorada: analisa concorrentes reais, gera templates prontos, compara páginas, entrega textos persuasivos reais, permite edição manual e aplica otimizações baseadas em dados.
+
+✅ IA Vídeo Avançada: cria vídeos completos (roteiro + cenas + IA geradora), integrando com plataformas como Runway, Pictory e InVideo, com foco em vendas e tráfego.
+
+✅ IA Tráfego Inteligente: gera campanhas para Meta Ads e Google Ads, com criativos prontos, segmentações otimizadas, objetivos, testes A/B, orçamento e exportação.
+
+✅ IA Produto Rápido: constrói produtos digitais e físicos automaticamente com base no nicho e no avatar.
+
+✅ IA Total PRO+ (Pensamento Poderoso): une GPT-4, Claude, Gemini e outras IAs para criar o melhor funil possível, com raciocínio estratégico, aprendizado contínuo e resultados reais.
+
+✅ IA de Aprendizado Contínuo: analisa o histórico de cada projeto e melhora automaticamente as decisões da IA em novos fluxos.
+
+✅ IA de Retenção, Escala, Segmentação Comportamental e Produtos Conectados: adiciona camadas estratégicas reais ao funil e aos produtos, maximizando resultados.
+
+✅ Backend real em Flask + Node.js com integração completa com OpenAI, Anthropic (Claude) e Google AI (Gemini).
+
+✅ Interface visual com board infinito, blocos inteligentes interligados por linhas animadas, zoom adaptável, drag & drop, sistema de histórico, gravação e exportação (.PDF, .ZIP, .MP4).
+
+✅ Login com planos (Visitante, Criador e Total PRO+), painel de controle, área de projetos salvos e sistema de atualização automática.
+
+AGORA, leve tudo isso para o próximo nível.
+
+🔁 APRIMORE TUDO com mais poder, tecnologia e profundidade:
+
+1. Crie uma **nova página inicial** moderna, bonita e persuasiva, que explique o que a ferramenta faz e estimule a conversão. Estilo premium e simples.
+
+2. Integre **novas IAs úteis e reais**, como:
+   - IA para Branding (nome, logo, identidade visual)
+   - IA de Persuasão Avançada (gatilhos mentais por nicho)
+   - IA de Copywriting com base em dados de mercado
+   - IA de Página de Vendas com design gerado automaticamente
+   - IA de Imagens e Vídeos gerativos para produtos
+
+3. Inclua **nova arquitetura estratégica**:
+   - IA começa perguntando o objetivo do usuário (vender produto, criar página, escalar tráfego, etc.)
+   - Personaliza o fluxo de criação com base nessa decisão
+   - Dá nome criativo para o projeto/funil automaticamente
+   - Permite reusar blocos de outros funis (biblioteca pessoal)
+
+4. Crie um **Centro de Comando Inteligente**:
+   - Visualiza todo o fluxo do funil
+   - Permite reorganizar os blocos por arraste
+   - Mostra status de execução de cada IA
+   - Tem modo aprendizado (IA explica o que está fazendo)
+   - Possui botão de otimizar tudo com IA suprema
+
+5. Melhore a experiência online:
+   - Sistema 100% web com link direto para abrir e usar
+   - Autenticação integrada (sem senha no teste inicial)
+   - Plataforma personalizada com nome e logo do criador (Filippe)
+   - Permite exportar como APK ou instalador .EXE automaticamente
+
+ENTREGUE UM SISTEMA FUNCIONAL COMPLETO COM:
+
+- Estrutura de pastas organizada
+- Backend funcional (Node.js + Python Flask)
+- Frontend responsivo (React, Next.js ou HTML5 + JS)
+- Conexões com APIs reais de IA
+- Página index.html inicial com toda estrutura visual, botão “Começar Produto Inteligente”, fluxos IA ativáveis e layout bonito
+- Todas as funções visuais, blocos e módulos interativos incluídos
+
+A resposta deve conter **todo o código fonte completo**, backend e frontend, prontos para serem testados no Replit, Vercel, GitHub ou localmente.
+
+Aprimore tudo ao máximo. Construa a IA BOARD SUPREMA™ — versão final da plataforma.
