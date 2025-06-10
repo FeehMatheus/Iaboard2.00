@@ -113,20 +113,10 @@ function AppContent() {
     );
   }
 
-  // Página inicial
+  // Sistema Máquina Milionária completo
   return (
-    <div className="min-h-screen">
-      <MaquinaMilionaria 
-        onOpenFurion={handleOpenFurion}
-        onAccessPlatform={handleAccessPlatform}
-        onOpenLogin={handleOpenLogin}
-      />
-
-      {/* Furion AI Modal */}
-      {showFurion && (
-        <FurionAI onClose={handleCloseFurion} />
-      )}
-
+    <div>
+      <MaquinaMilionaria />
       <Toaster />
     </div>
   );
