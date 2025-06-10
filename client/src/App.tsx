@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import SupremaLanding from "@/pages/suprema-landing";
+import SuperiorLanding from "@/pages/superior-landing";
 import Dashboard from "@/pages/dashboard";
 import AIDashboard from "@/pages/ai-dashboard";
 import Home from "@/pages/home";
@@ -27,7 +28,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/">
-        {isAuthenticated ? <Dashboard /> : <SupremaLanding />}
+        {isAuthenticated ? <Dashboard /> : <SuperiorLanding />}
       </Route>
       <Route path="/landing" component={Landing} />
       <Route path="/suprema" component={SupremaLanding} />
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/ai" component={AIDashboard} />
       <Route path="/canvas" component={CanvasPage} />
       <Route path="/funnel" component={Home} />
+      <Route path="/superior" component={SuperiorLanding} />
       <Route path="/competitor-analysis" component={CompetitorAnalysisPage} />
       <Route component={NotFound} />
     </Switch>
