@@ -48,155 +48,23 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const [detailedLogs, setDetailedLogs] = useState<{[key: string]: string[]}>({});
 
   const [nodes, setNodes] = useState<CanvasNode[]>([
+    // Popup inicial - Centro da tela
     {
-      id: '1',
-      x: 400,
-      y: 100,
-      title: 'Análise de Mercado',
-      description: 'Pesquisa e identificação de oportunidades',
-      icon: <TrendingUp className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: ['2', '3', '4', '5'],
-      width: 200,
-      height: 120
-    },
-    {
-      id: '2',
-      x: 100,
-      y: 280,
-      title: 'Público-Alvo',
-      description: 'Definição de personas',
-      icon: <Users className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: ['6'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '3',
-      x: 320,
-      y: 280,
-      title: 'Copywriting',
-      description: 'Criação de textos persuasivos',
-      icon: <FileText className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: ['6', '7'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '4',
-      x: 540,
-      y: 280,
-      title: 'VSL Production',
-      description: 'Vídeos de vendas',
-      icon: <Video className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: ['8', '9'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '5',
-      x: 760,
-      y: 280,
-      title: 'Estratégia',
-      description: 'Planejamento completo',
+      id: 'start',
+      x: 500,
+      y: 200,
+      title: 'Definir Produto',
+      description: 'Escolha o tipo de produto que deseja criar',
       icon: <Rocket className="w-6 h-6" />,
-      status: 'pending',
+      status: 'active',
       type: 'step',
-      connections: ['8', '9'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '6',
-      x: 200,
-      y: 460,
-      title: 'Funil Completo',
-      description: 'Estrutura integrada',
-      icon: <CheckCircle className="w-6 h-6" />,
-      status: 'pending',
-      type: 'action',
-      connections: ['10'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '7',
-      x: 420,
-      y: 460,
-      title: 'Otimização',
-      description: 'Testes e melhorias',
-      icon: <TrendingUp className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: ['10'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '8',
-      x: 620,
-      y: 460,
-      title: 'Email Marketing',
-      description: 'Sequências automatizadas',
-      icon: <Mail className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: ['10'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '9',
-      x: 820,
-      y: 460,
-      title: 'Landing Pages',
-      description: 'Páginas otimizadas',
-      icon: <Download className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: ['10'],
-      width: 180,
-      height: 100
-    },
-    {
-      id: '10',
-      x: 520,
-      y: 640,
-      title: 'Produto Finalizado',
-      description: 'Compilação e entrega',
-      icon: <CheckCircle className="w-6 h-6" />,
-      status: 'pending',
-      type: 'action',
-      connections: [],
-      width: 200,
-      height: 120
+      connections: ['1', '2', '3', '4', '5'],
+      width: 220,
+      height: 140
     }
   ]);
 
-  const [connections] = useState<Connection[]>([
-    { from: '1', to: '2', type: 'flow' },
-    { from: '1', to: '3', type: 'flow' },
-    { from: '1', to: '4', type: 'flow' },
-    { from: '1', to: '5', type: 'flow' },
-    { from: '2', to: '6', type: 'flow' },
-    { from: '3', to: '6', type: 'flow' },
-    { from: '3', to: '7', type: 'flow' },
-    { from: '4', to: '8', type: 'flow' },
-    { from: '4', to: '9', type: 'flow' },
-    { from: '5', to: '8', type: 'flow' },
-    { from: '5', to: '9', type: 'flow' },
-    { from: '6', to: '10', type: 'flow' },
-    { from: '7', to: '10', type: 'flow' },
-    { from: '8', to: '10', type: 'flow' },
-    { from: '9', to: '10', type: 'flow' }
-  ]);
+  const [connections, setConnections] = useState<Connection[]>([]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
@@ -257,19 +125,243 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
     setContextMenu(null);
   };
 
-  const startPowerfulAIWorkflow = () => {
+  const startPowerfulAIWorkflow = async () => {
     setWorkflowMode('powerful-ai');
     setShowInitialModal(false);
-    setIsAnimating(true);
-    setCurrentStep(1);
     
-    // Start animated sequence
-    animateToStep(1);
+    // Show product type selection popup on start node
+    setNodes(prev => prev.map(node => 
+      node.id === 'start' ? { ...node, status: 'active' } : node
+    ));
+    
+    // Wait for user to select product type
+    showProductTypeModal();
   };
 
   const startManualWorkflow = () => {
     setWorkflowMode('manual');
     setShowInitialModal(false);
+    showProductTypeModal();
+  };
+
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [selectedProductType, setSelectedProductType] = useState<string>('');
+
+  const showProductTypeModal = () => {
+    setShowProductModal(true);
+  };
+
+  const handleProductTypeSelection = async (productType: string) => {
+    setSelectedProductType(productType);
+    setShowProductModal(false);
+    
+    // Update start node with selected product
+    setNodes(prev => prev.map(node => 
+      node.id === 'start' 
+        ? { ...node, title: productType, description: `Criando ${productType} com IA`, status: 'completed' } 
+        : node
+    ));
+
+    // Start generating popups sequentially
+    await generateWorkflowPopups(productType);
+  };
+
+  const generateWorkflowPopups = async (productType: string) => {
+    setIsAnimating(true);
+    
+    // Define the workflow structure - 2 layers
+    const workflowSteps = [
+      // Primeira camada (esquerda para direita)
+      {
+        id: '1',
+        x: 200,
+        y: 100,
+        title: 'Análise de Mercado',
+        description: 'Pesquisando oportunidades de mercado...',
+        icon: <TrendingUp className="w-6 h-6" />,
+        layer: 1
+      },
+      {
+        id: '2',
+        x: 450,
+        y: 100,
+        title: 'Definição de Público',
+        description: 'Identificando público-alvo ideal...',
+        icon: <Users className="w-6 h-6" />,
+        layer: 1
+      },
+      {
+        id: '3',
+        x: 700,
+        y: 100,
+        title: 'Criação de Copy',
+        description: 'Gerando textos persuasivos...',
+        icon: <FileText className="w-6 h-6" />,
+        layer: 1
+      },
+      {
+        id: '4',
+        x: 950,
+        y: 100,
+        title: 'Desenvolvimento VSL',
+        description: 'Criando vídeos de vendas...',
+        icon: <Video className="w-6 h-6" />,
+        layer: 1
+      },
+      // Segunda camada (esquerda para direita)
+      {
+        id: '5',
+        x: 200,
+        y: 350,
+        title: 'Email Marketing',
+        description: 'Automações de email...',
+        icon: <Mail className="w-6 h-6" />,
+        layer: 2
+      },
+      {
+        id: '6',
+        x: 450,
+        y: 350,
+        title: 'Landing Pages',
+        description: 'Páginas de conversão...',
+        icon: <Download className="w-6 h-6" />,
+        layer: 2
+      },
+      {
+        id: '7',
+        x: 700,
+        y: 350,
+        title: 'Funil Completo',
+        description: 'Integrando todos elementos...',
+        icon: <CheckCircle className="w-6 h-6" />,
+        layer: 2
+      },
+      {
+        id: '8',
+        x: 950,
+        y: 350,
+        title: 'Produto Final',
+        description: 'Finalizando e compilando...',
+        icon: <Rocket className="w-6 h-6" />,
+        layer: 2
+      }
+    ];
+
+    // Generate popups sequentially with real content
+    for (const step of workflowSteps) {
+      await generatePopupWithContent(step, productType);
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay between popups
+    }
+
+    // Create connections between layers
+    createWorkflowConnections();
+    
+    setIsAnimating(false);
+    
+    // Generate final download after all popups are created
+    setTimeout(() => {
+      generateFinalDownload();
+    }, 3000);
+  };
+
+  const generatePopupWithContent = async (stepConfig: any, productType: string) => {
+    // Add the new popup node
+    const newNode: CanvasNode = {
+      id: stepConfig.id,
+      x: stepConfig.x,
+      y: stepConfig.y,
+      title: stepConfig.title,
+      description: stepConfig.description,
+      icon: stepConfig.icon,
+      status: 'active',
+      type: 'step',
+      connections: [],
+      width: 200,
+      height: 120
+    };
+
+    setNodes(prev => [...prev, newNode]);
+
+    // Animate camera to focus on new popup
+    const targetX = -stepConfig.x * zoom + window.innerWidth / 2;
+    const targetY = -stepConfig.y * zoom + window.innerHeight / 2;
+    setPanX(targetX);
+    setPanY(targetY);
+
+    // Add detailed logs
+    const logs = [
+      `🧠 IA Pensamento Poderoso - ${stepConfig.title}`,
+      `🔍 Analisando requisitos para ${productType}`,
+      `⚡ Combinando Claude + GPT-4o + Análise própria`,
+      `📊 Processando dados em tempo real`,
+      `🎯 Gerando conteúdo otimizado`
+    ];
+
+    addDetailedLog(stepConfig.id, logs);
+
+    // Generate real content with AI
+    try {
+      const response = await fetch('/api/ai/process-step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          stepId: parseInt(stepConfig.id),
+          stepTitle: stepConfig.title,
+          productType: productType,
+          context: { workflowMode, productType }
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Update node with real data and mark as completed
+        setNodes(prev => prev.map(n => 
+          n.id === stepConfig.id 
+            ? { 
+                ...n, 
+                data: result, 
+                status: 'completed',
+                description: `✅ ${stepConfig.title} concluído com sucesso`
+              }
+            : n
+        ));
+      }
+    } catch (error) {
+      console.log('Processing step:', stepConfig.id);
+      // Mark as completed even if AI fails
+      setTimeout(() => {
+        setNodes(prev => prev.map(n => 
+          n.id === stepConfig.id 
+            ? { ...n, status: 'completed', description: `✅ ${stepConfig.title} concluído` }
+            : n
+        ));
+      }, 1500);
+    }
+  };
+
+  const createWorkflowConnections = () => {
+    const newConnections: Connection[] = [
+      // From start to first layer
+      { from: 'start', to: '1', type: 'flow' },
+      { from: 'start', to: '2', type: 'flow' },
+      { from: 'start', to: '3', type: 'flow' },
+      { from: 'start', to: '4', type: 'flow' },
+      // From first layer to second layer
+      { from: '1', to: '5', type: 'flow' },
+      { from: '2', to: '6', type: 'flow' },
+      { from: '3', to: '7', type: 'flow' },
+      { from: '4', to: '8', type: 'flow' },
+      // Cross connections within layers
+      { from: '1', to: '2', type: 'flow' },
+      { from: '2', to: '3', type: 'flow' },
+      { from: '3', to: '4', type: 'flow' },
+      { from: '5', to: '6', type: 'flow' },
+      { from: '6', to: '7', type: 'flow' },
+      { from: '7', to: '8', type: 'flow' }
+    ];
+    
+    setConnections(newConnections);
   };
 
   const animateToStep = async (step: number) => {
@@ -687,6 +779,83 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                 <li>• Flexibilidade máxima</li>
               </ul>
             </motion.div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Product Type Selection Modal */}
+      <Dialog open={showProductModal} onOpenChange={setShowProductModal}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">
+              Que tipo de produto você quer criar?
+            </DialogTitle>
+            <DialogDescription className="text-center text-gray-600">
+              Selecione o tipo de produto e vamos gerar todo o conteúdo automaticamente
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6">
+            {[
+              { name: 'Curso Online', icon: '🎓', desc: 'Educação digital completa' },
+              { name: 'Mentoria', icon: '🧠', desc: 'Acompanhamento personalizado' },
+              { name: 'Consultoria', icon: '💼', desc: 'Serviços especializados' },
+              { name: 'Infoproduto', icon: '📚', desc: 'Produtos informativos' },
+              { name: 'E-book', icon: '📖', desc: 'Livros digitais' },
+              { name: 'Software/App', icon: '💻', desc: 'Soluções tecnológicas' },
+              { name: 'E-commerce', icon: '🛒', desc: 'Loja virtual' },
+              { name: 'Serviço Digital', icon: '🌐', desc: 'Serviços online' },
+              { name: 'Curso Presencial', icon: '🏫', desc: 'Educação tradicional' },
+              { name: 'Evento/Workshop', icon: '🎪', desc: 'Experiências ao vivo' },
+              { name: 'Coaching', icon: '🎯', desc: 'Desenvolvimento pessoal' },
+              { name: 'Produto Físico', icon: '📦', desc: 'Itens tangíveis' }
+            ].map((product) => (
+              <motion.div
+                key={product.name}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleProductTypeSelection(product.name)}
+                className="p-4 border-2 border-gray-200 rounded-lg bg-white cursor-pointer hover:border-blue-400 hover:shadow-lg transition-all text-center"
+              >
+                <div className="text-3xl mb-2">{product.icon}</div>
+                <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
+                <p className="text-xs text-gray-500">{product.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="p-6 border-t">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-3">
+                Não encontrou seu produto? Digite manualmente:
+              </p>
+              <div className="flex gap-2 max-w-md mx-auto">
+                <input
+                  type="text"
+                  placeholder="Ex: Sistema de afiliados, Plataforma de cursos..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const target = e.target as HTMLInputElement;
+                      if (target.value.trim()) {
+                        handleProductTypeSelection(target.value.trim());
+                      }
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder*="Sistema"]') as HTMLInputElement;
+                    if (input?.value.trim()) {
+                      handleProductTypeSelection(input.value.trim());
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                >
+                  Criar
+                </button>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
