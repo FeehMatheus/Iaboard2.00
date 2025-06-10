@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Users, Clock, Zap, Brain, Globe, CheckCircle, Star, ArrowRight } from 'lucide-react';
+import { Play, Users, Clock, Zap, Brain, Globe, CheckCircle, Star, ArrowRight, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface LandingPageProps {
@@ -9,7 +9,7 @@ interface LandingPageProps {
   onAccessPlatform: () => void;
 }
 
-export default function LandingPage({ onOpenFurion, onAccessPlatform }: LandingPageProps) {
+export default function LandingPage({ onOpenFurion, onOpenFurionSuprema, onAccessPlatform }: LandingPageProps) {
   const [videoPlaying, setVideoPlaying] = useState(false);
 
   const testimonials = [
@@ -178,12 +178,23 @@ export default function LandingPage({ onOpenFurion, onAccessPlatform }: LandingP
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-4xl mx-auto">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-5xl mx-auto">
                 <Button 
                   size="lg" 
                   className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-12 py-6 text-xl font-bold flex-1 max-w-md"
                 >
                   QUERO TER UMA MÁQUINA MILIONÁRIA
+                </Button>
+                
+                <Button 
+                  onClick={onOpenFurionSuprema}
+                  size="lg" 
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-6 text-lg font-bold flex-1 max-w-md relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 animate-pulse"></div>
+                  <Brain className="w-5 h-5 mr-2 relative z-10" />
+                  <span className="relative z-10">FURION.AI SUPREMA</span>
+                  <span className="ml-2 bg-yellow-400 text-black px-2 py-1 rounded-full text-xs font-bold relative z-10">NOVO!</span>
                 </Button>
                 
                 <Button 
@@ -193,7 +204,7 @@ export default function LandingPage({ onOpenFurion, onAccessPlatform }: LandingP
                   className="border-orange-500 text-orange-400 hover:bg-orange-500/10 px-8 py-6 text-lg font-bold flex-1 max-w-md"
                 >
                   <Brain className="w-5 h-5 mr-2" />
-                  TESTAR FURION.AI GRÁTIS
+                  FURION.AI BÁSICO
                 </Button>
                 
                 <Button 
@@ -300,9 +311,10 @@ export default function LandingPage({ onOpenFurion, onAccessPlatform }: LandingP
         </div>
       </section>
 
-      {/* Furion.AI Section */}
-      <section className="py-20 px-6 bg-gradient-to-r from-purple-900 to-blue-900">
-        <div className="max-w-7xl mx-auto text-center">
+      {/* Furion.AI Suprema Section */}
+      <section className="py-20 px-6 bg-gradient-to-r from-purple-900 to-blue-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 animate-pulse"></div>
+        <div className="max-w-7xl mx-auto text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -310,27 +322,78 @@ export default function LandingPage({ onOpenFurion, onAccessPlatform }: LandingP
             viewport={{ once: true }}
           >
             <div className="flex items-center justify-center space-x-2 mb-6">
-              <span className="bg-orange-500 text-white px-4 py-2 rounded-full font-bold">NOVIDADE:</span>
-              <span className="text-3xl font-bold">FURION.AI</span>
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-3 rounded-full font-bold text-lg">
+                🚀 LANÇAMENTO SUPREMO:
+              </span>
+              <span className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                FURION.AI SUPREMA
+              </span>
               <CheckCircle className="w-8 h-8 text-green-400" />
             </div>
             
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              A inteligência forjada para transformar ideias em dinheiro!
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Sistema de Quadros Infinitos + IA Multimilionária!
             </h2>
             
-            <p className="text-xl text-gray-200 mb-8 max-w-4xl mx-auto leading-relaxed">
-              Ambiciosamente eu e a minha equipe reunimos todo o conhecimento que acumulamos em 12 anos e criamos uma inteligência capaz de ser o seu maior e talvez ÚNICO aliado para vender milhões! Uma máquina com poderes de uma equipe de marketing completa, seja para um simples iniciante, um empreendedor de loja física ou até mesmo um dono de um império das vendas…
+            <p className="text-xl text-gray-200 mb-8 max-w-5xl mx-auto leading-relaxed">
+              A evolução definitiva do Furion.AI! Agora com sistema de quadros infinitos, 8 módulos especializados de IA, geração automática de recursos visuais e capacidade de criar campanhas completas que faturam milhões. Uma plataforma visual inteligente que organiza todas as suas ideias em um canvas infinito enquanto a IA mais avançada do mercado trabalha para você!
             </p>
+
+            <div className="grid md:grid-cols-4 gap-6 mb-8 max-w-6xl mx-auto">
+              <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                  <Eye className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">IA Espiã Suprema</h3>
+                <p className="text-sm text-gray-300">Análise profunda da concorrência e identificação de oportunidades ocultas</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 backdrop-blur-sm rounded-xl p-6 border border-yellow-500/30">
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Branding Master</h3>
+                <p className="text-sm text-gray-300">Criação de marcas multimilionárias com identidade visual completa</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-600/20 to-teal-600/20 backdrop-blur-sm rounded-xl p-6 border border-green-500/30">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                  <Zap className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Copywriter Pro</h3>
+                <p className="text-sm text-gray-300">Textos que convertem baseados em 12 anos de experiência real</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-red-600/20 to-pink-600/20 backdrop-blur-sm rounded-xl p-6 border border-red-500/30">
+                <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+                  <Globe className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-lg mb-2">Sistema Infinito</h3>
+                <p className="text-sm text-gray-300">Canvas infinito para organizar projetos e campanhas visualmente</p>
+              </div>
+            </div>
             
-            <Button
-              onClick={onOpenFurion}
-              size="lg"
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-6 text-xl font-bold"
-            >
-              <Brain className="w-6 h-6 mr-3" />
-              CONHECER O FURION.AI
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                onClick={onOpenFurionSuprema}
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-12 py-6 text-xl font-bold relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 animate-pulse"></div>
+                <Brain className="w-6 h-6 mr-3 relative z-10" />
+                <span className="relative z-10">EXPERIMENTAR FURION SUPREMA</span>
+              </Button>
+              
+              <Button
+                onClick={onOpenFurion}
+                size="lg"
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10 px-12 py-6 text-xl font-bold"
+              >
+                <Brain className="w-6 h-6 mr-3" />
+                FURION BÁSICO (GRÁTIS)
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
