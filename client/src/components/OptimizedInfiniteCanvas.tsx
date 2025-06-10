@@ -42,6 +42,7 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [showInitialModal, setShowInitialModal] = useState(false);
   const [showCanvasPopup, setShowCanvasPopup] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(false);
   const [contextMenu, setContextMenu] = useState<{x: number, y: number, nodeId: string} | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -613,6 +614,113 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Sidebar Toggle */}
+      <button
+        onClick={() => setShowSidebar(!showSidebar)}
+        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+        title="Menu"
+      >
+        <Menu className="w-5 h-5 text-gray-600" />
+      </button>
+
+      {/* Collapsible Sidebar */}
+      <motion.div 
+        className="fixed left-0 top-0 h-full bg-white shadow-xl border-r border-gray-200 z-40"
+        initial={{ x: -280 }}
+        animate={{ x: showSidebar ? 0 : -280 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        style={{ width: '280px' }}
+      >
+        <div className="p-4 h-full flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-bold text-gray-800">IA Board V2</h2>
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="p-1 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          
+          {/* Program Shortcuts */}
+          <div className="space-y-4 flex-1">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 mb-2">Criação</h3>
+              <div className="space-y-1">
+                <button
+                  onClick={() => {setShowCanvasPopup(true); setShowSidebar(false);}}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <Plus className="w-4 h-4 text-blue-500" />
+                  <span className="text-sm">Novo Produto</span>
+                </button>
+                <button 
+                  onClick={() => {startPowerfulAIWorkflow(); setShowSidebar(false);}}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <Brain className="w-4 h-4 text-emerald-500" />
+                  <span className="text-sm">IA Pensamento Poderoso</span>
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 mb-2">Visualização</h3>
+              <div className="space-y-1">
+                <button
+                  onClick={() => setZoom(Math.min(2, zoom + 0.2))}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <ZoomIn className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm">Aumentar Zoom</span>
+                </button>
+                <button
+                  onClick={() => setZoom(Math.max(0.3, zoom - 0.2))}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <ZoomOut className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm">Diminuir Zoom</span>
+                </button>
+                <button
+                  onClick={() => { setZoom(1); setPanX(0); setPanY(0); }}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm">Centralizar Vista</span>
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-semibold text-gray-600 mb-2">Exportação</h3>
+              <div className="space-y-1">
+                <button
+                  onClick={() => {onSave?.(); setShowSidebar(false);}}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <Save className="w-4 h-4 text-green-500" />
+                  <span className="text-sm">Salvar Projeto</span>
+                </button>
+                <button
+                  onClick={() => {onExport?.(); setShowSidebar(false);}}
+                  className="w-full flex items-center gap-3 p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <Download className="w-4 h-4 text-purple-500" />
+                  <span className="text-sm">Baixar Conteúdo</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Footer */}
+          <div className="border-t border-gray-200 pt-4">
+            <div className="text-xs text-gray-500 text-center">
+              IA Board V2 - Powered by AI
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Optimized Header - Fixed Position */}
       <div className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-20 border-b flex items-center justify-between px-6">
         <h1 className="text-xl font-bold text-gray-800">Canvas Infinito - IA Board V2</h1>
@@ -718,60 +826,110 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                   ? 'bg-blue-50 border-blue-500 shadow-lg'
                   : 'bg-white border-gray-300 hover:border-gray-400'
               }`}>
-                <CardContent className="p-4 h-full flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`p-1 rounded ${
-                        node.status === 'completed' 
-                          ? 'bg-green-100 text-green-600' 
-                          : node.status === 'active'
-                          ? 'bg-blue-100 text-blue-600'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        {node.icon}
-                      </div>
-                      <div className="flex-1">
+                <CardContent className="p-3 h-full flex flex-col">
+                  {/* Product Selection Interface */}
+                  {node.id === 'product-selection' && node.status === 'active' && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="p-1 rounded bg-blue-100 text-blue-600">
+                          {node.icon}
+                        </div>
                         <h3 className="font-semibold text-sm">{node.title}</h3>
                       </div>
-                    </div>
-                    <p className="text-xs text-gray-600 line-clamp-2">
-                      {node.description}
-                    </p>
-                  </div>
-                  
-                  <div className="flex justify-between items-center mt-2">
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      node.status === 'completed' 
-                        ? 'bg-green-100 text-green-800' 
-                        : node.status === 'active'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {node.status === 'completed' ? 'Concluído' : 
-                       node.status === 'active' ? 'Ativo' : 'Pendente'}
-                    </span>
-                    
-                    {/* Detailed logs for active nodes */}
-                    {node.status === 'active' && detailedLogs[node.id] && (
-                      <div className="absolute top-full left-0 w-80 mt-2 p-3 bg-white border border-blue-200 rounded-lg shadow-lg z-50 max-w-sm">
-                        <h4 className="font-semibold text-sm mb-2 text-blue-800">IA Pensamento Poderoso - Logs</h4>
-                        <div className="space-y-1">
-                          {detailedLogs[node.id].map((log, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.5 }}
-                              className="text-xs text-gray-700 flex items-center gap-2"
-                            >
-                              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                              {log}
-                            </motion.div>
-                          ))}
-                        </div>
+                      <p className="text-xs text-gray-600 mb-3">Escolha seu produto:</p>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {[
+                          { name: 'Curso Online', icon: '🎓' },
+                          { name: 'Mentoria', icon: '🧠' },
+                          { name: 'E-book', icon: '📖' },
+                          { name: 'Consultoria', icon: '💼' },
+                          { name: 'Software', icon: '💻' },
+                          { name: 'E-commerce', icon: '🛒' }
+                        ].map((product) => (
+                          <button
+                            key={product.name}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleProductTypeSelection(product.name);
+                            }}
+                            className="p-2 text-xs bg-white border border-gray-200 rounded hover:border-blue-400 hover:bg-blue-50 transition-all text-center"
+                          >
+                            <div className="text-base mb-1">{product.icon}</div>
+                            <div className="font-medium text-xs">{product.name}</div>
+                          </button>
+                        ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                  
+                  {/* Regular Node Content */}
+                  {(node.id !== 'product-selection' || node.status !== 'active') && (
+                    <>
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`p-1 rounded ${
+                            node.status === 'completed' 
+                              ? 'bg-green-100 text-green-600' 
+                              : node.status === 'active'
+                              ? 'bg-blue-100 text-blue-600'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            {node.icon}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-sm">{node.title}</h3>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-600 line-clamp-3">
+                          {node.description}
+                        </p>
+                      </div>
+                      
+                      {/* Progress indicator for active nodes */}
+                      {node.status === 'active' && (
+                        <div className="mt-2">
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div className="bg-blue-500 h-1.5 rounded-full animate-pulse" style={{width: '70%'}}></div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Data summary for completed nodes */}
+                      {node.status === 'completed' && node.data && (
+                        <div className="mt-2 text-xs">
+                          <div className="bg-green-100 p-2 rounded border-l-2 border-green-400">
+                            <div className="font-medium text-green-800">Concluído ✓</div>
+                            {Object.keys(node.data).length > 0 && (
+                              <div className="text-green-600 mt-1">
+                                {Object.keys(node.data).length} elementos gerados
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between items-center mt-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          node.status === 'completed' 
+                            ? 'bg-green-100 text-green-800' 
+                            : node.status === 'active'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {node.status === 'completed' ? 'Concluído' : 
+                           node.status === 'active' ? 'Processando' : 'Pendente'}
+                        </span>
+                        
+                        {node.status === 'active' && (
+                          <div className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                        )}
+                        
+                        {node.status === 'completed' && (
+                          <CheckCircle className="w-3 h-3 text-green-600" />
+                        )}
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
