@@ -61,24 +61,30 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
     
     // Special handling for product selection popup
     if (node.id === 'product-selection' && node.status === 'active') {
-      return { width: 320, height: 260 };
+      return { width: 340, height: 280 };
     }
     
     // Calculate width based on title and description length
     const titleLength = node.title.length;
     const descriptionLength = node.description.length;
     
-    let width = Math.max(baseWidth, Math.min(titleLength * 8 + 40, 300));
+    let width = Math.max(baseWidth, Math.min(titleLength * 9 + 60, 320));
     let height = baseHeight;
     
-    // Adjust height based on description length
-    if (descriptionLength > 50) {
-      height += Math.floor(descriptionLength / 50) * 20;
+    // Adjust height based on description length and content
+    if (descriptionLength > 40) {
+      height += Math.floor(descriptionLength / 40) * 22;
     }
     
     // Add space for data content if completed
     if (node.status === 'completed' && node.data) {
-      height += 60;
+      const dataKeys = Object.keys(node.data).length;
+      height += Math.min(dataKeys * 15 + 45, 80);
+    }
+    
+    // Add space for progress indicators
+    if (node.status === 'active') {
+      height += 25;
     }
     
     // Ensure minimum dimensions
@@ -176,8 +182,9 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       status: 'active',
       type: 'step',
       connections: [],
-      width: 320,
-      height: 240
+      autoResize: true,
+      minWidth: 320,
+      minHeight: 240
     };
 
     setNodes([productPopup]);
@@ -319,8 +326,9 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       status: 'active',
       type: 'step',
       connections: [],
-      width: 200,
-      height: 140
+      autoResize: true,
+      minWidth: 200,
+      minHeight: 140
     };
 
     setNodes(prev => [...prev, newNode]);
@@ -839,8 +847,8 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
               style={{
                 left: node.x,
                 top: node.y,
-                width: node.width || 180,
-                height: node.height || 100
+                width: node.autoResize !== false ? calculateNodeDimensions(node).width : (node.width || 180),
+                height: node.autoResize !== false ? calculateNodeDimensions(node).height : (node.height || 100)
               }}
               drag
               dragMomentum={false}
@@ -863,7 +871,7 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                   ? 'bg-blue-50 border-blue-500 shadow-lg'
                   : 'bg-white border-gray-300 hover:border-gray-400'
               }`}>
-                <CardContent className="p-3 h-full flex flex-col">
+                <CardContent className="p-4 h-full flex flex-col overflow-hidden">
                   {/* Product Selection Interface */}
                   {node.id === 'product-selection' && node.status === 'active' && (
                     <div className="space-y-2">
@@ -874,7 +882,7 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                         <h3 className="font-semibold text-sm">{node.title}</h3>
                       </div>
                       <p className="text-xs text-gray-600 mb-3">Escolha seu produto:</p>
-                      <div className="grid grid-cols-2 gap-1.5">
+                      <div className="grid grid-cols-2 gap-2">
                         {[
                           { name: 'Curso Online', icon: '🎓' },
                           { name: 'Mentoria', icon: '🧠' },
@@ -889,10 +897,10 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                               e.stopPropagation();
                               handleProductTypeSelection(product.name);
                             }}
-                            className="p-2 text-xs bg-white border border-gray-200 rounded hover:border-blue-400 hover:bg-blue-50 transition-all text-center"
+                            className="p-3 text-xs bg-white border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all text-center min-h-[60px] flex flex-col items-center justify-center"
                           >
-                            <div className="text-base mb-1">{product.icon}</div>
-                            <div className="font-medium text-xs">{product.name}</div>
+                            <div className="text-lg mb-1">{product.icon}</div>
+                            <div className="font-medium text-xs leading-tight">{product.name}</div>
                           </button>
                         ))}
                       </div>
