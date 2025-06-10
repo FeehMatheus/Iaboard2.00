@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { furionAI } from "./furion-ai-system";
+import { furionSupremaEngine } from "./furion-suprema-engine";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -115,7 +116,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ROTAS DO FURION.AI
   // ================================
 
-  // Processar solicitação do Furion.AI
+  // Processar solicitação do Furion.AI Suprema
+  app.post('/api/furion/processar-supremo', authenticateDemo, async (req: any, res) => {
+    try {
+      const furionSchema = z.object({
+        tipo: z.enum(['produto', 'copy', 'anuncio', 'funil', 'estrategia', 'landing', 'vsl', 'email']),
+        prompt: z.string().min(1),
+        nicho: z.string().optional(),
+        avatarCliente: z.string().optional(),
+        orcamento: z.string().optional(),
+        objetivo: z.string().optional(),
+        tonalidade: z.enum(['profissional', 'casual', 'persuasiva', 'urgente', 'exclusiva']).optional(),
+        complexidade: z.enum(['basico', 'intermediario', 'avancado', 'supremo']).optional(),
+        sistemInfiniteBoard: z.boolean().optional(),
+        configuracaoAvancada: z.object({
+          gerarQuadros: z.boolean().optional(),
+          incluirRecursos: z.boolean().optional(),
+          formatoSaida: z.enum(['supremo', 'padrao']).optional(),
+          modulosAtivos: z.array(z.string()).optional(),
+        }).optional(),
+      });
+
+      const validatedData = furionSchema.parse(req.body);
+      
+      // Verificar créditos do usuário
+      const user = await storage.getUser(req.user.id);
+      if (!user || (user.furionCredits || 0) <= 0) {
+        return res.status(402).json({ 
+          message: "Insufficient Furion credits",
+          creditsRemaining: user?.furionCredits || 0 
+        });
+      }
+
+      console.log(`🧠 Furion Suprema - Processando: ${validatedData.tipo} (Complexidade: ${validatedData.complexidade || 'supremo'})`);
+      
+      // Processar com Furion Suprema Engine
+      const resultado = await furionSupremaEngine.processarSupremo(validatedData);
+      
+      // Salvar sessão do Furion
+      await storage.createFurionSession({
+        userId: req.user.id,
+        type: validatedData.tipo,
+        prompt: validatedData.prompt,
+        response: resultado,
+        metadata: {
+          nicho: validatedData.nicho,
+          avatarCliente: validatedData.avatarCliente,
+          orcamento: validatedData.orcamento,
+          complexidade: validatedData.complexidade,
+          sistemInfiniteBoard: validatedData.sistemInfiniteBoard,
+          configuracaoAvancada: validatedData.configuracaoAvancada,
+        },
+        creditsUsed: validatedData.complexidade === 'supremo' ? 3 : 1,
+      });
+
+      // Atualizar créditos do usuário
+      const creditsUsed = validatedData.complexidade === 'supremo' ? 3 : 1;
+      await storage.updateUserCredits(req.user.id, (user.furionCredits || 0) - creditsUsed);
+
+      res.json(resultado);
+    } catch (error) {
+      console.error("Error processing Furion Suprema request:", error);
+      res.status(500).json({ 
+        message: "Failed to process Furion Suprema request",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Processar solicitação do Furion.AI básico
   app.post('/api/furion/processar', authenticateDemo, async (req: any, res) => {
     try {
       const furionSchema = z.object({

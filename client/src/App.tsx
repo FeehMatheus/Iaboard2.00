@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import LandingPage from '@/pages/LandingPage';
 import Dashboard from '@/pages/Dashboard';
 import FurionInterface from '@/components/FurionInterface';
+import FurionSuprema from '@/components/FurionSuprema';
 import { useAuth } from '@/hooks/useAuth';
 
 const queryClient = new QueryClient({
@@ -18,6 +19,7 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const [showFurion, setShowFurion] = useState(false);
+  const [showFurionSuprema, setShowFurionSuprema] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const handleOpenFurion = () => {
@@ -28,6 +30,14 @@ function AppContent() {
     setShowFurion(false);
   };
 
+  const handleOpenFurionSuprema = () => {
+    setShowFurionSuprema(true);
+  };
+
+  const handleCloseFurionSuprema = () => {
+    setShowFurionSuprema(false);
+  };
+
   const handleAccessPlatform = () => {
     window.location.href = '/dashboard';
   };
@@ -35,9 +45,10 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Switch>
-        <Route path="/" exact>
+        <Route path="/">
           <LandingPage 
             onOpenFurion={handleOpenFurion}
+            onOpenFurionSuprema={handleOpenFurionSuprema}
             onAccessPlatform={handleAccessPlatform}
           />
         </Route>
@@ -69,6 +80,11 @@ function AppContent() {
       {/* Furion Interface Modal */}
       {showFurion && (
         <FurionInterface onClose={handleCloseFurion} />
+      )}
+
+      {/* Furion Suprema Interface Modal */}
+      {showFurionSuprema && (
+        <FurionSuprema onClose={handleCloseFurionSuprema} />
       )}
 
       <Toaster />

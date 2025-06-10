@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 
 interface LandingPageProps {
   onOpenFurion: () => void;
+  onOpenFurionSuprema: () => void;
   onAccessPlatform: () => void;
 }
 
