@@ -76,10 +76,10 @@ export default function ThiagoFinchAI({ onBack }: ThiagoFinchAIProps) {
   const processAIMutation = useMutation({
     mutationFn: async (data: { prompt: string; type: string }) => {
       const response = await apiRequest('POST', '/api/thiago-ai/process', data);
-      return response;
+      return await response.json();
     },
-    onSuccess: (result) => {
-      const ticketId = result.ticketId;
+    onSuccess: (result: any) => {
+      const ticketId = result.ticketId || result.id;
       updateTicketStatus(ticketId, 'completed', result);
       toast({
         title: "IA Processada com Sucesso!",

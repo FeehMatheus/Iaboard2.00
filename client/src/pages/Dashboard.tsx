@@ -26,7 +26,8 @@ import {
   BookOpen,
   Video,
   Mail,
-  Globe
+  Globe,
+  Cpu
 } from 'lucide-react';
 import VideoStudio from '@/components/VideoStudio';
 import { motion } from 'framer-motion';
@@ -58,7 +59,7 @@ interface DashboardProps {
   onOpenThiagoFinchAI?: () => void;
 }
 
-export default function Dashboard({ user: currentUser, onOpenFurionCanvas }: DashboardProps) {
+export default function Dashboard({ user: currentUser, onOpenFurionCanvas, onOpenThiagoFinchAI }: DashboardProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activePhase, setActivePhase] = useState(1);
   const [showVideoStudio, setShowVideoStudio] = useState(false);
@@ -421,6 +422,13 @@ export default function Dashboard({ user: currentUser, onOpenFurionCanvas }: Das
                             >
                               <Brain className="w-4 h-4 mr-2" />
                               Abrir Canvas Infinito Furion
+                            </Button>
+                            <Button 
+                              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white" 
+                              onClick={onOpenThiagoFinchAI}
+                            >
+                              <Cpu className="w-4 h-4 mr-2" />
+                              Sistema IA Avançado
                             </Button>
                             <Button 
                               className="w-full" 
