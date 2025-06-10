@@ -700,6 +700,7 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
     }
   };
 
+  // Enhanced interactive connection rendering
   const renderConnections = () => {
     const connectionPairs: Connection[] = [];
     
@@ -728,39 +729,107 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       const toX = toNode.x + 110;
       const toY = toNode.y; // Top of target node
 
-      // Calculate curved path for professional appearance
+      // Calculate smooth curved path
       const midX = (fromX + toX) / 2;
-      const curvature = Math.abs(toY - fromY) * 0.3;
+      const curvature = Math.abs(toY - fromY) * 0.4;
+      const pathId = `path-${connection.from}-${connection.to}`;
 
       return (
         <g key={`${connection.from}-${connection.to}-${index}`}>
           <defs>
+            {/* Enhanced gradient with more vibrant colors */}
             <linearGradient id={`conn-gradient-${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#3b82f6', stopOpacity: 0.9 }} />
-              <stop offset="50%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.8 }} />
-              <stop offset="100%" style={{ stopColor: '#06b6d4', stopOpacity: 0.7 }} />
+              <stop offset="0%" style={{ stopColor: '#00d4ff', stopOpacity: 1 }} />
+              <stop offset="30%" style={{ stopColor: '#7c3aed', stopOpacity: 0.9 }} />
+              <stop offset="70%" style={{ stopColor: '#00ffa3', stopOpacity: 0.8 }} />
+              <stop offset="100%" style={{ stopColor: '#ff6b6b', stopOpacity: 0.9 }} />
             </linearGradient>
+            
+            {/* Glow effect */}
+            <filter id={`glow-${index}`} x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+              <feMerge> 
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
           </defs>
           
-          {/* Animated connection path */}
+          {/* Interactive connection path without arrows */}
           <motion.path
+            id={pathId}
             d={`M ${fromX} ${fromY} Q ${midX} ${fromY + curvature} ${toX} ${toY}`}
             stroke={`url(#conn-gradient-${index})`}
-            strokeWidth="3"
+            strokeWidth="4"
             fill="none"
-            markerEnd="url(#arrowhead)"
+            filter={`url(#glow-${index})`}
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 1 }}
             transition={{ 
-              duration: 1.0, 
-              delay: index * 0.2,
+              duration: 1.2, 
+              delay: index * 0.3,
               ease: "easeInOut"
             }}
-            className="drop-shadow-sm"
+            className="cursor-pointer hover:stroke-6 transition-all duration-200"
+            onClick={() => handleConnectionClick(connection.from, connection.to)}
+            style={{ pointerEvents: 'stroke' }}
+          />
+          
+          {/* Animated flow particles */}
+          <motion.circle
+            r="3"
+            fill="#00d4ff"
+            initial={{ offsetDistance: "0%" }}
+            animate={{ offsetDistance: "100%" }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "linear",
+              delay: index * 0.4
+            }}
+            style={{
+              offsetPath: `path('M ${fromX} ${fromY} Q ${midX} ${fromY + curvature} ${toX} ${toY}')`
+            }}
+          />
+          
+          {/* Secondary particle for extra visual appeal */}
+          <motion.circle
+            r="2"
+            fill="#00ffa3"
+            initial={{ offsetDistance: "0%" }}
+            animate={{ offsetDistance: "100%" }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear",
+              delay: index * 0.4 + 1
+            }}
+            style={{
+              offsetPath: `path('M ${fromX} ${fromY} Q ${midX} ${fromY + curvature} ${toX} ${toY}')`
+            }}
           />
         </g>
       );
     });
+  };
+
+  // Handle connection click for interaction
+  const handleConnectionClick = (fromId: string, toId: string) => {
+    // Remove connection when clicked
+    setNodes(prev => prev.map(node => 
+      node.id === fromId 
+        ? { ...node, connections: node.connections.filter(id => id !== toId) }
+        : node
+    ));
+  };
+
+  // Add connection between nodes (for user interaction)
+  const addConnection = (fromId: string, toId: string) => {
+    setNodes(prev => prev.map(node => 
+      node.id === fromId 
+        ? { ...node, connections: [...node.connections, toId] }
+        : node
+    ));
   };
 
   // Click outside to clear context menu
