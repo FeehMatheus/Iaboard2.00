@@ -730,7 +730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { workflowData, mode } = req.body;
       
-      const JSZip = require('jszip');
+      const JSZip = (await import('jszip')).default;
       const zip = new JSZip();
 
       // Generate comprehensive package using all workflow data

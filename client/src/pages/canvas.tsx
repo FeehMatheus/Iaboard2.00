@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import InfiniteCanvas from '@/components/InfiniteCanvas';
+import OptimizedInfiniteCanvas from '@/components/OptimizedInfiniteCanvas';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
@@ -85,13 +85,13 @@ export default function CanvasPage() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="h-screen bg-gray-50 overflow-hidden">
       {isPowerfulAIMode && (
-        <div className="absolute top-4 left-4 z-50 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+        <div className="absolute top-20 left-6 z-50 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
           🧠 IA Pensamento Poderoso Ativa
         </div>
       )}
-      <InfiniteCanvas 
+      <OptimizedInfiniteCanvas 
         onExport={handleExport}
         onSave={handleSave}
         powerfulAIMode={isPowerfulAIMode}

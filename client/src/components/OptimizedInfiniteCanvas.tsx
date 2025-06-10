@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
-import { Brain, Target, Rocket, Users, TrendingUp, FileText, Video, Mail, Download, CheckCircle, Plus, Trash2, Edit3, Copy, Play, RotateCcw } from 'lucide-react';
+import { Brain, Target, Rocket, Users, TrendingUp, FileText, Video, Mail, Download, CheckCircle, Plus, Trash2, Edit3, Copy, ZoomIn, ZoomOut, Grid, Settings, Save, Download as DownloadIcon, Play, Pause, RotateCcw, Link, Unlink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface CanvasNode {
   id: string;
@@ -31,17 +34,12 @@ interface InfiniteCanvasProps {
   powerfulAIMode?: boolean;
 }
 
-export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: InfiniteCanvasProps) {
+export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMode }: InfiniteCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(1);
   const [panX, setPanX] = useState(0);
   const [panY, setPanY] = useState(0);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  
-  const [showGrid, setShowGrid] = useState(true);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [showInitialModal, setShowInitialModal] = useState(true);
   const [contextMenu, setContextMenu] = useState<{x: number, y: number, nodeId: string} | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -55,8 +53,8 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
       x: 400,
       y: 100,
       title: 'Análise de Mercado',
-      description: 'Pesquisa e análise competitiva com IA',
-      icon: <Brain className="w-6 h-6" />,
+      description: 'Pesquisa e identificação de oportunidades',
+      icon: <TrendingUp className="w-6 h-6" />,
       status: 'pending',
       type: 'step',
       connections: ['2', '3', '4', '5'],
@@ -65,24 +63,24 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     },
     {
       id: '2',
-      x: 200,
+      x: 100,
       y: 280,
       title: 'Público-Alvo',
-      description: 'Identificação e segmentação',
-      icon: <Target className="w-6 h-6" />,
+      description: 'Definição de personas',
+      icon: <Users className="w-6 h-6" />,
       status: 'pending',
       type: 'step',
-      connections: ['6', '7'],
+      connections: ['6'],
       width: 180,
       height: 100
     },
     {
       id: '3',
-      x: 400,
+      x: 320,
       y: 280,
-      title: 'Estratégia de Produto',
-      description: 'Posicionamento e diferenciação',
-      icon: <Rocket className="w-6 h-6" />,
+      title: 'Copywriting',
+      description: 'Criação de textos persuasivos',
+      icon: <FileText className="w-6 h-6" />,
       status: 'pending',
       type: 'step',
       connections: ['6', '7'],
@@ -91,11 +89,11 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     },
     {
       id: '4',
-      x: 600,
+      x: 540,
       y: 280,
-      title: 'Análise Competitiva',
-      description: 'Mapeamento da concorrência',
-      icon: <Users className="w-6 h-6" />,
+      title: 'VSL Production',
+      description: 'Vídeos de vendas',
+      icon: <Video className="w-6 h-6" />,
       status: 'pending',
       type: 'step',
       connections: ['8', '9'],
@@ -104,11 +102,11 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     },
     {
       id: '5',
-      x: 800,
+      x: 760,
       y: 280,
-      title: 'Projeção ROI',
-      description: 'Estimativas e métricas',
-      icon: <TrendingUp className="w-6 h-6" />,
+      title: 'Estratégia',
+      description: 'Planejamento completo',
+      icon: <Rocket className="w-6 h-6" />,
       status: 'pending',
       type: 'step',
       connections: ['8', '9'],
@@ -117,24 +115,24 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     },
     {
       id: '6',
-      x: 300,
+      x: 200,
       y: 460,
-      title: 'Copy Persuasivo',
-      description: 'Textos de alta conversão',
-      icon: <FileText className="w-6 h-6" />,
+      title: 'Funil Completo',
+      description: 'Estrutura integrada',
+      icon: <CheckCircle className="w-6 h-6" />,
       status: 'pending',
-      type: 'step',
+      type: 'action',
       connections: ['10'],
       width: 180,
       height: 100
     },
     {
       id: '7',
-      x: 500,
+      x: 420,
       y: 460,
-      title: 'VSL Profissional',
-      description: 'Video Sales Letter',
-      icon: <Video className="w-6 h-6" />,
+      title: 'Otimização',
+      description: 'Testes e melhorias',
+      icon: <TrendingUp className="w-6 h-6" />,
       status: 'pending',
       type: 'step',
       connections: ['10'],
@@ -143,7 +141,7 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     },
     {
       id: '8',
-      x: 700,
+      x: 620,
       y: 460,
       title: 'Email Marketing',
       description: 'Sequências automatizadas',
@@ -156,7 +154,7 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     },
     {
       id: '9',
-      x: 900,
+      x: 820,
       y: 460,
       title: 'Landing Pages',
       description: 'Páginas otimizadas',
@@ -169,7 +167,7 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     },
     {
       id: '10',
-      x: 500,
+      x: 520,
       y: 640,
       title: 'Produto Finalizado',
       description: 'Compilação e entrega',
@@ -411,36 +409,19 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
     if (node) {
       const newNode: CanvasNode = {
         ...node,
-        id: `${nodeId}_copy_${Date.now()}`,
-        x: node.x + 50,
-        y: node.y + 50,
+        id: `${Date.now()}`,
+        x: node.x + 20,
+        y: node.y + 20,
         connections: []
       };
       setNodes(prev => [...prev, newNode]);
     }
   };
 
-  const addNewNode = () => {
-    const newNode: CanvasNode = {
-      id: `node_${Date.now()}`,
-      x: 500 + Math.random() * 200,
-      y: 300 + Math.random() * 200,
-      title: 'Nova Etapa',
-      description: 'Descrição da etapa',
-      icon: <Plus className="w-6 h-6" />,
-      status: 'pending',
-      type: 'step',
-      connections: [],
-      width: 180,
-      height: 100
-    };
-    setNodes(prev => [...prev, newNode]);
-  };
-
   const renderConnections = () => {
-    return connections.map((conn, index) => {
-      const fromNode = nodes.find(n => n.id === conn.from);
-      const toNode = nodes.find(n => n.id === conn.to);
+    return connections.map((connection, index) => {
+      const fromNode = nodes.find(n => n.id === connection.from);
+      const toNode = nodes.find(n => n.id === connection.to);
       
       if (!fromNode || !toNode) return null;
 
@@ -449,44 +430,62 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
       const toX = toNode.x + (toNode.width || 180) / 2;
       const toY = toNode.y;
 
-      const controlY = fromY + (toY - fromY) / 2;
-
       return (
-        <path
-          key={`${conn.from}-${conn.to}-${index}`}
-          d={`M ${fromX} ${fromY} Q ${fromX} ${controlY} ${toX} ${toY}`}
+        <line
+          key={index}
+          x1={fromX}
+          y1={fromY}
+          x2={toX}
+          y2={toY}
           stroke="#4f46e5"
           strokeWidth="2"
-          fill="none"
           markerEnd="url(#arrowhead)"
-          className="transition-all duration-300"
         />
       );
     });
   };
 
-  
+  // Click outside to clear context menu
+  useEffect(() => {
+    const handleClick = () => {
+      if (contextMenu) {
+        setContextMenu(null);
+      }
+    };
+    
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [contextMenu]);
 
   return (
-    <div className="h-screen bg-gray-100">
-      {/* Main Canvas */}
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Optimized Header - Fixed Position */}
+      <div className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-20 border-b flex items-center justify-between px-6">
+        <h1 className="text-xl font-bold text-gray-800">Canvas Infinito - IA Board V2</h1>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">
+            {nodes.length} elementos • Zoom {Math.round(zoom * 100)}%
+          </span>
+          <Button
+            onClick={() => {
+              setZoom(1);
+              setPanX(0);
+              setPanY(0);
+            }}
+            variant="outline"
+            size="sm"
+          >
+            Resetar Vista
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Canvas - Full Screen */}
       <div 
         ref={canvasRef}
         className="w-full h-full overflow-hidden relative"
+        style={{ marginTop: '64px' }}
       >
-        {/* Mouse Controls Tooltip */}
-        <div className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg text-sm">
-          <div className="font-semibold mb-2">Mouse Controls:</div>
-          <div className="space-y-1 text-xs text-gray-600">
-            <div>• <strong>Left Click:</strong> Select/Drag nodes</div>
-            <div>• <strong>Double Click:</strong> Activate node</div>
-            <div>• <strong>Right Click:</strong> Context menu</div>
-            <div>• <strong>Scroll:</strong> Pan canvas</div>
-            <div>• <strong>Ctrl+Scroll:</strong> Zoom</div>
-            <div>• <strong>Drag:</strong> Pan canvas</div>
-          </div>
-        </div>
-
         <motion.div
           className="w-full h-full relative cursor-grab active:cursor-grabbing"
           style={{
@@ -500,18 +499,16 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
           }}
         >
           {/* Grid Background */}
-          {showGrid && (
-            <div 
-              className="absolute inset-0 opacity-30"
-              style={{
-                backgroundImage: `
-                  linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
-                `,
-                backgroundSize: '20px 20px'
-              }}
-            />
-          )}
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '20px 20px'
+            }}
+          />
 
           {/* SVG for connections */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none">
@@ -552,11 +549,6 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
                 handleNodeDrag(node.id, node.x + info.delta.x, node.y + info.delta.y);
               }}
               onClick={() => handleNodeClick(node.id)}
-              onDoubleClick={() => {
-                if (node.status === 'pending') {
-                  handleNodeEdit(node.id, { status: 'active' });
-                }
-              }}
               onContextMenu={(e) => handleNodeRightClick(e, node.id)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -607,7 +599,7 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
                     
                     {/* Detailed logs for active nodes */}
                     {node.status === 'active' && detailedLogs[node.id] && (
-                      <div className="absolute top-full left-0 w-80 mt-2 p-3 bg-white border border-blue-200 rounded-lg shadow-lg z-50">
+                      <div className="absolute top-full left-0 w-80 mt-2 p-3 bg-white border border-blue-200 rounded-lg shadow-lg z-50 max-w-sm">
                         <h4 className="font-semibold text-sm mb-2 text-blue-800">IA Pensamento Poderoso - Logs</h4>
                         <div className="space-y-1">
                           {detailedLogs[node.id].map((log, index) => (
@@ -625,8 +617,6 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
                         </div>
                       </div>
                     )}
-                    
-                    
                   </div>
                 </CardContent>
               </Card>
@@ -637,15 +627,15 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
 
       {/* Initial Mode Selection Modal */}
       <Dialog open={showInitialModal} onOpenChange={setShowInitialModal}>
-        <DialogContent className="max-w-2xl" aria-describedby="dialog-description">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center">
               Como deseja criar seu produto?
             </DialogTitle>
+            <DialogDescription className="text-center text-gray-600">
+              Escolha entre IA Pensamento Poderoso para criação automática ou Criação Manual para controle total
+            </DialogDescription>
           </DialogHeader>
-          <div id="dialog-description" className="sr-only">
-            Escolha entre IA Pensamento Poderoso para criação automática ou Criação Manual para controle total
-          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
             <motion.div
@@ -710,8 +700,8 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
             exit={{ opacity: 0, scale: 0.8 }}
             className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-2 min-w-[160px]"
             style={{
-              left: contextMenu.x,
-              top: contextMenu.y
+              left: Math.min(contextMenu.x, window.innerWidth - 180),
+              top: Math.min(contextMenu.y, window.innerHeight - 200)
             }}
             onMouseLeave={closeContextMenu}
           >
@@ -774,14 +764,6 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* Click away to close context menu */}
-      {contextMenu && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={closeContextMenu}
-        />
-      )}
     </div>
   );
 }
