@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, CheckCircle, Users, Clock, Zap, Brain, Globe, ArrowDown, Star, Award, TrendingUp, Rocket, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 interface MaquinaMilionariaProps {
   onOpenFurion: () => void;
@@ -11,6 +12,7 @@ interface MaquinaMilionariaProps {
 
 export default function MaquinaMilionaria({ onOpenFurion, onAccessPlatform, onOpenLogin }: MaquinaMilionariaProps) {
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const { toast } = useToast();
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -61,39 +63,33 @@ export default function MaquinaMilionaria({ onOpenFurion, onAccessPlatform, onOp
               <ArrowDown className="w-6 h-6 text-orange-500 animate-bounce" style={{ animationDelay: '0.4s' }} />
             </div>
 
-            {/* Video Player - Replica do original */}
+            {/* Video Player - Funcional */}
             <div className="relative max-w-4xl mx-auto mb-16">
               <div className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden border-4 border-gray-700 shadow-2xl">
-                {!videoPlaying ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                    <img 
-                      src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop&crop=center" 
-                      alt="Video Preview"
-                      className="w-full h-full object-cover opacity-70"
-                    />
-                    <div className="absolute inset-0 bg-black/40"></div>
-                    <Button
-                      onClick={() => setVideoPlaying(true)}
-                      className="absolute z-10 w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 transition-all duration-300"
-                    >
-                      <Play className="w-8 h-8 text-white ml-1" />
-                    </Button>
-                    
-                    {/* Botão Ativar Som - igual ao original */}
-                    <div className="absolute top-4 left-4 bg-white text-black px-4 py-2 rounded font-bold text-sm">
-                      🔊 ATIVAR SOM
-                    </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+                  <img 
+                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop&crop=center" 
+                    alt="Video Preview"
+                    className="w-full h-full object-cover opacity-70"
+                  />
+                  <div className="absolute inset-0 bg-black/40"></div>
+                  <Button
+                    onClick={() => {
+                      toast({
+                        title: "Vídeo em breve!",
+                        description: "O vídeo de apresentação estará disponível em breve. Por enquanto, explore o Furion.AI!",
+                      });
+                    }}
+                    className="absolute z-10 w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 transition-all duration-300"
+                  >
+                    <Play className="w-8 h-8 text-white ml-1" />
+                  </Button>
+                  
+                  {/* Botão Ativar Som */}
+                  <div className="absolute top-4 left-4 bg-white text-black px-4 py-2 rounded font-bold text-sm">
+                    🔊 ATIVAR SOM
                   </div>
-                ) : (
-                  <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                        <Play className="w-8 h-8 text-white" />
-                      </div>
-                      <p className="text-gray-400">AGUARDANDO LIVE STREAM</p>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
 
@@ -120,7 +116,8 @@ export default function MaquinaMilionaria({ onOpenFurion, onAccessPlatform, onOp
               <Button 
                 onClick={onOpenLogin}
                 size="lg" 
-                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-16 py-8 text-2xl font-bold rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-300"
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 px-16 py-8 text-2xl font-bold rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-300"
+                style={{ color: '#000000', fontWeight: 'bold' }}
               >
                 QUERO TER UMA MÁQUINA MILIONÁRIA
               </Button>
