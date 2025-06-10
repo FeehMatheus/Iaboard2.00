@@ -28,6 +28,7 @@ import {
   Mail,
   Globe
 } from 'lucide-react';
+import VideoStudio from '@/components/VideoStudio';
 import { motion } from 'framer-motion';
 
 interface Project {
@@ -420,6 +421,14 @@ export default function Dashboard({ user: currentUser, onOpenFurionCanvas }: Das
                               <Brain className="w-4 h-4 mr-2" />
                               Abrir Canvas Infinito Furion
                             </Button>
+                            <Button 
+                              className="w-full" 
+                              variant="outline"
+                              onClick={() => setShowVideoStudio(true)}
+                            >
+                              <Video className="w-4 h-4 mr-2" />
+                              Criar Vídeo com IA
+                            </Button>
                             <Button className="w-full" variant="outline">
                               <FileText className="w-4 h-4 mr-2" />
                               Gerar Copy de Vendas
@@ -589,6 +598,11 @@ export default function Dashboard({ user: currentUser, onOpenFurionCanvas }: Das
           </div>
         </div>
       </div>
+
+      {/* Video Studio Modal */}
+      {showVideoStudio && (
+        <VideoStudio onClose={() => setShowVideoStudio(false)} />
+      )}
     </div>
   );
 }

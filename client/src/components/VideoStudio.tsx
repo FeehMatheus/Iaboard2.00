@@ -46,8 +46,8 @@ export default function VideoStudio({ onClose }: VideoStudioProps) {
       const response = await apiRequest('POST', '/api/videos/generate-script', data);
       return response;
     },
-    onSuccess: (data) => {
-      setScript(data.script);
+    onSuccess: (response: any) => {
+      setScript(response.script);
       setGeneratingScript(false);
       toast({
         title: "Script Gerado!",
