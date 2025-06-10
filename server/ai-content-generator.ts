@@ -42,29 +42,72 @@ export class AIContentGenerator {
   async generateRealContent(request: ContentGenerationRequest): Promise<GeneratedContent> {
     console.log(`🧠 IA Pensamento Poderoso - Analisando step ${request.stepId} para ${request.productType}`);
     
-    switch (request.stepId) {
-      case 1:
-        return this.generateMarketResearch(request);
-      case 2:
-        return this.generateAudienceAnalysis(request);
-      case 3:
-        return this.generateCopywriting(request);
-      case 4:
-        return this.generateVSLContent(request);
-      case 5:
-        return this.generateEmailSequences(request);
-      case 6:
-        return this.generateLandingPages(request);
-      case 7:
-        return this.generateCompletePackage(request);
-      case 8:
-        return this.generateCompletePackage(request);
-      case 9:
-        return this.generateCompletePackage(request);
-      case 10:
-        return this.generateCompletePackage(request);
-      default:
-        throw new Error('Invalid step ID');
+    // Handle both numeric and string step identifiers
+    const stepId = typeof request.stepId === 'string' ? request.stepId : request.stepId.toString();
+    
+    // Map step IDs to generation methods
+    const stepMethods: Record<string, () => Promise<GeneratedContent>> = {
+      // Numeric IDs
+      '1': () => this.generateMarketResearch(request),
+      '2': () => this.generateAudienceAnalysis(request),
+      '3': () => this.generateCopywriting(request),
+      '4': () => this.generateVSLContent(request),
+      '5': () => this.generateEmailSequences(request),
+      '6': () => this.generateLandingPages(request),
+      '7': () => this.generateCompletePackage(request),
+      '8': () => this.generateCompletePackage(request),
+      '9': () => this.generateCompletePackage(request),
+      '10': () => this.generateCompletePackage(request),
+      
+      // String IDs for new workflow system
+      'market-research': () => this.generateMarketResearch(request),
+      'audience-analysis': () => this.generateAudienceAnalysis(request),
+      'copywriting': () => this.generateCopywriting(request),
+      'vsl-creation': () => this.generateVSLContent(request),
+      'email-sequences': () => this.generateEmailSequences(request),
+      'landing-pages': () => this.generateLandingPages(request),
+      'complete-package': () => this.generateCompletePackage(request)
+    };
+    
+    const stepMethod = stepMethods[stepId];
+    if (!stepMethod) {
+      console.warn(`No method found for step ID: ${stepId}, generating general content`);
+      return await this.generateGeneralContent(request);
+    }
+    
+    return await stepMethod();
+  }
+
+  private async generateGeneralContent(request: ContentGenerationRequest): Promise<GeneratedContent> {
+    const prompt = `
+Crie conteúdo profissional para:
+- Produto: ${request.productType}
+- Público-alvo: ${request.targetAudience}
+- Contexto: ${JSON.stringify(request.context)}
+
+Forneça conteúdo relevante, persuasivo e orientado para resultados.
+Inclua estratégias específicas e acionáveis.
+`;
+
+    try {
+      const content = await this.callAI(prompt);
+      return {
+        type: 'general-content',
+        content,
+        metadata: {
+          generated: true,
+          provider: this.openai ? 'openai' : this.anthropic ? 'anthropic' : 'fallback'
+        }
+      };
+    } catch (error) {
+      return {
+        type: 'general-content',
+        content: this.generateIntelligentFallback(prompt),
+        metadata: {
+          generated: false,
+          fallback: true
+        }
+      };
     }
   }
 
