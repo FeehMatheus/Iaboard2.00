@@ -105,6 +105,79 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
     }
   }, [handleWheel]);
 
+  // Automatic camera animation following connection paths
+  const animateCameraFollowingConnection = async (fromNode: any, toNode: any) => {
+    const steps = 25;
+    const startX = panX;
+    const startY = panY;
+    
+    const fromCenterX = fromNode.x + 110;
+    const fromCenterY = fromNode.y + 90;
+    const toCenterX = toNode.x + 110;
+    const toCenterY = toNode.y + 90;
+    
+    // Calculate target camera positions to follow the connection line
+    const targetToX = -toCenterX * zoom + window.innerWidth / 2;
+    const targetToY = -toCenterY * zoom + window.innerHeight / 2;
+    
+    // Animate camera smoothly following the connection path
+    for (let i = 0; i <= steps; i++) {
+      const progress = i / steps;
+      const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+      
+      const currentX = startX + (targetToX - startX) * easeProgress;
+      const currentY = startY + (targetToY - startY) * easeProgress;
+      
+      setPanX(currentX);
+      setPanY(currentY);
+      
+      await new Promise(resolve => setTimeout(resolve, 40));
+    }
+  };
+
+  // Auto-fit all nodes within canvas boundaries
+  const autoFitAllNodes = async () => {
+    if (nodes.length === 0) return;
+    
+    const padding = 120;
+    const minX = Math.min(...nodes.map(n => n.x)) - padding;
+    const maxX = Math.max(...nodes.map(n => n.x + 220)) + padding;
+    const minY = Math.min(...nodes.map(n => n.y)) - padding;
+    const maxY = Math.max(...nodes.map(n => n.y + 180)) + padding;
+    
+    const contentWidth = maxX - minX;
+    const contentHeight = maxY - minY;
+    const canvasWidth = window.innerWidth;
+    const canvasHeight = window.innerHeight - 48; // Account for header
+    
+    const scaleX = canvasWidth / contentWidth;
+    const scaleY = canvasHeight / contentHeight;
+    const newZoom = Math.min(scaleX, scaleY, 1.0);
+    
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    
+    const targetPanX = -centerX * newZoom + canvasWidth / 2;
+    const targetPanY = -centerY * newZoom + canvasHeight / 2;
+    
+    // Smooth transition to fit all content within boundaries
+    const steps = 50;
+    const startZoom = zoom;
+    const startPanX = panX;
+    const startPanY = panY;
+    
+    for (let i = 0; i <= steps; i++) {
+      const progress = i / steps;
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      
+      setZoom(startZoom + (newZoom - startZoom) * easeProgress);
+      setPanX(startPanX + (targetPanX - startPanX) * easeProgress);
+      setPanY(startPanY + (targetPanY - startPanY) * easeProgress);
+      
+      await new Promise(resolve => setTimeout(resolve, 30));
+    }
+  };
+
   const handleNodeDrag = (nodeId: string, x: number, y: number) => {
     setNodes(prev => prev.map(node => 
       node.id === nodeId ? { ...node, x, y } : node
@@ -280,7 +353,7 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       }
     ];
 
-    // Generate popups sequentially with animated connections
+    // Generate popups sequentially with animated connections and camera following
     for (let i = 0; i < workflowSteps.length; i++) {
       const step = workflowSteps[i];
       const previousStep = i > 0 ? workflowSteps[i - 1] : null;
@@ -288,15 +361,17 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       // Generate connection animation first if there's a previous step
       if (previousStep) {
         await createAnimatedConnection(previousStep, step);
+        // Camera follows the connection line
+        await animateCameraFollowingConnection(previousStep, step);
       }
       
       // Then generate the popup
       await generatePopupWithContent(step, productType, i);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second focus on each step
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Focus time on each step
     }
     
-    // Final camera adjustment to show entire workflow
-    await adjustCameraToShowFullWorkflow();
+    // Final camera adjustment to fit all content within canvas boundaries
+    await autoFitAllNodes();
     
     setIsAnimating(false);
     
@@ -809,114 +884,70 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
         </div>
       </motion.div>
 
-      {/* Enhanced Professional Header */}
-      <div className="fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md shadow-lg z-20 border-b border-gray-200">
+      {/* Minimal Professional Header */}
+      <div className="fixed top-0 left-0 right-0 h-12 bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 shadow-xl z-30 border-b border-purple-500/30">
         <div className="flex items-center justify-between px-6 h-full">
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+              <div className="w-6 h-6 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-lg flex items-center justify-center animate-pulse">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                 IA Board V2
               </span>
             </div>
             
-            {/* Professional Tool Options */}
-            <div className="flex items-center space-x-1 bg-gray-50 rounded-lg p-1">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs h-8"
-                onClick={startPowerfulAIWorkflow}
-              >
-                <Brain className="w-3 h-3 mr-1" />
-                IA Automática
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs h-8"
-                onClick={startManualWorkflow}
-              >
-                <Target className="w-3 h-3 mr-1" />
-                Manual
-              </Button>
-            </div>
-            
             {/* Status Info */}
-            <div className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
-              {nodes.length} elementos • Zoom {Math.round(zoom * 100)}%
+            <div className="text-xs text-cyan-300 bg-slate-800/50 px-3 py-1 rounded-full border border-cyan-500/30">
+              {nodes.length} nós • Zoom {Math.round(zoom * 100)}%
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
-            {/* Canvas Controls */}
-            <div className="flex items-center space-x-1 bg-gray-50 rounded-lg p-1">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setZoom(Math.min(2, zoom * 1.2))} 
-                className="text-xs h-8"
-              >
-                <ZoomIn className="w-3 h-3" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setZoom(Math.max(0.3, zoom * 0.8))} 
-                className="text-xs h-8"
-              >
-                <ZoomOut className="w-3 h-3" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => { setZoom(1); setPanX(0); setPanY(0); }} 
-                className="text-xs h-8"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </Button>
+          {/* Progress Indicator */}
+          {isAnimating && (
+            <div className="flex items-center space-x-2 text-cyan-300">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+              <span className="text-xs">Gerando IA...</span>
             </div>
-            
-            {/* Action Buttons */}
-            <Button variant="outline" size="sm" className="text-xs h-8">
-              <Save className="w-3 h-3 mr-1" />
-              Salvar
-            </Button>
-            <Button variant="outline" size="sm" className="text-xs h-8">
-              <Download className="w-3 h-3 mr-1" />
-              Exportar
-            </Button>
-            <Button 
-              size="sm" 
-              className="text-xs h-8 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
-              onClick={() => setShowCanvasPopup(true)}
-            >
-              <Rocket className="w-3 h-3 mr-1" />
-              Novo Projeto
-            </Button>
-          </div>
+          )}
         </div>
-        
-        {/* Progress Bar for Active Generation */}
-        {isAnimating && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
-            <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" style={{width: '70%'}}></div>
-          </div>
-        )}
       </div>
 
-      {/* Main Canvas - Full Screen with Professional Border */}
+      {/* Enhanced Infinite Canvas with Uniform Boundaries */}
       <div 
         ref={canvasRef}
-        className="w-full h-full overflow-hidden relative shadow-2xl border-4 rounded-2xl"
+        className="w-full h-full overflow-hidden relative"
         style={{ 
-          marginTop: '64px',
-          background: 'linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%)',
-          borderImage: 'linear-gradient(45deg, #3b82f6, #8b5cf6, #14b8a6) 1'
+          marginTop: '48px',
+          background: 'radial-gradient(ellipse at center, #0f0f23 0%, #1a1a2e  50%, #16213e 100%)',
+          border: '3px solid transparent',
+          borderRadius: '20px',
+          backgroundClip: 'padding-box',
+          position: 'relative'
         }}
+        onWheel={handleWheel}
       >
+        {/* Animated Border Effect */}
+        <div 
+          className="absolute inset-0 rounded-[20px] opacity-80"
+          style={{
+            background: 'linear-gradient(45deg, #00d4ff, #7c3aed, #00ffa3, #ff6b6b, #4ecdc4, #00d4ff)',
+            backgroundSize: '400% 400%',
+            animation: 'borderGlow 6s ease infinite',
+            zIndex: -1,
+            margin: '-3px'
+          }}
+        />
+        
+        {/* CSS Animation for Border Glow */}
+        <style>{`
+          @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+          }
+        `}</style>
         <motion.div
           className="w-full h-full relative cursor-grab active:cursor-grabbing"
           style={{
@@ -929,18 +960,35 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
             setPanY(prev => prev + info.delta.y / zoom);
           }}
         >
-          {/* Enhanced Professional Grid Background */}
+          {/* Technological Grid Background */}
           <div 
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-40"
             style={{
               backgroundImage: `
-                radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-                linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px)
+                radial-gradient(circle at 1px 1px, rgba(0, 212, 255, 0.4) 1px, transparent 1px),
+                linear-gradient(rgba(124, 58, 237, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124, 58, 237, 0.15) 1px, transparent 1px),
+                radial-gradient(circle at 20px 20px, rgba(0, 255, 163, 0.2) 2px, transparent 2px)
               `,
-              backgroundSize: '40px 40px, 20px 20px, 20px 20px'
+              backgroundSize: '30px 30px, 15px 15px, 15px 15px, 60px 60px'
             }}
           />
+
+          {/* Floating Particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60 animate-pulse"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`
+                }}
+              />
+            ))}
+          </div>
 
           {/* SVG for connections */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none">
@@ -1004,13 +1052,13 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
               whileHover={{ scale: 1.05, rotateX: 5 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Card className={`w-full h-full border-2 transition-all duration-200 ${
+              <Card className={`w-full h-full border-2 transition-all duration-300 ${
                 node.status === 'completed' 
-                  ? 'bg-green-50 border-green-500' 
+                  ? 'bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-400 shadow-emerald-500/30' 
                   : node.status === 'active'
-                  ? 'bg-blue-50 border-blue-500 shadow-lg'
-                  : 'bg-white border-gray-300 hover:border-gray-400'
-              }`}>
+                  ? 'bg-gradient-to-br from-blue-50 to-cyan-100 border-cyan-400 shadow-cyan-500/40'
+                  : 'bg-gradient-to-br from-slate-50 to-gray-100 border-purple-300 hover:border-cyan-400'
+              } shadow-xl backdrop-blur-sm`}>
                 <CardContent className="p-4 h-full flex flex-col overflow-hidden">
                   {/* Product Selection Interface */}
                   {node.id === 'product-selection' && node.status === 'active' && (
