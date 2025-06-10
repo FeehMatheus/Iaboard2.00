@@ -31,8 +31,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Credenciais inválidas" });
       }
 
-      // Retornar dados do usuário (sem senha)
-      const { password: _, ...userWithoutPassword } = user;
+      // Retornar dados do usuário
+      const userWithoutPassword = user;
       res.json({ 
         success: true, 
         user: userWithoutPassword,
@@ -69,8 +69,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         furionCredits: plan === 'premium' ? 1000 : plan === 'pro' ? 500 : 100,
       });
 
-      // Retornar dados do usuário (sem senha)
-      const { password: _, ...userWithoutPassword } = newUser;
+      // Retornar dados do usuário
+      const userWithoutPassword = newUser;
       res.json({ 
         success: true, 
         user: userWithoutPassword,

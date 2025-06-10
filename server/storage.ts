@@ -77,26 +77,45 @@ export class MemStorage implements IStorage {
   }
 
   private async initializeDemo() {
-    // Criando usuário demo para acesso direto
-    const demoUser: User = {
-      id: "demo-user",
-      email: "demo@maquinamilionaria.com",
-      firstName: "Usuário",
-      lastName: "Demo",
-      profileImageUrl: null,
-      plan: "premium",
-      subscriptionStatus: "active",
-      subscriptionData: {
-        planType: "premium",
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+    // Criando usuários de teste
+    const users = [
+      {
+        id: "demo-user",
+        email: "demo@maquinamilionaria.com",
+        firstName: "Usuário",
+        lastName: "Demo",
+        profileImageUrl: null,
+        plan: "premium",
+        subscriptionStatus: "active",
+        subscriptionData: {
+          planType: "premium",
+          startDate: new Date().toISOString(),
+          endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        furionCredits: 1000,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
-      furionCredits: 100,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      {
+        id: "test-user",
+        email: "teste@email.com",
+        firstName: "João",
+        lastName: "Silva",
+        profileImageUrl: null,
+        plan: "pro",
+        subscriptionStatus: "active",
+        subscriptionData: {
+          planType: "pro",
+          startDate: new Date().toISOString(),
+          endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        furionCredits: 500,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    ];
     
-    this.users.set(demoUser.id, demoUser);
+    users.forEach(user => this.users.set(user.id, user));
 
     // Criando projeto demo
     const demoProject: Project = {
@@ -126,6 +145,29 @@ export class MemStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(user => user.email === email);
+  }
+
+  async createUser(userData: any): Promise<User> {
+    const userId = Date.now().toString();
+    const firstName = userData.name ? userData.name.split(' ')[0] : null;
+    const lastName = userData.name ? userData.name.split(' ').slice(1).join(' ') : null;
+    
+    const newUser: User = {
+      id: userId,
+      email: userData.email,
+      firstName: firstName,
+      lastName: lastName,
+      profileImageUrl: null,
+      plan: userData.plan || "pro",
+      subscriptionStatus: userData.subscriptionStatus || "active",
+      subscriptionData: null,
+      furionCredits: userData.furionCredits || 500,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    this.users.set(userId, newUser);
+    return newUser;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
