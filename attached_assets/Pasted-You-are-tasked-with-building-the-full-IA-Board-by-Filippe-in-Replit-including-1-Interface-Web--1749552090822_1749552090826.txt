@@ -1,0 +1,53 @@
+You are tasked with building the full IA Board by Filippe in Replit, including:
+
+1. **Interface Web Completa**
+   - Board infinito, zoom com scroll, blocos arrastáveis (esquerdo mover, direito abrir menus pop-up)
+   - Painel lateral com visão geral do projeto e seleção de IAs (GPT‑4, Claude, Gemini)
+   - Modo IA Total PRO+ (colaboração de múltiplos modelos)
+   - Armazenamento de estado (HTML5/localStorage + backup JSON)
+   - Exportação de projeto inteiro em ZIP/JSON/PDF/PNG
+
+2. **Módulos IA Inteligentes**
+   - **IA Espiã**: raspa concorrentes e páginas similares; gera templates com copy editável
+   - **IA Vídeo**: analisa conteúdo do produto e cria roteiro, cenas, guião de vídeo, títulos, gancho etc.
+   - **IA Tráfego**: gera campanha otimizada para Meta & Google com segmentação, orçamento, criativos
+   - **IA Produto Rápido**: cria ofertas (1 principal, 2 secundárias, 1 upsell) com página de vendas, vídeos, PDF
+   - **IA Copy**: headlines devastadoras, P.S., call to action irresistível, proposta única, objeções, PASTOR framework
+
+3. **Análise do site https://maquinamilionaria.com/**
+   - Acesse e analise o conteúdo textual e visual do vídeo de vendas
+   - Extraia estrutura de roteiro, apresentação da oferta, gatilhos mentais usados
+   - Replique estilo: corte, ritmo, gatilhos, provas, CTA, objeções
+   - Gere um novo roteiro adaptado ao produto criado no funil IA Board
+
+4. **Fluxo Automático Integrado**
+   - Escolha modular automática do produto e nicho
+   - Geração sequencial de nicho, avatar, oferta, página, vídeo, tráfego, funil
+   - Linha de pensamento interconectada em blocos encadeados com animação
+   - Quando clicar “Gerar Modo IA Total”, a sequência é processada automaticamente
+
+5. **Back-end com OpenAI & Meta APIs**
+   - Python Flask (ou FastAPI) rodando no Replit, fazendo chamadas grpc/openai open-source
+   - Endpoints para cada módulo: /video, /trafego, /espiao, /produto
+   - Salva todos resultados na pasta `storage/Filippe_<funil_nome>/`
+
+6. **Deploy e Acesso**
+   - Deploy em Replit com domínio provisório
+   - Login sem senha (identificador único)
+   - Painel “Meus Funis” com nome e status (em andamento, concluído, exportável)
+
+### **Tarefa:**
+- 0-1Implemente `main.py`, `frontend/` (HTML/CSS/JS), `backend/` (Flask/Node) 
+- 0-2Use Replit Agent checkpoints para garantir progresso incremental: 
+  1. 0-3Criar interface básica da board e backend stub 
+  2. 0-4Integrar IA Espiã + módulo vídeo com API OpenAI 
+  3. 0-5Adicionar módulo tráfego com dados de funil 
+  4. 0-6Implementar análise do site “maquinamilionaria.com” e geração de roteiro semelhante 
+  5. 0-7Testar fluxo completo e exportação 
+  6. 0-8Deploy e visualização online 
+
+**Use uma abordagem clara e iterativa** conforme boas práticas (replit docs) 9.  
+**Foque em “prompt clarity” e “checkpoint”** para salvar cada estágio funcional.  
+Por fim, **mostre-me os links para acessar a V2 online e compartilhe o ZIP** completo das versões.
+
+Obrigado, aja como seu plugin de desenvolvimento ideal no Replit — objetivo: entrega funcional, robusta, iterativa e pública.

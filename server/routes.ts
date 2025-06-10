@@ -1862,6 +1862,40 @@ ADAPTAÇÕES POR CANAL:
     }
   });
 
+  // Complete Export System
+  app.post("/api/export/complete", async (req, res) => {
+    try {
+      const { projectName, projectData, includeVideo, includeTraffic } = req.body;
+      
+      console.log(`📦 Gerando export completo para: ${projectName}`);
+      
+      const { exportSystem } = await import('./export-system');
+      
+      const exportData = {
+        projectName: projectName || 'Projeto IA Board',
+        projectData,
+        videoContent: includeVideo ? projectData.videoContent : undefined,
+        trafficCampaigns: includeTraffic ? projectData.trafficCampaigns : undefined,
+        moduleResults: projectData.moduleResults || [],
+        createdAt: new Date()
+      };
+      
+      const zipBuffer = await exportSystem.generateCompleteExport(exportData);
+      
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', `attachment; filename="${projectName}_export.zip"`);
+      res.send(zipBuffer);
+      
+    } catch (error: any) {
+      console.error('Erro no export completo:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na geração do export',
+        message: error.message
+      });
+    }
+  });
+
   // Enhanced Workflow API - Integrates all AI modules
   app.post("/api/ai/workflow/complete", async (req, res) => {
     try {

@@ -11,12 +11,15 @@ import AnimatedBackground from "@/components/AnimatedBackground";
 import Logo from "@/components/Logo";
 import ProductTypeModal from "@/components/ProductTypeModal";
 import FunnelGenerator from "@/components/FunnelGenerator";
+import AutomatedWorkflow from "@/components/AutomatedWorkflow";
+import CentroComandoSupremo from "@/components/CentroComandoSupremo";
 
 export default function Dashboard() {
   const { user, logout, isLoading } = useAuth();
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [showProductModal, setShowProductModal] = useState(false);
   const [showFunnelGenerator, setShowFunnelGenerator] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'workflow' | 'centro-comando'>('overview');
 
   const { data: tools = [] } = useQuery<Tool[]>({
     queryKey: ['/api/tools'],
