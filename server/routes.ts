@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { furionAI } from "./furion-ai-system";
 import { furionSupremaEngine } from "./furion-suprema-engine";
+import { exportSystem } from "./export-system";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {

@@ -6,6 +6,7 @@ import MaquinaMilionaria from '@/pages/MaquinaMilionaria';
 import LoginPage from '@/pages/LoginPage';
 import Dashboard from '@/pages/Dashboard';
 import FurionAI from '@/components/FurionAI';
+import FurionCanvas from '@/pages/FurionCanvas';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,6 +19,7 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const [showFurion, setShowFurion] = useState(false);
+  const [showFurionCanvas, setShowFurionCanvas] = useState(false);
   const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'dashboard'>('home');
   const [user, setUser] = useState<any>(null);
 
@@ -48,6 +50,14 @@ function AppContent() {
     } else {
       setCurrentPage('login');
     }
+  };
+
+  const handleOpenFurionCanvas = () => {
+    setShowFurionCanvas(true);
+  };
+
+  const handleCloseFurionCanvas = () => {
+    setShowFurionCanvas(false);
   };
 
   if (currentPage === 'login') {
