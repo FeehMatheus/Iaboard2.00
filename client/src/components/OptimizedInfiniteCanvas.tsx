@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, PanInfo, AnimatePresence } from 'framer-motion';
-import { Brain, Target, Rocket, Users, TrendingUp, FileText, Video, Mail, Download, CheckCircle, Plus, Trash2, Edit3, Copy, ZoomIn, ZoomOut, Grid, Settings, Save, Download as DownloadIcon, Play, Pause, RotateCcw, Link, Unlink, Menu, X } from 'lucide-react';
+import { Brain, Target, Rocket, Users, TrendingUp, FileText, Video, Mail, Download, CheckCircle, Plus, Trash2, Edit3, Copy, ZoomIn, ZoomOut, Grid, Settings, Save, Download as DownloadIcon, Play, Pause, RotateCcw, Link, Unlink, Menu, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -146,10 +146,16 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const [selectedProductType, setSelectedProductType] = useState<string>('');
 
   const createProductSelectionPopup = () => {
+    // Position initial popup in right-center of canvas
+    const canvasWidth = window.innerWidth;
+    const canvasHeight = window.innerHeight;
+    const initialX = canvasWidth * 0.7; // Right side
+    const initialY = canvasHeight * 0.4; // Center vertically
+    
     const productPopup: CanvasNode = {
       id: 'product-selection',
-      x: 400,
-      y: 200,
+      x: initialX,
+      y: initialY,
       title: 'Selecionar Produto',
       description: 'Escolha o tipo de produto',
       icon: <Rocket className="w-6 h-6" />,
@@ -189,93 +195,105 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const generateWorkflowPopups = async (productType: string) => {
     setIsAnimating(true);
     
-    // Define the workflow structure - 2 perfectly aligned layers
+    // Calculate grid positions for 4x3 layout (4 wide, 3 high)
+    const gridCols = 4;
+    const gridRows = 3;
+    const nodeSpacing = 280; // Space between nodes
+    const startX = 150; // Starting X position
+    const startY = 100; // Starting Y position
+    
+    // Define the workflow structure in 4x3 grid
     const workflowSteps = [
-      // Primeira camada - perfeitamente alinhada
+      // Row 1
       {
         id: 'step-1',
-        x: 100,
-        y: 120,
+        x: startX + (0 * nodeSpacing),
+        y: startY + (0 * nodeSpacing),
         title: 'Análise de Mercado',
         description: 'Pesquisa avançada de tendências, concorrência e oportunidades de mercado usando IA para identificar nichos lucrativos.',
         icon: <TrendingUp className="w-5 h-5" />,
-        layer: 1
+        gridPos: { row: 0, col: 0 }
       },
       {
         id: 'step-2',
-        x: 350,
-        y: 120,
+        x: startX + (1 * nodeSpacing),
+        y: startY + (0 * nodeSpacing),
         title: 'Público-Alvo',
         description: 'Criação detalhada de personas com dados demográficos, psicográficos e comportamentais para segmentação precisa.',
         icon: <Users className="w-5 h-5" />,
-        layer: 1
+        gridPos: { row: 0, col: 1 }
       },
       {
         id: 'step-3',
-        x: 600,
-        y: 120,
+        x: startX + (2 * nodeSpacing),
+        y: startY + (0 * nodeSpacing),
         title: 'Copywriting',
         description: 'Desenvolvimento de textos persuasivos e headlines otimizadas para máxima conversão e engajamento.',
         icon: <FileText className="w-5 h-5" />,
-        layer: 1
+        gridPos: { row: 0, col: 2 }
       },
       {
         id: 'step-4',
-        x: 850,
-        y: 120,
+        x: startX + (3 * nodeSpacing),
+        y: startY + (0 * nodeSpacing),
         title: 'VSL & Vídeos',
         description: 'Produção de roteiros profissionais para Video Sales Letters e conteúdo audiovisual de alta conversão.',
         icon: <Video className="w-5 h-5" />,
-        layer: 1
+        gridPos: { row: 0, col: 3 }
       },
-      // Segunda camada - perfeitamente alinhada
+      // Row 2
       {
         id: 'step-5',
-        x: 100,
-        y: 320,
+        x: startX + (0 * nodeSpacing),
+        y: startY + (1 * nodeSpacing),
         title: 'Email Marketing',
         description: 'Sequências automatizadas de email com segmentação inteligente e campanhas de nutrição personalizadas.',
         icon: <Mail className="w-5 h-5" />,
-        layer: 2
+        gridPos: { row: 1, col: 0 }
       },
       {
         id: 'step-6',
-        x: 350,
-        y: 320,
+        x: startX + (1 * nodeSpacing),
+        y: startY + (1 * nodeSpacing),
         title: 'Landing Pages',
         description: 'Páginas de alta conversão com elementos psicológicos, testes A/B e otimização para dispositivos móveis.',
         icon: <Download className="w-5 h-5" />,
-        layer: 2
+        gridPos: { row: 1, col: 1 }
       },
       {
         id: 'step-7',
-        x: 600,
-        y: 320,
+        x: startX + (2 * nodeSpacing),
+        y: startY + (1 * nodeSpacing),
         title: 'Funil Integrado',
         description: 'Integração completa de todos os componentes com automações avançadas e tracking de performance.',
         icon: <CheckCircle className="w-5 h-5" />,
-        layer: 2
+        gridPos: { row: 1, col: 2 }
       },
       {
         id: 'step-8',
-        x: 850,
-        y: 320,
+        x: startX + (3 * nodeSpacing),
+        y: startY + (1 * nodeSpacing),
         title: 'Produto Final',
         description: 'Compilação final com documentação completa, métricas de sucesso e roadmap de otimização contínua.',
         icon: <Rocket className="w-5 h-5" />,
-        layer: 2
+        gridPos: { row: 1, col: 3 }
       }
     ];
 
-    // Generate popups sequentially with smooth camera animation focusing on each
+    // Generate popups sequentially with animated connections
     for (let i = 0; i < workflowSteps.length; i++) {
       const step = workflowSteps[i];
+      const previousStep = i > 0 ? workflowSteps[i - 1] : null;
+      
+      // Generate connection animation first if there's a previous step
+      if (previousStep) {
+        await createAnimatedConnection(previousStep, step);
+      }
+      
+      // Then generate the popup
       await generatePopupWithContent(step, productType, i);
-      await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second focus on each step
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second focus on each step
     }
-
-    // Create connections between all steps
-    createWorkflowConnections();
     
     // Final camera adjustment to show entire workflow
     await adjustCameraToShowFullWorkflow();
@@ -286,6 +304,21 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
     setTimeout(() => {
       generateFinalDownload();
     }, 2000);
+  };
+
+  // Create animated connection between two steps
+  const createAnimatedConnection = async (fromStep: any, toStep: any) => {
+    return new Promise<void>((resolve) => {
+      // Add connection to the previous node
+      setNodes(prev => prev.map(node => 
+        node.id === fromStep.id 
+          ? { ...node, connections: [...node.connections, toStep.id] }
+          : node
+      ));
+      
+      // Wait for connection animation to complete
+      setTimeout(resolve, 800);
+    });
   };
 
   const generatePopupWithContent = async (stepConfig: any, productType: string, stepIndex: number) => {
@@ -740,25 +773,102 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
         </div>
       </motion.div>
 
-      {/* Optimized Header - Fixed Position */}
-      <div className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-20 border-b flex items-center justify-between px-6">
-        <h1 className="text-xl font-bold text-gray-800">Canvas Infinito - IA Board V2</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">
-            {nodes.length} elementos • Zoom {Math.round(zoom * 100)}%
-          </span>
-          <Button
-            onClick={() => {
-              setZoom(1);
-              setPanX(0);
-              setPanY(0);
-            }}
-            variant="outline"
-            size="sm"
-          >
-            Resetar Vista
-          </Button>
+      {/* Enhanced Professional Header */}
+      <div className="fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md shadow-lg z-20 border-b border-gray-200">
+        <div className="flex items-center justify-between px-6 h-full">
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                IA Board V2
+              </span>
+            </div>
+            
+            {/* Professional Tool Options */}
+            <div className="flex items-center space-x-1 bg-gray-50 rounded-lg p-1">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-8"
+                onClick={startPowerfulAIWorkflow}
+              >
+                <Brain className="w-3 h-3 mr-1" />
+                IA Automática
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs h-8"
+                onClick={startManualWorkflow}
+              >
+                <Target className="w-3 h-3 mr-1" />
+                Manual
+              </Button>
+            </div>
+            
+            {/* Status Info */}
+            <div className="text-xs text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+              {nodes.length} elementos • Zoom {Math.round(zoom * 100)}%
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            {/* Canvas Controls */}
+            <div className="flex items-center space-x-1 bg-gray-50 rounded-lg p-1">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setZoom(Math.min(2, zoom * 1.2))} 
+                className="text-xs h-8"
+              >
+                <ZoomIn className="w-3 h-3" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setZoom(Math.max(0.3, zoom * 0.8))} 
+                className="text-xs h-8"
+              >
+                <ZoomOut className="w-3 h-3" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => { setZoom(1); setPanX(0); setPanY(0); }} 
+                className="text-xs h-8"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </Button>
+            </div>
+            
+            {/* Action Buttons */}
+            <Button variant="outline" size="sm" className="text-xs h-8">
+              <Save className="w-3 h-3 mr-1" />
+              Salvar
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs h-8">
+              <Download className="w-3 h-3 mr-1" />
+              Exportar
+            </Button>
+            <Button 
+              size="sm" 
+              className="text-xs h-8 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+              onClick={() => setShowCanvasPopup(true)}
+            >
+              <Rocket className="w-3 h-3 mr-1" />
+              Novo Projeto
+            </Button>
+          </div>
         </div>
+        
+        {/* Progress Bar for Active Generation */}
+        {isAnimating && (
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
+            <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" style={{width: '70%'}}></div>
+          </div>
+        )}
       </div>
 
       {/* Main Canvas - Full Screen with Professional Border */}
