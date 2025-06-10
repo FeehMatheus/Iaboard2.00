@@ -1,59 +1,85 @@
-import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/useAuth";
-import Landing from "@/pages/landing";
-import SupremaLanding from "@/pages/suprema-landing";
-import SuperiorLanding from "@/pages/superior-landing";
-import MaquinaMilionariaPage from "@/pages/maquina-milionaria";
-import Dashboard from "@/pages/dashboard";
-import AIDashboard from "@/pages/ai-dashboard";
-import Home from "@/pages/home";
-import CanvasPage from "@/pages/canvas";
-import CompetitorAnalysisPage from "@/pages/competitor-analysis";
-import NotFound from "@/pages/not-found";
+import { useState } from 'react';
+import { Switch, Route } from 'wouter';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
+import LandingPage from '@/pages/LandingPage';
+import Dashboard from '@/pages/Dashboard';
+import FurionInterface from '@/components/FurionInterface';
+import { useAuth } from '@/hooks/useAuth';
 
-function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
+function AppContent() {
+  const [showFurion, setShowFurion] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  const handleOpenFurion = () => {
+    setShowFurion(true);
+  };
+
+  const handleCloseFurion = () => {
+    setShowFurion(false);
+  };
+
+  const handleAccessPlatform = () => {
+    window.location.href = '/dashboard';
+  };
 
   return (
-    <Switch>
-      <Route path="/">
-        {isAuthenticated ? <Dashboard /> : <MaquinaMilionariaPage />}
-      </Route>
-      <Route path="/landing" component={Landing} />
-      <Route path="/suprema" component={SupremaLanding} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/ai" component={AIDashboard} />
-      <Route path="/canvas" component={CanvasPage} />
-      <Route path="/funnel" component={Home} />
-      <Route path="/superior" component={SuperiorLanding} />
-      <Route path="/maquina-milionaria" component={MaquinaMilionariaPage} />
-      <Route path="/competitor-analysis" component={CompetitorAnalysisPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Switch>
+        <Route path="/" exact>
+          <LandingPage 
+            onOpenFurion={handleOpenFurion}
+            onAccessPlatform={handleAccessPlatform}
+          />
+        </Route>
+        
+        <Route path="/dashboard">
+          <Dashboard />
+        </Route>
+        
+        <Route>
+          <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                404 - Página não encontrada
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mb-8">
+                A página que você está procurando não existe.
+              </p>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 py-3 rounded-lg font-semibold"
+              >
+                Voltar ao Início
+              </button>
+            </div>
+          </div>
+        </Route>
+      </Switch>
+
+      {/* Furion Interface Modal */}
+      {showFurion && (
+        <FurionInterface onClose={handleCloseFurion} />
+      )}
+
+      <Toaster />
+    </div>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <AppContent />
     </QueryClientProvider>
   );
 }
-
-export default App;
