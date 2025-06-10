@@ -10,6 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import AIDashboard from "@/pages/ai-dashboard";
 import Home from "@/pages/home";
 import CanvasPage from "@/pages/canvas";
+import CompetitorAnalysisPage from "@/pages/competitor-analysis";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/ai" component={AIDashboard} />
       <Route path="/canvas" component={CanvasPage} />
       <Route path="/funnel" component={Home} />
+      <Route path="/competitor-analysis" component={CompetitorAnalysisPage} />
       <Route component={NotFound} />
     </Switch>
   );
