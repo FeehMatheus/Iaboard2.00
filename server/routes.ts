@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { AIFunnelGenerator, ContentGenerator } from "./ai-services-clean";
+import { iaSupremaServices } from "./ai-suprema-services";
 import { insertFunnelSchema, insertAIGenerationSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
