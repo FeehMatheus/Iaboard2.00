@@ -7,6 +7,7 @@ import LoginPage from '@/pages/LoginPage';
 import Dashboard from '@/pages/Dashboard';
 import FurionAI from '@/components/FurionAI';
 import FurionCanvas from '@/pages/FurionCanvas';
+import ThiagoFinchAI from '@/pages/ThiagoFinchAI';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +24,7 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [showLogin, setShowLogin] = useState(false);
   const [showFurionCanvas, setShowFurionCanvas] = useState(false);
+  const [showThiagoFinchAI, setShowThiagoFinchAI] = useState(false);
 
   const handleOpenFurion = () => {
     setShowFurion(true);
@@ -59,6 +61,14 @@ function AppContent() {
     setShowFurionCanvas(false);
   };
 
+  const handleOpenThiagoFinchAI = () => {
+    setShowThiagoFinchAI(true);
+  };
+
+  const handleCloseThiagoFinchAI = () => {
+    setShowThiagoFinchAI(false);
+  };
+
   // Se está na tela de login
   if (showLogin) {
     return (
@@ -79,11 +89,25 @@ function AppContent() {
     );
   }
 
+  // Se está no sistema Thiago Finch AI
+  if (showThiagoFinchAI) {
+    return (
+      <div>
+        <ThiagoFinchAI onBack={handleCloseThiagoFinchAI} />
+        <Toaster />
+      </div>
+    );
+  }
+
   // Se está no dashboard
   if (currentPage === 'dashboard') {
     return (
       <div>
-        <Dashboard user={currentUser} onOpenFurionCanvas={handleOpenFurionCanvas} />
+        <Dashboard 
+          user={currentUser} 
+          onOpenFurionCanvas={handleOpenFurionCanvas}
+          onOpenThiagoFinchAI={handleOpenThiagoFinchAI}
+        />
         <Toaster />
       </div>
     );

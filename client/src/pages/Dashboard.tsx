@@ -55,6 +55,7 @@ interface User {
 interface DashboardProps {
   user?: any;
   onOpenFurionCanvas?: () => void;
+  onOpenThiagoFinchAI?: () => void;
 }
 
 export default function Dashboard({ user: currentUser, onOpenFurionCanvas }: DashboardProps) {
