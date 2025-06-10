@@ -19,40 +19,25 @@ interface RegisterData {
 let authCache: { user: User | null; lastChecked: number } = { user: null, lastChecked: 0 };
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(authCache.user);
+  // Simulando usuário demo para acesso direto à plataforma
+  const demoUser: User = {
+    id: "demo-user",
+    firstName: "Usuário",
+    lastName: "Demo",
+    email: "demo@maquinamilionaria.com",
+    plan: "pro",
+    createdAt: new Date(),
+    updatedAt: new Date()
+  };
+
+  const [user, setUser] = useState<User | null>(demoUser);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const now = Date.now();
-      // Only check auth if cache is older than 30 seconds
-      if (now - authCache.lastChecked < 30000) {
-        setUser(authCache.user);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const response = await fetch('/api/auth/user');
-        if (response.ok) {
-          const userData = await response.json();
-          authCache = { user: userData, lastChecked: now };
-          setUser(userData);
-        } else {
-          authCache = { user: null, lastChecked: now };
-          setUser(null);
-        }
-      } catch (err) {
-        authCache = { user: null, lastChecked: now };
-        setUser(null);
-        setError(err as Error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
+    // Definindo usuário demo automaticamente
+    setUser(demoUser);
+    authCache = { user: demoUser, lastChecked: Date.now() };
   }, []);
 
   const loginMutation = useMutation({
