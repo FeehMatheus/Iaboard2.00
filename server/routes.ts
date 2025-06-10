@@ -20,6 +20,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ROTAS DE USUÁRIO E AUTENTICAÇÃO
   // ================================
 
+  // Registro de usuário
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { firstName, lastName, email, password, plan } = req.body;
+      
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ error: 'E-mail já cadastrado' });
+      }
+
+      // Create user
+      const newUser = await storage.createUser({
+        firstName,
+        lastName,
+        email,
+        password, // In production, hash the password
+        plan: plan || 'starter',
+        subscriptionStatus: 'trial',
+        furionCredits: plan === 'enterprise' ? 10000 : plan === 'professional' ? 5000 : 1000
+      });
+
+      res.json({
+        success: true,
+        user: {
+          id: newUser.id,
+          name: `${newUser.firstName} ${newUser.lastName}`,
+          email: newUser.email,
+          plan: newUser.plan,
+          credits: newUser.furionCredits
+        }
+      });
+    } catch (error) {
+      console.error('Erro no registro:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Login de usuário
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email e senha são obrigatórios' });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(401).json({ error: 'Credenciais inválidas' });
+      }
+
+      // In production, verify hashed password
+      // For now, simple comparison
+      if (password !== user.password) {
+        return res.status(401).json({ error: 'Credenciais inválidas' });
+      }
+
+      res.json({
+        success: true,
+        user: {
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          plan: user.plan,
+          credits: user.furionCredits
+        }
+      });
+    } catch (error) {
+      console.error('Erro no login:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Obter dados do usuário
+  app.get('/api/auth/user', authenticateDemo, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: 'Usuário não encontrado' });
+      }
+
+      res.json({
+        id: user.id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        plan: user.plan,
+        credits: user.furionCredits
+      });
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   // Login de usuário
   app.post('/api/auth/login', async (req, res) => {
     try {

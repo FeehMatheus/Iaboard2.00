@@ -1,10 +1,11 @@
 import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
-import MaquinaMilionariaLanding from '@/pages/MaquinaMilionariaLanding';
-import FurionAI from '@/pages/FurionAI';
+import Home from '@/pages/Home';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import AIPlatform from '@/pages/AIPlatform';
 import Checkout from '@/pages/Checkout';
-import MaquinaMilionaria from '@/pages/MaquinaMilionaria';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,15 +19,15 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen">
         <Switch>
-          <Route path="/" component={MaquinaMilionariaLanding} />
-          <Route path="/furion-ai" component={FurionAI} />
-          <Route path="/furion-access" component={FurionAI} />
+          <Route path="/" component={Home} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <Route path="/dashboard" component={AIPlatform} />
           <Route path="/checkout" component={Checkout} />
-          <Route path="/maquina-milionaria" component={MaquinaMilionaria} />
           <Route>
-            <MaquinaMilionariaLanding />
+            <Home />
           </Route>
         </Switch>
         <Toaster />
