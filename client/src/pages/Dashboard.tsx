@@ -51,7 +51,11 @@ interface User {
   furionCredits: number;
 }
 
-export default function Dashboard() {
+interface DashboardProps {
+  onOpenFurionCanvas?: () => void;
+}
+
+export default function Dashboard({ onOpenFurionCanvas }: DashboardProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [activePhase, setActivePhase] = useState(1);
   const queryClient = useQueryClient();
@@ -404,9 +408,12 @@ export default function Dashboard() {
                             Use a inteligência artificial para acelerar seu progresso nesta fase.
                           </p>
                           <div className="space-y-2">
-                            <Button className="w-full" variant="outline">
+                            <Button 
+                              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white" 
+                              onClick={onOpenFurionCanvas}
+                            >
                               <Brain className="w-4 h-4 mr-2" />
-                              Criar Produto com IA
+                              Abrir Canvas Infinito Furion
                             </Button>
                             <Button className="w-full" variant="outline">
                               <FileText className="w-4 h-4 mr-2" />

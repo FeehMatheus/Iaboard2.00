@@ -99,7 +99,7 @@ export default function FurionCanvas({ onBack }: FurionCanvasProps) {
           y: Math.random() * 600 + 100 
         },
         tamanho: { width: 350, height: 250 },
-        cor: cores[tipoSelecionado],
+        cor: cores[tipoSelecionado] || '#6b7280',
         tags: resultado.modulosRecomendados || [tipoSelecionado],
         metadata: resultado.estrutura || {},
         conectado: false
@@ -120,7 +120,7 @@ export default function FurionCanvas({ onBack }: FurionCanvasProps) {
               y: novoQuadro.posicao.y + (index % 2) * 150
             },
             tamanho: quadroAI.tamanho || { width: 300, height: 200 },
-            cor: quadroAI.cor || cores[quadroAI.tipo] || '#6b7280',
+            cor: quadroAI.cor || cores[quadroAI.tipo as keyof typeof cores] || '#6b7280',
             tags: quadroAI.tags || [],
             metadata: quadroAI.metadata || {},
             conectado: true

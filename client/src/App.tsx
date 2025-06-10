@@ -72,10 +72,19 @@ function AppContent() {
     );
   }
 
+  if (showFurionCanvas) {
+    return (
+      <div>
+        <FurionCanvas onBack={handleCloseFurionCanvas} />
+        <Toaster />
+      </div>
+    );
+  }
+
   if (currentPage === 'dashboard') {
     return (
       <div>
-        <Dashboard />
+        <Dashboard onOpenFurionCanvas={handleOpenFurionCanvas} />
         <Toaster />
       </div>
     );
