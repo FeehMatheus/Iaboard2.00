@@ -427,6 +427,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ================================
+  // ROTAS FURION.AI
+  // ================================
+
+  // Processar requisição do Furion.AI
+  app.post('/api/furion/processar', async (req, res) => {
+    try {
+      const { prompt, tipo, nicho, avatarCliente, orcamento } = req.body;
+      
+      const furionRequest = {
+        prompt,
+        tipo,
+        nicho,
+        avatarCliente,
+        orcamento,
+      };
+
+      const result = await furionAI.processar(furionRequest);
+      res.json(result);
+    } catch (error) {
+      console.error('Erro no Furion.AI:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Erro interno do servidor',
+        message: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+    }
+  });
+
+  // ================================
   // ROTAS DE RECURSOS E MATERIAIS
   // ================================
 
