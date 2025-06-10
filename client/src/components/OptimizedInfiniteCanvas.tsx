@@ -54,44 +54,18 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
 
   const [nodes, setNodes] = useState<CanvasNode[]>([]);
 
-  // Function to calculate optimal node dimensions based on content
+  // Function to calculate uniform node dimensions
   const calculateNodeDimensions = (node: CanvasNode): { width: number; height: number } => {
-    const baseWidth = 180;
-    const baseHeight = 120;
-    
     // Special handling for product selection popup
     if (node.id === 'product-selection' && node.status === 'active') {
       return { width: 340, height: 280 };
     }
     
-    // Calculate width based on title and description length
-    const titleLength = node.title.length;
-    const descriptionLength = node.description.length;
+    // Uniform dimensions for all workflow nodes to maintain perfect alignment
+    const uniformWidth = 220;
+    const uniformHeight = 180;
     
-    let width = Math.max(baseWidth, Math.min(titleLength * 9 + 60, 320));
-    let height = baseHeight;
-    
-    // Adjust height based on description length and content
-    if (descriptionLength > 40) {
-      height += Math.floor(descriptionLength / 40) * 22;
-    }
-    
-    // Add space for data content if completed
-    if (node.status === 'completed' && node.data) {
-      const dataKeys = Object.keys(node.data).length;
-      height += Math.min(dataKeys * 15 + 45, 80);
-    }
-    
-    // Add space for progress indicators
-    if (node.status === 'active') {
-      height += 25;
-    }
-    
-    // Ensure minimum dimensions
-    width = Math.max(width, node.minWidth || baseWidth);
-    height = Math.max(height, node.minHeight || baseHeight);
-    
-    return { width, height };
+    return { width: uniformWidth, height: uniformHeight };
   };
 
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -215,79 +189,79 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const generateWorkflowPopups = async (productType: string) => {
     setIsAnimating(true);
     
-    // Define the workflow structure - 2 organized layers from left to right
+    // Define the workflow structure - 2 perfectly aligned layers
     const workflowSteps = [
-      // Primeira camada (esquerda para direita)
+      // Primeira camada - perfeitamente alinhada
       {
         id: 'step-1',
-        x: 150,
-        y: 100,
+        x: 100,
+        y: 120,
         title: 'Análise de Mercado',
-        description: 'Analisando mercado...',
+        description: 'Pesquisa avançada de tendências, concorrência e oportunidades de mercado usando IA para identificar nichos lucrativos.',
         icon: <TrendingUp className="w-5 h-5" />,
         layer: 1
       },
       {
         id: 'step-2',
         x: 350,
-        y: 100,
+        y: 120,
         title: 'Público-Alvo',
-        description: 'Definindo personas...',
+        description: 'Criação detalhada de personas com dados demográficos, psicográficos e comportamentais para segmentação precisa.',
         icon: <Users className="w-5 h-5" />,
         layer: 1
       },
       {
         id: 'step-3',
-        x: 550,
-        y: 100,
+        x: 600,
+        y: 120,
         title: 'Copywriting',
-        description: 'Criando textos...',
+        description: 'Desenvolvimento de textos persuasivos e headlines otimizadas para máxima conversão e engajamento.',
         icon: <FileText className="w-5 h-5" />,
         layer: 1
       },
       {
         id: 'step-4',
-        x: 750,
-        y: 100,
+        x: 850,
+        y: 120,
         title: 'VSL & Vídeos',
-        description: 'Produzindo vídeos...',
+        description: 'Produção de roteiros profissionais para Video Sales Letters e conteúdo audiovisual de alta conversão.',
         icon: <Video className="w-5 h-5" />,
         layer: 1
       },
-      // Segunda camada (esquerda para direita)
+      // Segunda camada - perfeitamente alinhada
       {
         id: 'step-5',
-        x: 150,
-        y: 300,
+        x: 100,
+        y: 320,
         title: 'Email Marketing',
-        description: 'Sequências de email...',
+        description: 'Sequências automatizadas de email com segmentação inteligente e campanhas de nutrição personalizadas.',
         icon: <Mail className="w-5 h-5" />,
         layer: 2
       },
       {
         id: 'step-6',
         x: 350,
-        y: 300,
+        y: 320,
         title: 'Landing Pages',
-        description: 'Páginas de captura...',
+        description: 'Páginas de alta conversão com elementos psicológicos, testes A/B e otimização para dispositivos móveis.',
         icon: <Download className="w-5 h-5" />,
         layer: 2
       },
       {
         id: 'step-7',
-        x: 550,
-        y: 300,
+        x: 600,
+        y: 320,
         title: 'Funil Integrado',
-        description: 'Conectando tudo...',
+        description: 'Integração completa de todos os componentes com automações avançadas e tracking de performance.',
         icon: <CheckCircle className="w-5 h-5" />,
         layer: 2
       },
       {
         id: 'step-8',
-        x: 750,
-        y: 300,
+        x: 850,
+        y: 320,
         title: 'Produto Final',
-        description: 'Finalizando...',
+        description: 'Compilação final com documentação completa, métricas de sucesso e roadmap de otimização contínua.',
         icon: <Rocket className="w-5 h-5" />,
         layer: 2
       }
@@ -315,7 +289,7 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   };
 
   const generatePopupWithContent = async (stepConfig: any, productType: string, stepIndex: number) => {
-    // Add the new popup node with processing state
+    // Add the new popup node with enhanced animation and processing state
     const newNode: CanvasNode = {
       id: stepConfig.id,
       x: stepConfig.x,
@@ -327,13 +301,13 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       type: 'step',
       connections: [],
       autoResize: true,
-      minWidth: 200,
-      minHeight: 140
+      minWidth: 220,
+      minHeight: 180
     };
 
     setNodes(prev => [...prev, newNode]);
 
-    // Smooth camera animation to focus on this popup
+    // Enhanced camera animation with smooth focus transition
     animateCameraToNode(stepConfig);
 
     // Show detailed processing logs inside the popup
@@ -787,12 +761,37 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
         </div>
       </div>
 
-      {/* Main Canvas - Full Screen */}
+      {/* Main Canvas - Full Screen with Professional Border */}
       <div 
         ref={canvasRef}
-        className="w-full h-full overflow-hidden relative"
-        style={{ marginTop: '64px' }}
+        className="w-full h-full overflow-hidden relative shadow-2xl"
+        style={{ 
+          marginTop: '64px',
+          background: 'linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%)',
+          border: '4px solid transparent',
+          borderRadius: '16px',
+          backgroundClip: 'padding-box',
+          position: 'relative'
+        }}
       >
+        {/* Animated Border Effect */}
+        <div 
+          className="absolute inset-0 rounded-2xl opacity-75"
+          style={{
+            background: 'linear-gradient(45deg, #3b82f6, #8b5cf6, #14b8a6, #f59e0b, #ef4444, #3b82f6)',
+            backgroundSize: '400% 400%',
+            animation: 'gradientShift 6s ease infinite',
+            zIndex: -1,
+            margin: '-4px'
+          }}
+        />
+        <style jsx>{`
+          @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+        `}</style>
         <motion.div
           className="w-full h-full relative cursor-grab active:cursor-grabbing"
           style={{
@@ -805,15 +804,16 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
             setPanY(prev => prev + info.delta.y / zoom);
           }}
         >
-          {/* Grid Background */}
+          {/* Enhanced Professional Grid Background */}
           <div 
-            className="absolute inset-0 opacity-20"
+            className="absolute inset-0 opacity-30"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+                radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.3) 1px, transparent 1px),
+                linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.1) 1px, transparent 1px)
               `,
-              backgroundSize: '20px 20px'
+              backgroundSize: '40px 40px, 20px 20px, 20px 20px'
             }}
           />
 
@@ -842,13 +842,32 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
             <motion.div
               key={node.id}
               className={`absolute cursor-pointer select-none ${
-                selectedNode === node.id ? 'ring-2 ring-blue-500' : ''
+                selectedNode === node.id ? 'ring-4 ring-blue-500 ring-opacity-50' : ''
               }`}
               style={{
                 left: node.x,
                 top: node.y,
                 width: node.autoResize !== false ? calculateNodeDimensions(node).width : (node.width || 180),
                 height: node.autoResize !== false ? calculateNodeDimensions(node).height : (node.height || 100)
+              }}
+              initial={{ scale: 0, opacity: 0, rotateY: -90 }}
+              animate={{ 
+                scale: 1, 
+                opacity: 1, 
+                rotateY: 0,
+                boxShadow: node.status === 'active' ? 
+                  ['0 0 0 rgba(59, 130, 246, 0.7)', '0 0 30px rgba(59, 130, 246, 0.4)', '0 0 0 rgba(59, 130, 246, 0.7)'] :
+                  node.status === 'completed' ?
+                  '0 10px 25px rgba(34, 197, 94, 0.3)' :
+                  '0 4px 12px rgba(0, 0, 0, 0.1)'
+              }}
+              exit={{ scale: 0, opacity: 0, rotateY: 90 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: nodes.indexOf(node) * 0.1,
+                type: "spring",
+                stiffness: 100,
+                boxShadow: { duration: 2, repeat: node.status === 'active' ? Infinity : 0 }
               }}
               drag
               dragMomentum={false}
@@ -857,12 +876,8 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
               }}
               onClick={() => handleNodeClick(node.id)}
               onContextMenu={(e) => handleNodeRightClick(e, node.id)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              animate={node.status === 'active' ? {
-                boxShadow: ['0 0 0 rgba(59, 130, 246, 0.7)', '0 0 20px rgba(59, 130, 246, 0.4)', '0 0 0 rgba(59, 130, 246, 0.7)']
-              } : {}}
-              transition={{ duration: 2, repeat: node.status === 'active' ? Infinity : 0 }}
+              whileHover={{ scale: 1.05, rotateX: 5 }}
+              whileTap={{ scale: 0.95 }}
             >
               <Card className={`w-full h-full border-2 transition-all duration-200 ${
                 node.status === 'completed' 
@@ -910,9 +925,9 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                   {/* Regular Node Content */}
                   {(node.id !== 'product-selection' || node.status !== 'active') && (
                     <>
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className={`p-1 rounded ${
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className={`p-2 rounded-lg ${
                             node.status === 'completed' 
                               ? 'bg-green-100 text-green-600' 
                               : node.status === 'active'
@@ -922,10 +937,11 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                             {node.icon}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-sm">{node.title}</h3>
+                            <h3 className="font-bold text-sm text-gray-800 leading-tight">{node.title}</h3>
                           </div>
                         </div>
-                        <p className="text-xs text-gray-600 line-clamp-3">
+                        <p className="text-xs text-gray-600 leading-relaxed mb-3 overflow-hidden" 
+                           style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' }}>
                           {node.description}
                         </p>
                       </div>
@@ -939,14 +955,26 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
                         </div>
                       )}
                       
-                      {/* Data summary for completed nodes */}
+                      {/* Enhanced data summary for completed nodes */}
                       {node.status === 'completed' && node.data && (
-                        <div className="mt-2 text-xs">
-                          <div className="bg-green-100 p-2 rounded border-l-2 border-green-400">
-                            <div className="font-medium text-green-800">Concluído ✓</div>
+                        <div className="mt-auto">
+                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="font-bold text-green-800 text-xs">Concluído</div>
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            </div>
                             {Object.keys(node.data).length > 0 && (
-                              <div className="text-green-600 mt-1">
-                                {Object.keys(node.data).length} elementos gerados
+                              <div className="space-y-1">
+                                {Object.entries(node.data).slice(0, 2).map(([key, value]) => (
+                                  <div key={key} className="text-xs text-green-700">
+                                    <span className="font-medium">{key}:</span> {String(value).slice(0, 20)}...
+                                  </div>
+                                ))}
+                                {Object.keys(node.data).length > 2 && (
+                                  <div className="text-xs text-green-600 font-medium">
+                                    +{Object.keys(node.data).length - 2} mais elementos
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
