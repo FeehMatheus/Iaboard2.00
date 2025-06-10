@@ -155,50 +155,50 @@ export default function AIPlatform() {
       return;
     }
 
-    // Load sample projects
-    const sampleProjects: AIProject[] = [
-      {
-        id: '1',
-        type: 'copy',
-        title: 'Copy para Curso de Marketing Digital',
-        status: 'completed',
-        progress: 100,
-        position: { x: 100, y: 100 },
-        size: { width: 320, height: 240 },
-        isExpanded: false,
-        createdAt: new Date().toISOString(),
-        content: {
-          headline: 'Transforme-se no Expert em Marketing Digital que Todas as Empresas Querem Contratar',
-          subheadline: 'Descubra os segredos que apenas 3% dos profissionais conhecem e multiplique sua renda em até 5x nos próximos 90 dias',
-          body: 'Se você está cansado de...'
-        }
-      },
-      {
-        id: '2',
-        type: 'vsl',
-        title: 'VSL para Infoproduto',
-        status: 'processing',
-        progress: 67,
-        position: { x: 450, y: 150 },
-        size: { width: 320, height: 240 },
-        isExpanded: false,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: '3',
-        type: 'funnel',
-        title: 'Funil Consultoria Business',
-        status: 'completed',
-        progress: 100,
-        position: { x: 200, y: 400 },
-        size: { width: 320, height: 240 },
-        isExpanded: false,
-        createdAt: new Date().toISOString()
-      }
-    ];
-    
-    setProjects(sampleProjects);
+    // Load user data and projects from API
+    loadUserData();
+    loadProjects();
   }, [setLocation]);
+
+  const loadUserData = async () => {
+    try {
+      const response = await fetch('/api/auth/user', {
+        headers: {
+          'Authorization': `Bearer demo-user`
+        }
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  };
+
+  const loadProjects = async () => {
+    try {
+      const response = await fetch('/api/projects', {
+        headers: {
+          'Authorization': `Bearer demo-user`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const formattedProjects = data.projects.map((p: any, index: number) => ({
+          ...p,
+          position: { x: 100 + (index * 350), y: 100 + (index % 2) * 300 },
+          size: { width: 320, height: 240 },
+          isExpanded: false
+        }));
+        setProjects(formattedProjects);
+      }
+    } catch (error) {
+      console.error('Error loading projects:', error);
+    }
+  };
 
   const handleCreateProject = async () => {
     if (!newProjectType || !newProjectPrompt.trim()) {
@@ -222,46 +222,94 @@ export default function AIPlatform() {
       return;
     }
 
-    const newProject: AIProject = {
-      id: Date.now().toString(),
-      type: newProjectType as any,
-      title: newProjectPrompt.substring(0, 50) + (newProjectPrompt.length > 50 ? '...' : ''),
-      status: 'processing',
-      progress: 0,
-      position: { 
-        x: Math.random() * 400 + 100, 
-        y: Math.random() * 300 + 100 
-      },
-      size: { width: 320, height: 240 },
-      isExpanded: false,
-      createdAt: new Date().toISOString()
-    };
+    try {
+      // Create project via API
+      const response = await fetch('/api/projects/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer demo-user`
+        },
+        body: JSON.stringify({
+          type: newProjectType,
+          title: newProjectPrompt.substring(0, 50) + (newProjectPrompt.length > 50 ? '...' : ''),
+          prompt: newProjectPrompt
+        })
+      });
 
-    setProjects(prev => [...prev, newProject]);
-    setUser(prev => ({ ...prev, credits: prev.credits - selectedType.credits }));
-    setIsCreatingProject(false);
-    setNewProjectType('');
-    setNewProjectPrompt('');
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Add project to local state with position for canvas
+        const newProject: AIProject = {
+          ...data.project,
+          position: { 
+            x: Math.random() * 400 + 100, 
+            y: Math.random() * 300 + 100 
+          },
+          size: { width: 320, height: 240 },
+          isExpanded: false
+        };
 
-    toast({
-      title: "Projeto criado!",
-      description: "A IA está processando seu projeto..."
-    });
+        setProjects(prev => [...prev, newProject]);
+        setUser(prev => ({ ...prev, credits: prev.credits - selectedType.credits }));
+        setIsCreatingProject(false);
+        setNewProjectType('');
+        setNewProjectPrompt('');
 
-    // Simulate AI processing
-    const progressInterval = setInterval(() => {
-      setProjects(prev => prev.map(p => {
-        if (p.id === newProject.id && p.status === 'processing') {
-          const newProgress = Math.min(p.progress + Math.random() * 20, 100);
-          if (newProgress >= 100) {
-            clearInterval(progressInterval);
-            return { ...p, progress: 100, status: 'completed' };
+        toast({
+          title: "Projeto criado!",
+          description: "A IA está processando seu projeto..."
+        });
+
+        // Poll for project updates
+        const pollProject = async () => {
+          try {
+            const projectResponse = await fetch(`/api/projects/${data.project.id}`, {
+              headers: {
+                'Authorization': `Bearer demo-user`
+              }
+            });
+            
+            if (projectResponse.ok) {
+              const projectData = await projectResponse.json();
+              setProjects(prev => prev.map(p => 
+                p.id === data.project.id 
+                  ? { ...p, ...projectData.project }
+                  : p
+              ));
+
+              if (projectData.project.status === 'completed') {
+                toast({
+                  title: "Projeto concluído!",
+                  description: "Seu conteúdo está pronto!"
+                });
+              } else if (projectData.project.status === 'processing') {
+                setTimeout(pollProject, 2000);
+              }
+            }
+          } catch (error) {
+            console.error('Error polling project:', error);
           }
-          return { ...p, progress: newProgress };
-        }
-        return p;
-      }));
-    }, 1000);
+        };
+
+        setTimeout(pollProject, 2000);
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Erro ao criar projeto",
+          description: error.error || "Tente novamente",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error creating project:', error);
+      toast({
+        title: "Erro de conexão",
+        description: "Verifique sua conexão e tente novamente",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleProjectClick = (project: AIProject) => {
