@@ -1066,6 +1066,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ================================
+  // FURION.AI API ROUTES
+  // ================================
+
+  // Processar projeto com FURION
+  app.post('/api/furion/process', async (req, res) => {
+    try {
+      const { tipo, prompt, titulo } = req.body;
+      
+      if (!tipo || !prompt) {
+        return res.status(400).json({ error: 'Tipo e prompt são obrigatórios' });
+      }
+
+      const resultado = await furionAI.processar({
+        tipo,
+        prompt,
+        titulo,
+        contexto: 'Máquina Milionária - Sistema Premium'
+      });
+
+      res.json({
+        success: true,
+        resultado
+      });
+    } catch (error) {
+      console.error('Erro no processamento FURION:', error);
+      res.status(500).json({ error: 'Erro no processamento da IA' });
+    }
+  });
+
+  // Obter estatísticas do usuário
+  app.get('/api/furion/stats', async (req, res) => {
+    try {
+      res.json({
+        projectsCreated: 47,
+        projectsCompleted: 42,
+        creditsUsed: 1853,
+        creditsRemaining: 2847,
+        successRate: 89.4
+      });
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Exportar projeto
+  app.post('/api/furion/export/:projectId', async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const { format } = req.body;
+
+      // Simular exportação
+      const exportData = {
+        projectId,
+        format,
+        downloadUrl: `/downloads/project-${projectId}.${format}`,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      };
+
+      res.json({
+        success: true,
+        export: exportData
+      });
+    } catch (error) {
+      console.error('Erro na exportação:', error);
+      res.status(500).json({ error: 'Erro na exportação' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

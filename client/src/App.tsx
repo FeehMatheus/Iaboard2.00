@@ -1,13 +1,10 @@
-import { useState } from 'react';
 import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
+import MaquinaMilionariaLanding from '@/pages/MaquinaMilionariaLanding';
+import FurionAI from '@/pages/FurionAI';
+import Checkout from '@/pages/Checkout';
 import MaquinaMilionaria from '@/pages/MaquinaMilionaria';
-import LoginPage from '@/pages/LoginPage';
-import Dashboard from '@/pages/Dashboard';
-import FurionAI from '@/components/FurionAI';
-import FurionCanvas from '@/pages/FurionCanvas';
-import ThiagoFinchAI from '@/pages/ThiagoFinchAI';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,114 +15,22 @@ const queryClient = new QueryClient({
   },
 });
 
-function AppContent() {
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [showFurion, setShowFurion] = useState(false);
-  const [currentPage, setCurrentPage] = useState('home');
-  const [showLogin, setShowLogin] = useState(false);
-  const [showFurionCanvas, setShowFurionCanvas] = useState(false);
-  const [showThiagoFinchAI, setShowThiagoFinchAI] = useState(false);
-
-  const handleOpenFurion = () => {
-    setShowFurion(true);
-  };
-
-  const handleCloseFurion = () => {
-    setShowFurion(false);
-  };
-
-  const handleOpenLogin = () => {
-    setShowLogin(true);
-  };
-
-  const handleLogin = (userData: any) => {
-    setCurrentUser(userData);
-    setShowLogin(false);
-    setCurrentPage('dashboard');
-  };
-
-  const handleBackToHome = () => {
-    setShowLogin(false);
-    setCurrentPage('home');
-  };
-
-  const handleAccessPlatform = () => {
-    setCurrentPage('dashboard');
-  };
-
-  const handleOpenFurionCanvas = () => {
-    setShowFurionCanvas(true);
-  };
-
-  const handleCloseFurionCanvas = () => {
-    setShowFurionCanvas(false);
-  };
-
-  const handleOpenThiagoFinchAI = () => {
-    setShowThiagoFinchAI(true);
-  };
-
-  const handleCloseThiagoFinchAI = () => {
-    setShowThiagoFinchAI(false);
-  };
-
-  // Se está na tela de login
-  if (showLogin) {
-    return (
-      <div>
-        <LoginPage onLogin={handleLogin} onBack={handleBackToHome} />
-        <Toaster />
-      </div>
-    );
-  }
-
-  // Se está no canvas do Furion
-  if (showFurionCanvas) {
-    return (
-      <div>
-        <FurionCanvas onBack={handleCloseFurionCanvas} />
-        <Toaster />
-      </div>
-    );
-  }
-
-  // Se está no sistema Thiago Finch AI
-  if (showThiagoFinchAI) {
-    return (
-      <div>
-        <ThiagoFinchAI onBack={handleCloseThiagoFinchAI} />
-        <Toaster />
-      </div>
-    );
-  }
-
-  // Se está no dashboard
-  if (currentPage === 'dashboard') {
-    return (
-      <div>
-        <Dashboard 
-          user={currentUser} 
-          onOpenFurionCanvas={handleOpenFurionCanvas}
-          onOpenThiagoFinchAI={handleOpenThiagoFinchAI}
-        />
-        <Toaster />
-      </div>
-    );
-  }
-
-  // Sistema Máquina Milionária completo
-  return (
-    <div>
-      <MaquinaMilionaria />
-      <Toaster />
-    </div>
-  );
-}
-
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <div className="min-h-screen bg-black">
+        <Switch>
+          <Route path="/" component={MaquinaMilionariaLanding} />
+          <Route path="/furion-ai" component={FurionAI} />
+          <Route path="/furion-access" component={FurionAI} />
+          <Route path="/checkout" component={Checkout} />
+          <Route path="/maquina-milionaria" component={MaquinaMilionaria} />
+          <Route>
+            <MaquinaMilionariaLanding />
+          </Route>
+        </Switch>
+        <Toaster />
+      </div>
     </QueryClientProvider>
   );
 }
