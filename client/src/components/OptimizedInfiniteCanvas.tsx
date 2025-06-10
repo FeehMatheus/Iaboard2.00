@@ -40,29 +40,15 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
   const [panX, setPanX] = useState(0);
   const [panY, setPanY] = useState(0);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [showInitialModal, setShowInitialModal] = useState(true);
+  const [showInitialModal, setShowInitialModal] = useState(false);
+  const [showCanvasPopup, setShowCanvasPopup] = useState(true);
   const [contextMenu, setContextMenu] = useState<{x: number, y: number, nodeId: string} | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [workflowMode, setWorkflowMode] = useState<'powerful-ai' | 'manual' | null>(null);
   const [detailedLogs, setDetailedLogs] = useState<{[key: string]: string[]}>({});
 
-  const [nodes, setNodes] = useState<CanvasNode[]>([
-    // Popup inicial - Centro da tela
-    {
-      id: 'start',
-      x: 500,
-      y: 200,
-      title: 'Definir Produto',
-      description: 'Escolha o tipo de produto que deseja criar',
-      icon: <Rocket className="w-6 h-6" />,
-      status: 'active',
-      type: 'step',
-      connections: ['1', '2', '3', '4', '5'],
-      width: 220,
-      height: 140
-    }
-  ]);
+  const [nodes, setNodes] = useState<CanvasNode[]>([]);
 
   const [connections, setConnections] = useState<Connection[]>([]);
 
@@ -127,145 +113,164 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
 
   const startPowerfulAIWorkflow = async () => {
     setWorkflowMode('powerful-ai');
-    setShowInitialModal(false);
+    setShowCanvasPopup(false);
     
-    // Show product type selection popup on start node
-    setNodes(prev => prev.map(node => 
-      node.id === 'start' ? { ...node, status: 'active' } : node
-    ));
-    
-    // Wait for user to select product type
-    showProductTypeModal();
+    // Create the initial product selection popup directly on canvas
+    createProductSelectionPopup();
   };
 
   const startManualWorkflow = () => {
     setWorkflowMode('manual');
-    setShowInitialModal(false);
-    showProductTypeModal();
+    setShowCanvasPopup(false);
+    createProductSelectionPopup();
   };
 
-  const [showProductModal, setShowProductModal] = useState(false);
   const [selectedProductType, setSelectedProductType] = useState<string>('');
 
-  const showProductTypeModal = () => {
-    setShowProductModal(true);
+  const createProductSelectionPopup = () => {
+    const productPopup: CanvasNode = {
+      id: 'product-selection',
+      x: 400,
+      y: 200,
+      title: 'Selecionar Produto',
+      description: 'Escolha o tipo de produto',
+      icon: <Rocket className="w-6 h-6" />,
+      status: 'active',
+      type: 'step',
+      connections: [],
+      width: 280,
+      height: 160
+    };
+
+    setNodes([productPopup]);
+    
+    // Center camera on this popup
+    const targetX = -productPopup.x * zoom + window.innerWidth / 2;
+    const targetY = -productPopup.y * zoom + window.innerHeight / 2;
+    setPanX(targetX);
+    setPanY(targetY);
   };
 
   const handleProductTypeSelection = async (productType: string) => {
     setSelectedProductType(productType);
-    setShowProductModal(false);
     
-    // Update start node with selected product
+    // Update the product selection node
     setNodes(prev => prev.map(node => 
-      node.id === 'start' 
-        ? { ...node, title: productType, description: `Criando ${productType} com IA`, status: 'completed' } 
+      node.id === 'product-selection' 
+        ? { ...node, title: productType, description: `Iniciando criação...`, status: 'completed' } 
         : node
     ));
 
-    // Start generating popups sequentially
-    await generateWorkflowPopups(productType);
+    // Wait a moment then start generating workflow
+    setTimeout(() => {
+      generateWorkflowPopups(productType);
+    }, 1000);
   };
 
   const generateWorkflowPopups = async (productType: string) => {
     setIsAnimating(true);
     
-    // Define the workflow structure - 2 layers
+    // Define the workflow structure - 2 organized layers from left to right
     const workflowSteps = [
       // Primeira camada (esquerda para direita)
       {
-        id: '1',
-        x: 200,
+        id: 'step-1',
+        x: 150,
         y: 100,
         title: 'Análise de Mercado',
-        description: 'Pesquisando oportunidades de mercado...',
-        icon: <TrendingUp className="w-6 h-6" />,
+        description: 'Analisando mercado...',
+        icon: <TrendingUp className="w-5 h-5" />,
         layer: 1
       },
       {
-        id: '2',
-        x: 450,
+        id: 'step-2',
+        x: 350,
         y: 100,
-        title: 'Definição de Público',
-        description: 'Identificando público-alvo ideal...',
-        icon: <Users className="w-6 h-6" />,
+        title: 'Público-Alvo',
+        description: 'Definindo personas...',
+        icon: <Users className="w-5 h-5" />,
         layer: 1
       },
       {
-        id: '3',
-        x: 700,
+        id: 'step-3',
+        x: 550,
         y: 100,
-        title: 'Criação de Copy',
-        description: 'Gerando textos persuasivos...',
-        icon: <FileText className="w-6 h-6" />,
+        title: 'Copywriting',
+        description: 'Criando textos...',
+        icon: <FileText className="w-5 h-5" />,
         layer: 1
       },
       {
-        id: '4',
-        x: 950,
+        id: 'step-4',
+        x: 750,
         y: 100,
-        title: 'Desenvolvimento VSL',
-        description: 'Criando vídeos de vendas...',
-        icon: <Video className="w-6 h-6" />,
+        title: 'VSL & Vídeos',
+        description: 'Produzindo vídeos...',
+        icon: <Video className="w-5 h-5" />,
         layer: 1
       },
       // Segunda camada (esquerda para direita)
       {
-        id: '5',
-        x: 200,
-        y: 350,
+        id: 'step-5',
+        x: 150,
+        y: 300,
         title: 'Email Marketing',
-        description: 'Automações de email...',
-        icon: <Mail className="w-6 h-6" />,
+        description: 'Sequências de email...',
+        icon: <Mail className="w-5 h-5" />,
         layer: 2
       },
       {
-        id: '6',
-        x: 450,
-        y: 350,
+        id: 'step-6',
+        x: 350,
+        y: 300,
         title: 'Landing Pages',
-        description: 'Páginas de conversão...',
-        icon: <Download className="w-6 h-6" />,
+        description: 'Páginas de captura...',
+        icon: <Download className="w-5 h-5" />,
         layer: 2
       },
       {
-        id: '7',
-        x: 700,
-        y: 350,
-        title: 'Funil Completo',
-        description: 'Integrando todos elementos...',
-        icon: <CheckCircle className="w-6 h-6" />,
+        id: 'step-7',
+        x: 550,
+        y: 300,
+        title: 'Funil Integrado',
+        description: 'Conectando tudo...',
+        icon: <CheckCircle className="w-5 h-5" />,
         layer: 2
       },
       {
-        id: '8',
-        x: 950,
-        y: 350,
+        id: 'step-8',
+        x: 750,
+        y: 300,
         title: 'Produto Final',
-        description: 'Finalizando e compilando...',
-        icon: <Rocket className="w-6 h-6" />,
+        description: 'Finalizando...',
+        icon: <Rocket className="w-5 h-5" />,
         layer: 2
       }
     ];
 
-    // Generate popups sequentially with real content
-    for (const step of workflowSteps) {
-      await generatePopupWithContent(step, productType);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay between popups
+    // Generate popups sequentially with smooth camera animation focusing on each
+    for (let i = 0; i < workflowSteps.length; i++) {
+      const step = workflowSteps[i];
+      await generatePopupWithContent(step, productType, i);
+      await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second focus on each step
     }
 
-    // Create connections between layers
+    // Create connections between all steps
     createWorkflowConnections();
+    
+    // Final camera adjustment to show entire workflow
+    await adjustCameraToShowFullWorkflow();
     
     setIsAnimating(false);
     
-    // Generate final download after all popups are created
+    // Generate final download
     setTimeout(() => {
       generateFinalDownload();
-    }, 3000);
+    }, 2000);
   };
 
-  const generatePopupWithContent = async (stepConfig: any, productType: string) => {
-    // Add the new popup node
+  const generatePopupWithContent = async (stepConfig: any, productType: string, stepIndex: number) => {
+    // Add the new popup node with processing state
     const newNode: CanvasNode = {
       id: stepConfig.id,
       x: stepConfig.x,
@@ -276,36 +281,42 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       status: 'active',
       type: 'step',
       connections: [],
-      width: 200,
-      height: 120
+      width: 180,
+      height: 110
     };
 
     setNodes(prev => [...prev, newNode]);
 
-    // Animate camera to focus on new popup
-    const targetX = -stepConfig.x * zoom + window.innerWidth / 2;
-    const targetY = -stepConfig.y * zoom + window.innerHeight / 2;
-    setPanX(targetX);
-    setPanY(targetY);
+    // Smooth camera animation to focus on this popup
+    animateCameraToNode(stepConfig);
 
-    // Add detailed logs
+    // Show detailed processing logs inside the popup
     const logs = [
-      `🧠 IA Pensamento Poderoso - ${stepConfig.title}`,
-      `🔍 Analisando requisitos para ${productType}`,
-      `⚡ Combinando Claude + GPT-4o + Análise própria`,
-      `📊 Processando dados em tempo real`,
-      `🎯 Gerando conteúdo otimizado`
+      `Processando ${stepConfig.title}...`,
+      `Analisando ${productType}`,
+      `Gerando conteúdo otimizado`,
+      `Aplicando IA avançada`,
+      `Finalizando etapa`
     ];
 
-    addDetailedLog(stepConfig.id, logs);
+    // Update popup with processing logs
+    for (let i = 0; i < logs.length; i++) {
+      setTimeout(() => {
+        setNodes(prev => prev.map(n => 
+          n.id === stepConfig.id 
+            ? { ...n, description: logs[i] }
+            : n
+        ));
+      }, i * 400);
+    }
 
-    // Generate real content with AI
+    // Generate real AI content
     try {
       const response = await fetch('/api/ai/process-step', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          stepId: parseInt(stepConfig.id),
+          stepId: stepIndex + 1,
           stepTitle: stepConfig.title,
           productType: productType,
           context: { workflowMode, productType }
@@ -315,50 +326,101 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
       if (response.ok) {
         const result = await response.json();
         
-        // Update node with real data and mark as completed
+        // Mark as completed with success message
         setNodes(prev => prev.map(n => 
           n.id === stepConfig.id 
             ? { 
                 ...n, 
                 data: result, 
                 status: 'completed',
-                description: `✅ ${stepConfig.title} concluído com sucesso`
+                description: `✅ ${stepConfig.title} - Concluído`
               }
             : n
         ));
       }
     } catch (error) {
-      console.log('Processing step:', stepConfig.id);
       // Mark as completed even if AI fails
       setTimeout(() => {
         setNodes(prev => prev.map(n => 
           n.id === stepConfig.id 
-            ? { ...n, status: 'completed', description: `✅ ${stepConfig.title} concluído` }
+            ? { ...n, status: 'completed', description: `✅ ${stepConfig.title} - Finalizado` }
             : n
         ));
-      }, 1500);
+      }, 2000);
     }
+  };
+
+  const animateCameraToNode = (stepConfig: any) => {
+    // Calculate center position for this node
+    const targetX = -stepConfig.x * zoom + window.innerWidth / 2;
+    const targetY = -stepConfig.y * zoom + window.innerHeight / 2;
+    
+    // Smooth transition using CSS transitions
+    const canvasElement = document.querySelector('.infinite-canvas');
+    if (canvasElement) {
+      (canvasElement as HTMLElement).style.transition = 'transform 0.8s ease-in-out';
+    }
+    
+    setPanX(targetX);
+    setPanY(targetY);
+  };
+
+  const adjustCameraToShowFullWorkflow = async () => {
+    // Calculate bounds to show all nodes
+    const padding = 100;
+    const allNodes = nodes;
+    
+    if (allNodes.length === 0) return;
+    
+    const minX = Math.min(...allNodes.map(n => n.x)) - padding;
+    const maxX = Math.max(...allNodes.map(n => n.x + (n.width || 180))) + padding;
+    const minY = Math.min(...allNodes.map(n => n.y)) - padding;
+    const maxY = Math.max(...allNodes.map(n => n.y + (n.height || 110))) + padding;
+    
+    const workflowWidth = maxX - minX;
+    const workflowHeight = maxY - minY;
+    
+    // Calculate zoom to fit all nodes
+    const scaleX = window.innerWidth / workflowWidth;
+    const scaleY = window.innerHeight / workflowHeight;
+    const newZoom = Math.min(scaleX, scaleY, 1) * 0.8; // 80% of available space
+    
+    // Center the workflow
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const targetX = -centerX * newZoom + window.innerWidth / 2;
+    const targetY = -centerY * newZoom + window.innerHeight / 2;
+    
+    // Smooth transition
+    const canvasElement = document.querySelector('.infinite-canvas');
+    if (canvasElement) {
+      (canvasElement as HTMLElement).style.transition = 'transform 1.2s ease-in-out';
+    }
+    
+    setZoom(newZoom);
+    setPanX(targetX);
+    setPanY(targetY);
   };
 
   const createWorkflowConnections = () => {
     const newConnections: Connection[] = [
-      // From start to first layer
-      { from: 'start', to: '1', type: 'flow' },
-      { from: 'start', to: '2', type: 'flow' },
-      { from: 'start', to: '3', type: 'flow' },
-      { from: 'start', to: '4', type: 'flow' },
+      // From product selection to first layer
+      { from: 'product-selection', to: 'step-1', type: 'flow' },
+      { from: 'product-selection', to: 'step-2', type: 'flow' },
+      { from: 'product-selection', to: 'step-3', type: 'flow' },
+      { from: 'product-selection', to: 'step-4', type: 'flow' },
       // From first layer to second layer
-      { from: '1', to: '5', type: 'flow' },
-      { from: '2', to: '6', type: 'flow' },
-      { from: '3', to: '7', type: 'flow' },
-      { from: '4', to: '8', type: 'flow' },
-      // Cross connections within layers
-      { from: '1', to: '2', type: 'flow' },
-      { from: '2', to: '3', type: 'flow' },
-      { from: '3', to: '4', type: 'flow' },
-      { from: '5', to: '6', type: 'flow' },
-      { from: '6', to: '7', type: 'flow' },
-      { from: '7', to: '8', type: 'flow' }
+      { from: 'step-1', to: 'step-5', type: 'flow' },
+      { from: 'step-2', to: 'step-6', type: 'flow' },
+      { from: 'step-3', to: 'step-7', type: 'flow' },
+      { from: 'step-4', to: 'step-8', type: 'flow' },
+      // Sequential connections within layers
+      { from: 'step-1', to: 'step-2', type: 'flow' },
+      { from: 'step-2', to: 'step-3', type: 'flow' },
+      { from: 'step-3', to: 'step-4', type: 'flow' },
+      { from: 'step-5', to: 'step-6', type: 'flow' },
+      { from: 'step-6', to: 'step-7', type: 'flow' },
+      { from: 'step-7', to: 'step-8', type: 'flow' }
     ];
     
     setConnections(newConnections);
@@ -783,82 +845,41 @@ export default function OptimizedInfiniteCanvas({ onExport, onSave, powerfulAIMo
         </DialogContent>
       </Dialog>
 
-      {/* Product Type Selection Modal */}
-      <Dialog open={showProductModal} onOpenChange={setShowProductModal}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center">
-              Que tipo de produto você quer criar?
-            </DialogTitle>
-            <DialogDescription className="text-center text-gray-600">
-              Selecione o tipo de produto e vamos gerar todo o conteúdo automaticamente
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6">
-            {[
-              { name: 'Curso Online', icon: '🎓', desc: 'Educação digital completa' },
-              { name: 'Mentoria', icon: '🧠', desc: 'Acompanhamento personalizado' },
-              { name: 'Consultoria', icon: '💼', desc: 'Serviços especializados' },
-              { name: 'Infoproduto', icon: '📚', desc: 'Produtos informativos' },
-              { name: 'E-book', icon: '📖', desc: 'Livros digitais' },
-              { name: 'Software/App', icon: '💻', desc: 'Soluções tecnológicas' },
-              { name: 'E-commerce', icon: '🛒', desc: 'Loja virtual' },
-              { name: 'Serviço Digital', icon: '🌐', desc: 'Serviços online' },
-              { name: 'Curso Presencial', icon: '🏫', desc: 'Educação tradicional' },
-              { name: 'Evento/Workshop', icon: '🎪', desc: 'Experiências ao vivo' },
-              { name: 'Coaching', icon: '🎯', desc: 'Desenvolvimento pessoal' },
-              { name: 'Produto Físico', icon: '📦', desc: 'Itens tangíveis' }
-            ].map((product) => (
-              <motion.div
-                key={product.name}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleProductTypeSelection(product.name)}
-                className="p-4 border-2 border-gray-200 rounded-lg bg-white cursor-pointer hover:border-blue-400 hover:shadow-lg transition-all text-center"
+      {/* Canvas-based Compact Initial Popup */}
+      {showCanvasPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-xl p-6 max-w-md mx-4 shadow-2xl"
+          >
+            <h2 className="text-xl font-bold text-center mb-4">Como criar seu produto?</h2>
+            <div className="space-y-3">
+              <button
+                onClick={startPowerfulAIWorkflow}
+                className="w-full p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-all"
               >
-                <div className="text-3xl mb-2">{product.icon}</div>
-                <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
-                <p className="text-xs text-gray-500">{product.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-          
-          <div className="p-6 border-t">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-3">
-                Não encontrou seu produto? Digite manualmente:
-              </p>
-              <div className="flex gap-2 max-w-md mx-auto">
-                <input
-                  type="text"
-                  placeholder="Ex: Sistema de afiliados, Plataforma de cursos..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      const target = e.target as HTMLInputElement;
-                      if (target.value.trim()) {
-                        handleProductTypeSelection(target.value.trim());
-                      }
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => {
-                    const input = document.querySelector('input[placeholder*="Sistema"]') as HTMLInputElement;
-                    if (input?.value.trim()) {
-                      handleProductTypeSelection(input.value.trim());
-                    }
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
-                >
-                  Criar
-                </button>
-              </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Brain className="w-5 h-5" />
+                  IA Pensamento Poderoso
+                </div>
+                <div className="text-sm opacity-90 mt-1">Criação automática completa</div>
+              </button>
+              
+              <button
+                onClick={startManualWorkflow}
+                className="w-full p-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Target className="w-5 h-5" />
+                  Criação Manual
+                </div>
+                <div className="text-sm opacity-90 mt-1">Controle total do processo</div>
+              </button>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </motion.div>
+        </div>
+      )}
 
       {/* Context Menu */}
       <AnimatePresence>
