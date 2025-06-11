@@ -790,14 +790,14 @@ De R$ 2.997 por apenas R$ 497
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-60"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
             >
-              <Card className="bg-gray-900 border-orange-500/30 w-full max-w-2xl mx-4">
+              <Card className="bg-gray-900 border-orange-500/30 w-full max-w-2xl max-h-[85vh] overflow-y-auto">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -913,9 +913,10 @@ De R$ 2.997 por apenas R$ 497
                     <Button
                       variant="outline"
                       onClick={() => setShowCreationPanel(false)}
-                      className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-800 px-6"
                     >
-                      Cancelar
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Voltar
                     </Button>
                   </div>
                 </CardContent>

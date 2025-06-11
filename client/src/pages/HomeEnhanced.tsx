@@ -66,25 +66,25 @@ export default function HomeEnhanced() {
 
   const testimonials = [
     {
-      name: "Carlos Silva",
-      role: "Empreendedor Digital",
-      revenue: "R$ 150k/mês",
-      quote: "Em 30 dias saí do zero para seis dígitos. A IA quântica é revolucionária!",
-      image: "👨‍💼"
+      name: "Rafael Costa",
+      role: "Marketing Digital",
+      revenue: "R$ 47k/mês",
+      quote: "Automatizei meu funil de vendas e tripliquei o faturamento em 3 meses. A plataforma realmente funciona.",
+      image: "👨‍💻"
     },
     {
-      name: "Maria Santos",
-      role: "Coach de Vendas",
-      revenue: "R$ 89k/mês",
-      quote: "Nunca vi algo tão preciso. Os copies geram vendas no automático.",
+      name: "Ana Ferreira",
+      role: "Consultora",
+      revenue: "R$ 28k/mês",
+      quote: "O sistema de criação de conteúdo me economiza 20 horas por semana. Resultados impressionantes.",
       image: "👩‍💼"
     },
     {
-      name: "João Oliveira",
-      role: "Afiliado",
-      revenue: "R$ 234k/mês",
-      quote: "O tráfego supremo multiplicou meus resultados por 20x em 45 dias.",
-      image: "🚀"
+      name: "Marcos Ribeiro",
+      role: "E-commerce",
+      revenue: "R$ 65k/mês",
+      quote: "Consegui escalar minha operação e aumentar a conversão em 340%. Investimento que se paga.",
+      image: "📈"
     }
   ];
 
@@ -391,9 +391,9 @@ export default function HomeEnhanced() {
               className="mb-8"
             >
               <Button asChild size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-12 py-6 text-xl rounded-xl shadow-2xl">
-                <Link href="/register">
+                <Link href="/canvas">
                   <Crown className="w-6 h-6 mr-3" />
-                  Começar Agora - Grátis
+                  Acessar Canvas Infinito
                   <Sparkles className="w-6 h-6 ml-3" />
                 </Link>
               </Button>
