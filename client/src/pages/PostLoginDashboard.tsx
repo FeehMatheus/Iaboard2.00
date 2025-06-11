@@ -342,7 +342,10 @@ export default function PostLoginDashboard() {
             Visão Geral
           </TabsTrigger>
           <TabsTrigger value="canvas" className="text-white data-[state=active]:bg-blue-600">
-            Canvas IA
+            <Link href="/canvas" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Canvas Infinito
+            </Link>
           </TabsTrigger>
           <TabsTrigger value="traffic" className="text-white data-[state=active]:bg-red-600">
             Tráfego
@@ -353,6 +356,54 @@ export default function PostLoginDashboard() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          {/* Canvas Infinito CTA Supremo */}
+          <Card className="bg-gradient-to-r from-orange-600 to-red-600 border-0 mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <Sparkles className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-1">
+                      Canvas Infinito Supremo
+                    </h3>
+                    <p className="text-white/90 text-lg">
+                      Crie projetos milionários com IA multidimensional
+                    </p>
+                    <div className="flex items-center gap-4 mt-2">
+                      <Badge className="bg-white/20 text-white">
+                        R$ 387M+ gerados
+                      </Badge>
+                      <Badge className="bg-white/20 text-white">
+                        15.847 projetos ativos
+                      </Badge>
+                      <Badge className="bg-white/20 text-white">
+                        97.3% taxa de sucesso
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-white text-orange-600 hover:bg-gray-100 font-bold text-lg px-8 py-4 mb-3"
+                  >
+                    <Link href="/canvas">
+                      <Crown className="w-5 h-5 mr-2" />
+                      ACESSAR CANVAS AGORA
+                    </Link>
+                  </Button>
+                  <p className="text-white/80 text-sm">
+                    🚀 Transforme ideias em milhões
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="grid lg:grid-cols-2 gap-6">
             <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
               <CardHeader>

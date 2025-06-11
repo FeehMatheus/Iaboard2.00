@@ -6,6 +6,7 @@ import HomeEnhanced from '@/pages/HomeEnhanced';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AIPlatformFixed from '@/pages/AIPlatformFixed';
+import CanvasInfinito from '@/pages/CanvasInfinito';
 import Checkout from '@/pages/Checkout';
 import PostLoginDashboard from '@/pages/PostLoginDashboard';
 import { SupremeDashboard } from '@/components/ui/supreme-dashboard';
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/register" component={Register} />
             <Route path="/dashboard" component={PostLoginDashboard} />
             <Route path="/platform" component={AIPlatformFixed} />
+            <Route path="/canvas" component={CanvasInfinito} />
             <Route path="/supreme" component={SupremeDashboard} />
             <Route path="/checkout" component={Checkout} />
             <Route>
