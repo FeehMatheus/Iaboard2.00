@@ -6,6 +6,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AIPlatformNew from '@/pages/AIPlatformNew';
 import Checkout from '@/pages/Checkout';
+import { SupremeDashboard } from '@/components/ui/supreme-dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
