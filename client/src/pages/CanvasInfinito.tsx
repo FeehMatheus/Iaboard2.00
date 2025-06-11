@@ -594,7 +594,7 @@ De R$ 2.997 por apenas R$ 497
   };
 
   return (
-    <div className="relative w-full h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 overflow-hidden">
+    <div className="relative w-full h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 overflow-hidden">
       {/* Header Supremo */}
       <div className="absolute top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-orange-500/30">
         <div className="flex items-center justify-between p-4">
