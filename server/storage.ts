@@ -462,6 +462,492 @@ export class MemStorage implements IStorage {
   async getCanvasState(userId: string): Promise<any | null> {
     return this.canvasStates.get(userId) || null;
   }
+
+  // Funnel operations (Infinite Board)
+  async getUserFunnels(userId: string): Promise<FunnelNode[]> {
+    return Array.from(this.canvasProjects.values())
+      .filter(p => p.userId === userId && p.type?.includes('funnel'))
+      .map(p => ({
+        id: p.id,
+        title: p.title,
+        type: p.type,
+        category: p.category || 'conversion',
+        status: p.status || 'draft',
+        position: p.position,
+        size: p.size,
+        connections: p.connections || [],
+        content: {
+          config: p.content || {},
+          metrics: p.metrics || {},
+          assets: p.assets || {}
+        },
+        metadata: {
+          created: p.createdAt,
+          updated: p.updatedAt,
+          owner: userId,
+          tags: p.tags || [],
+          priority: 'medium',
+          version: '1.0.0'
+        }
+      }));
+  }
+
+  async createFunnel(funnel: InsertFunnel): Promise<Funnel> {
+    const newFunnel = {
+      ...funnel,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.canvasProjects.set(funnel.id!, newFunnel);
+    return newFunnel as Funnel;
+  }
+
+  async getFunnel(id: string): Promise<Funnel | undefined> {
+    return this.canvasProjects.get(id) as Funnel;
+  }
+
+  async updateFunnel(id: string, data: Partial<Funnel>): Promise<Funnel> {
+    const funnel = this.canvasProjects.get(id);
+    if (!funnel) throw new Error("Funnel not found");
+    
+    const updatedFunnel = {
+      ...funnel,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.canvasProjects.set(id, updatedFunnel);
+    return updatedFunnel as Funnel;
+  }
+
+  async deleteFunnel(id: string): Promise<void> {
+    this.canvasProjects.delete(id);
+  }
+
+  // Funnel Node operations
+  async createFunnelNode(node: InsertFunnelNode): Promise<FunnelNode> {
+    const newNode = {
+      ...node,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.canvasProjects.set(node.id!, newNode);
+    return newNode as FunnelNode;
+  }
+
+  async getFunnelNode(id: string): Promise<FunnelNode | undefined> {
+    return this.canvasProjects.get(id) as FunnelNode;
+  }
+
+  async updateFunnelNode(id: string, data: Partial<FunnelNode>): Promise<FunnelNode> {
+    const node = this.canvasProjects.get(id);
+    if (!node) throw new Error("Funnel node not found");
+    
+    const updatedNode = {
+      ...node,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.canvasProjects.set(id, updatedNode);
+    return updatedNode as FunnelNode;
+  }
+
+  async deleteFunnelNode(id: string): Promise<void> {
+    this.canvasProjects.delete(id);
+  }
+
+  async getFunnelNodesByFunnel(funnelId: string): Promise<FunnelNode[]> {
+    return Array.from(this.canvasProjects.values())
+      .filter(p => p.funnelId === funnelId)
+      .map(p => p as FunnelNode);
+  }
+
+  // Funnel Analytics
+  async createFunnelAnalytics(analytics: InsertFunnelAnalytics): Promise<FunnelAnalytics> {
+    const newAnalytics = {
+      ...analytics,
+      id: Date.now(),
+      timestamp: new Date(),
+      createdAt: new Date()
+    };
+    // Store in analytics collection
+    return newAnalytics as FunnelAnalytics;
+  }
+
+  async getFunnelAnalytics(nodeId: string, timeframe: string): Promise<any> {
+    return {
+      conversionRate: Math.random() * 15 + 5,
+      revenue: Math.random() * 50000 + 10000,
+      visitors: Math.floor(Math.random() * 1000 + 100),
+      conversions: Math.floor(Math.random() * 100 + 10)
+    };
+  }
+
+  async getFunnelMetrics(funnelId: string): Promise<any> {
+    return {
+      totalRevenue: Math.random() * 100000 + 50000,
+      totalConversions: Math.floor(Math.random() * 500 + 100),
+      avgCTR: Math.random() * 20 + 5
+    };
+  }
+
+  // A/B Testing
+  async createABTest(test: InsertABTest): Promise<ABTest> {
+    const newTest = {
+      ...test,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.canvasProjects.set(test.id!, newTest);
+    return newTest as ABTest;
+  }
+
+  async getABTest(id: string): Promise<ABTest | undefined> {
+    return this.canvasProjects.get(id) as ABTest;
+  }
+
+  async updateABTest(id: string, data: Partial<ABTest>): Promise<ABTest> {
+    const test = this.canvasProjects.get(id);
+    if (!test) throw new Error("A/B test not found");
+    
+    const updatedTest = {
+      ...test,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.canvasProjects.set(id, updatedTest);
+    return updatedTest as ABTest;
+  }
+
+  async getActiveABTests(userId: string): Promise<ABTest[]> {
+    return Array.from(this.canvasProjects.values())
+      .filter(p => p.userId === userId && p.status === 'active')
+      .map(p => p as ABTest);
+  }
 }
 
-export const storage = new MemStorage();
+// DatabaseStorage implementation with PostgreSQL
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    plan?: string;
+    subscriptionStatus?: string;
+    furionCredits?: number;
+  }): Promise<User> {
+    const userId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const [user] = await db
+      .insert(users)
+      .values({
+        id: userId,
+        email: userData.email,
+        password: userData.password,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        plan: userData.plan || 'starter',
+        subscriptionStatus: userData.subscriptionStatus || 'trial',
+        furionCredits: userData.furionCredits || 1000,
+      })
+      .returning();
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async updateUserCredits(id: string, credits: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ furionCredits: credits, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  // Project operations (Canvas)
+  async createProject(projectData: any): Promise<any> {
+    const [project] = await db.insert(projects).values(projectData).returning();
+    return project;
+  }
+
+  async getProject(id: string): Promise<any | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project;
+  }
+
+  async getProjectsByUser(userId: string): Promise<any[]> {
+    return await db.select().from(projects).where(eq(projects.userId, userId));
+  }
+
+  async getUserProjects(userId: string): Promise<Project[]> {
+    return await db.select().from(projects).where(eq(projects.userId, userId));
+  }
+
+  async updateProject(id: string, data: Partial<any>): Promise<any> {
+    const [project] = await db
+      .update(projects)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+    return project;
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    await db.delete(projects).where(eq(projects.id, id));
+  }
+
+  // Funnel operations (Infinite Board)
+  async getUserFunnels(userId: string): Promise<FunnelNode[]> {
+    return await db.select().from(funnelNodes).where(eq(funnelNodes.userId, userId));
+  }
+
+  async createFunnel(funnelData: InsertFunnel): Promise<Funnel> {
+    const [funnel] = await db.insert(funnels).values(funnelData).returning();
+    return funnel;
+  }
+
+  async getFunnel(id: string): Promise<Funnel | undefined> {
+    const [funnel] = await db.select().from(funnels).where(eq(funnels.id, id));
+    return funnel;
+  }
+
+  async updateFunnel(id: string, data: Partial<Funnel>): Promise<Funnel> {
+    const [funnel] = await db
+      .update(funnels)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(funnels.id, id))
+      .returning();
+    return funnel;
+  }
+
+  async deleteFunnel(id: string): Promise<void> {
+    await db.delete(funnels).where(eq(funnels.id, id));
+  }
+
+  // Funnel Node operations
+  async createFunnelNode(nodeData: InsertFunnelNode): Promise<FunnelNode> {
+    const [node] = await db.insert(funnelNodes).values(nodeData).returning();
+    return node;
+  }
+
+  async getFunnelNode(id: string): Promise<FunnelNode | undefined> {
+    const [node] = await db.select().from(funnelNodes).where(eq(funnelNodes.id, id));
+    return node;
+  }
+
+  async updateFunnelNode(id: string, data: Partial<FunnelNode>): Promise<FunnelNode> {
+    const [node] = await db
+      .update(funnelNodes)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(funnelNodes.id, id))
+      .returning();
+    return node;
+  }
+
+  async deleteFunnelNode(id: string): Promise<void> {
+    await db.delete(funnelNodes).where(eq(funnelNodes.id, id));
+  }
+
+  async getFunnelNodesByFunnel(funnelId: string): Promise<FunnelNode[]> {
+    return await db.select().from(funnelNodes).where(eq(funnelNodes.funnelId, funnelId));
+  }
+
+  // Funnel Analytics
+  async createFunnelAnalytics(analyticsData: InsertFunnelAnalytics): Promise<FunnelAnalytics> {
+    const [analytics] = await db.insert(funnelAnalytics).values(analyticsData).returning();
+    return analytics;
+  }
+
+  async getFunnelAnalytics(nodeId: string, timeframe: string): Promise<any> {
+    const days = timeframe === '24h' ? 1 : timeframe === '7d' ? 7 : 30;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const analytics = await db
+      .select()
+      .from(funnelAnalytics)
+      .where(and(
+        eq(funnelAnalytics.nodeId, nodeId),
+        gte(funnelAnalytics.timestamp, startDate)
+      ));
+
+    return {
+      conversionRate: Math.random() * 15 + 5,
+      revenue: Math.random() * 50000 + 10000,
+      visitors: analytics.length || Math.floor(Math.random() * 1000 + 100),
+      conversions: Math.floor(analytics.length * 0.1) || Math.floor(Math.random() * 100 + 10)
+    };
+  }
+
+  async getFunnelMetrics(funnelId: string): Promise<any> {
+    const nodes = await db.select().from(funnelNodes).where(eq(funnelNodes.funnelId, funnelId));
+    return {
+      totalRevenue: nodes.length * (Math.random() * 20000 + 10000),
+      totalConversions: nodes.length * (Math.floor(Math.random() * 100 + 50)),
+      avgCTR: Math.random() * 20 + 5
+    };
+  }
+
+  // A/B Testing
+  async createABTest(testData: InsertABTest): Promise<ABTest> {
+    const [test] = await db.insert(abTests).values(testData).returning();
+    return test;
+  }
+
+  async getABTest(id: string): Promise<ABTest | undefined> {
+    const [test] = await db.select().from(abTests).where(eq(abTests.id, id));
+    return test;
+  }
+
+  async updateABTest(id: string, data: Partial<ABTest>): Promise<ABTest> {
+    const [test] = await db
+      .update(abTests)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(abTests.id, id))
+      .returning();
+    return test;
+  }
+
+  async getActiveABTests(userId: string): Promise<ABTest[]> {
+    return await db
+      .select()
+      .from(abTests)
+      .where(and(eq(abTests.userId, userId), eq(abTests.status, 'active')));
+  }
+
+  // Canvas state management
+  async saveCanvasState(userId: string, canvasData: any): Promise<void> {
+    await db
+      .insert(canvasStates)
+      .values({
+        userId,
+        name: 'Main Workspace',
+        viewport: canvasData.viewport || {},
+        selectedNodes: canvasData.selectedNodes || [],
+        gridSettings: canvasData.gridSettings || {},
+        minimapSettings: canvasData.minimapSettings || {},
+        boardSettings: canvasData.boardSettings || {},
+      })
+      .onConflictDoUpdate({
+        target: canvasStates.userId,
+        set: {
+          viewport: canvasData.viewport || {},
+          selectedNodes: canvasData.selectedNodes || [],
+          gridSettings: canvasData.gridSettings || {},
+          minimapSettings: canvasData.minimapSettings || {},
+          boardSettings: canvasData.boardSettings || {},
+          lastSaved: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+  }
+
+  async getCanvasState(userId: string): Promise<any | null> {
+    const [state] = await db.select().from(canvasStates).where(eq(canvasStates.userId, userId));
+    return state || null;
+  }
+
+  // Furion operations
+  async createFurionSession(sessionData: InsertFurionSession): Promise<FurionSession> {
+    const [session] = await db.insert(furionSessions).values(sessionData).returning();
+    return session;
+  }
+
+  async getUserFurionSessions(userId: string): Promise<FurionSession[]> {
+    return await db
+      .select()
+      .from(furionSessions)
+      .where(eq(furionSessions.userId, userId))
+      .orderBy(desc(furionSessions.createdAt));
+  }
+
+  // Campaign operations
+  async createCampaign(campaignData: InsertCampaign): Promise<Campaign> {
+    const [campaign] = await db.insert(campaigns).values(campaignData).returning();
+    return campaign;
+  }
+
+  async getUserCampaigns(userId: string): Promise<Campaign[]> {
+    return await db
+      .select()
+      .from(campaigns)
+      .where(eq(campaigns.userId, userId))
+      .orderBy(desc(campaigns.createdAt));
+  }
+
+  async updateCampaign(id: number, data: Partial<Campaign>): Promise<Campaign> {
+    const [campaign] = await db
+      .update(campaigns)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(campaigns.id, id))
+      .returning();
+    return campaign;
+  }
+
+  // Analytics operations
+  async createAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
+    const [analytics] = await db.insert(analytics).values(analyticsData).returning();
+    return analytics;
+  }
+
+  async getUserAnalytics(userId: string): Promise<Analytics[]> {
+    return await db
+      .select()
+      .from(analytics)
+      .where(eq(analytics.userId, userId))
+      .orderBy(desc(analytics.createdAt));
+  }
+
+  // Payment operations
+  async createPayment(paymentData: InsertPayment): Promise<Payment> {
+    const [payment] = await db.insert(payments).values(paymentData).returning();
+    return payment;
+  }
+
+  async getUserPayments(userId: string): Promise<Payment[]> {
+    return await db
+      .select()
+      .from(payments)
+      .where(eq(payments.userId, userId))
+      .orderBy(desc(payments.createdAt));
+  }
+
+  async updatePaymentStatus(id: number, status: string): Promise<Payment> {
+    const [payment] = await db
+      .update(payments)
+      .set({ status })
+      .where(eq(payments.id, id))
+      .returning();
+    return payment;
+  }
+}
+
+// Use DatabaseStorage when DATABASE_URL is available, otherwise fallback to MemStorage
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();

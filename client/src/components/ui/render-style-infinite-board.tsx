@@ -28,7 +28,8 @@ import {
   PaintBucket, Brush, Scissors, Wand2, Layers3,
   GitBranch, GitCommit, GitMerge, Activity,
   TrendingDown, Minimize, Maximize2, RotateCcw,
-  RotateCw, FlipHorizontal, FlipVertical, Crop
+  RotateCw, FlipHorizontal, FlipVertical, Crop,
+  CreditCard
 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';

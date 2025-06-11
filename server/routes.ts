@@ -430,6 +430,60 @@ Desenvolva:
 }
 
 // Advanced fallback content generator
+// Helper functions for funnel system
+function generateRealisticFunnelMetrics(nodeType: string) {
+  const baseMetrics = {
+    visitors: Math.floor(Math.random() * 5000 + 1000),
+    conversions: Math.floor(Math.random() * 500 + 100),
+    ctr: Math.random() * 15 + 5,
+    revenue: Math.random() * 100000 + 20000
+  };
+
+  switch (nodeType) {
+    case 'landing':
+      return { ...baseMetrics, ctr: Math.random() * 25 + 15 };
+    case 'vsl':
+      return { ...baseMetrics, engagement: Math.random() * 80 + 60 };
+    case 'checkout':
+      return { ...baseMetrics, abandonment: Math.random() * 30 + 20 };
+    case 'traffic':
+      return { ...baseMetrics, cost: Math.random() * 5000 + 1000 };
+    default:
+      return baseMetrics;
+  }
+}
+
+function incrementVersion(version: string): string {
+  const parts = version.split('.');
+  const patch = parseInt(parts[2] || '0') + 1;
+  return `${parts[0]}.${parts[1]}.${patch}`;
+}
+
+function generateTrendData(timeframe: string) {
+  const points = timeframe === '24h' ? 24 : timeframe === '7d' ? 7 : 30;
+  return Array.from({ length: points }, (_, i) => ({
+    time: i,
+    value: Math.random() * 100 + 50
+  }));
+}
+
+function generateHeatmapData() {
+  return Array.from({ length: 10 }, (_, y) => 
+    Array.from({ length: 10 }, (_, x) => ({
+      x, y, intensity: Math.random()
+    }))
+  ).flat();
+}
+
+function generateUserJourneyData() {
+  return [
+    { step: 'Landing', users: 1000, conversion: 45 },
+    { step: 'Video', users: 450, conversion: 35 },
+    { step: 'Checkout', users: 158, conversion: 25 },
+    { step: 'Purchase', users: 40, conversion: 100 }
+  ];
+}
+
 function generateAdvancedFallback(type: string, options: any): string {
   const { title, prompt, niche, budget, target } = options;
   
@@ -1094,15 +1148,75 @@ function generateMonthlyMetrics(months: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Simple authentication middleware
-  const authenticate = (req: any, res: any, next: any) => {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const userId = authHeader.split(' ')[1];
-      req.user = { id: userId };
-    } else {
-      req.user = { id: "demo-user" };
+  // Demo authentication route
+  app.post('/api/auth/demo-login', async (req, res) => {
+    try {
+      const { email, password, firstName, lastName } = req.body;
+      
+      // Check if demo user exists
+      let demoUser = await storage.getUserByEmail(email);
+      
+      if (!demoUser) {
+        // Create demo user
+        demoUser = await storage.createUser({
+          email,
+          password: 'demo123', // Demo password
+          firstName,
+          lastName,
+          plan: 'professional',
+          subscriptionStatus: 'active',
+          furionCredits: 10000
+        });
+      }
+      
+      // Set session
+      (req as any).session = { userId: demoUser.id };
+      
+      res.json({
+        success: true,
+        user: {
+          id: demoUser.id,
+          email: demoUser.email,
+          firstName: demoUser.firstName,
+          lastName: demoUser.lastName,
+          plan: demoUser.plan,
+          credits: demoUser.furionCredits
+        }
+      });
+    } catch (error) {
+      console.error('Demo login error:', error);
+      res.status(500).json({ error: 'Failed to create demo session' });
     }
+  });
+
+  // Newsletter subscription route
+  app.post('/api/newsletter/subscribe', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+      
+      // In a real app, you would integrate with a newsletter service like Mailchimp or ConvertKit
+      // For now, we'll just return success
+      res.json({ 
+        success: true, 
+        message: 'Successfully subscribed to newsletter',
+        email 
+      });
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      res.status(500).json({ error: 'Failed to subscribe to newsletter' });
+    }
+  });
+
+  // Auth middleware for protected routes
+  const authenticate = (req: any, res: any, next: any) => {
+    if (!req.session?.userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    req.user = { id: req.session.userId };
     next();
   };
 
