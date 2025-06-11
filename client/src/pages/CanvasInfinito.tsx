@@ -137,6 +137,7 @@ export default function CanvasInfinito() {
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [showCreationPanel, setShowCreationPanel] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showProgress, setShowProgress] = useState(false);
   const [newProjectData, setNewProjectData] = useState({
     type: '',
     title: '',
@@ -584,7 +585,12 @@ De R$ 2.997 por apenas R$ 497
   const handleCreateProject = () => {
     if (!newProjectData.type || !newProjectData.title) return;
     
-    createProject.mutate(newProjectData);
+    setShowProgress(true);
+    setShowCreationPanel(false);
+    
+    setTimeout(() => {
+      createProject.mutate(newProjectData);
+    }, 1000);
   };
 
   return (
@@ -983,10 +989,16 @@ De R$ 2.997 por apenas R$ 497
           </div>
 
           <div className="text-orange-400 text-sm">
-            🚀 Canvas Infinito v2.0 | Powered by IA Multidimensional
+            Canvas Infinito v2.0 | Powered by IA Multidimensional
           </div>
         </div>
       </div>
+
+      {/* Progress Notification */}
+      <ProgressNotification 
+        isVisible={showProgress} 
+        onComplete={() => setShowProgress(false)} 
+      />
     </div>
   );
 }
