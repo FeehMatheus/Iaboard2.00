@@ -27,6 +27,7 @@ export default function App() {
           <Route path="/register" component={Register} />
           <Route path="/dashboard" component={AIPlatformNew} />
           <Route path="/platform" component={AIPlatformNew} />
+          <Route path="/supreme" component={SupremeDashboard} />
           <Route path="/checkout" component={Checkout} />
           <Route>
             <Home />
