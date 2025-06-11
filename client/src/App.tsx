@@ -8,6 +8,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AIPlatformFixed from '@/pages/AIPlatformFixed';
 import CanvasInfinito from '@/pages/CanvasInfinito';
+import { CaktoStyleInfiniteCanvas } from '@/components/ui/cakto-style-infinite-canvas';
 import Checkout from '@/pages/Checkout';
 import PostLoginDashboard from '@/pages/PostLoginDashboard';
 import { SupremeDashboard } from '@/components/ui/supreme-dashboard';
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/dashboard" component={PostLoginDashboard} />
             <Route path="/platform" component={AIPlatformFixed} />
             <Route path="/canvas" component={CanvasInfinito} />
+            <Route path="/canvas-supreme" component={() => <CaktoStyleInfiniteCanvas />} />
             <Route path="/supreme" component={SupremeDashboard} />
             <Route path="/checkout" component={Checkout} />
             <Route>

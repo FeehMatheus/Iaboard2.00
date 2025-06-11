@@ -37,11 +37,16 @@ export interface IStorage {
   updateUserCredits(id: string, credits: number): Promise<User>;
   
   // Project operations (Canvas)
-  createProject(project: InsertProject): Promise<Project>;
-  getProject(id: string): Promise<Project | undefined>;
+  createProject(project: any): Promise<any>;
+  getProject(id: string): Promise<any | undefined>;
+  getProjectsByUser(userId: string): Promise<any[]>;
   getUserProjects(userId: string): Promise<Project[]>;
-  updateProject(id: string, data: Partial<Project>): Promise<Project>;
+  updateProject(id: string, data: Partial<any>): Promise<any>;
   deleteProject(id: string): Promise<void>;
+  
+  // Canvas state management
+  saveCanvasState(userId: string, canvasData: any): Promise<void>;
+  getCanvasState(userId: string): Promise<any | null>;
   
   // Furion operations
   createFurionSession(session: InsertFurionSession): Promise<FurionSession>;
@@ -69,6 +74,8 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private users: Map<string, User> = new Map();
   private projects: Map<number, Project> = new Map();
+  private canvasProjects: Map<string, any> = new Map();
+  private canvasStates: Map<string, any> = new Map();
   private furionSessions: Map<number, FurionSession> = new Map();
   private campaigns: Map<number, Campaign> = new Map();
   private analytics: Map<number, Analytics> = new Map();
@@ -365,6 +372,53 @@ export class MemStorage implements IStorage {
     
     this.payments.set(id, updatedPayment);
     return updatedPayment;
+  }
+
+  // Enhanced Canvas Project methods
+  async createProject(projectData: any): Promise<any> {
+    const project = {
+      ...projectData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.canvasProjects.set(project.id, project);
+    return project;
+  }
+
+  async getProject(id: string): Promise<any | undefined> {
+    return this.canvasProjects.get(id);
+  }
+
+  async getProjectsByUser(userId: string): Promise<any[]> {
+    return Array.from(this.canvasProjects.values()).filter(p => p.userId === userId);
+  }
+
+  async updateProject(id: string, data: Partial<any>): Promise<any> {
+    const project = this.canvasProjects.get(id);
+    if (!project) throw new Error("Project not found");
+    
+    const updatedProject = {
+      ...project,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.canvasProjects.set(id, updatedProject);
+    return updatedProject;
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    this.canvasProjects.delete(id);
+  }
+
+  // Canvas state management
+  async saveCanvasState(userId: string, canvasData: any): Promise<void> {
+    this.canvasStates.set(userId, canvasData);
+  }
+
+  async getCanvasState(userId: string): Promise<any | null> {
+    return this.canvasStates.get(userId) || null;
   }
 }
 
