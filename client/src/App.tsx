@@ -1,49 +1,36 @@
-import { Switch, Route } from 'wouter';
+import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Router, Route, Switch } from 'wouter';
+import { RenderStyleInfiniteBoard } from '@/components/ui/render-style-infinite-board';
 import { Toaster } from '@/components/ui/toaster';
-import { EnhancedThemeProvider } from '@/components/ui/enhanced-theme-provider';
-import HomeSupreme from '@/pages/HomeSupreme';
-import LoginSupremo from '@/pages/LoginSupremo';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import AIPlatformFixed from '@/pages/AIPlatformFixed';
-import CanvasInfinito from '@/pages/CanvasInfinito';
-import { CaktoStyleInfiniteCanvas } from '@/components/ui/cakto-style-infinite-canvas';
-import Checkout from '@/pages/Checkout';
-import PostLoginDashboard from '@/pages/PostLoginDashboard';
-import { SupremeDashboard } from '@/components/ui/supreme-dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
     },
   },
 });
 
-export default function App() {
+function App() {
   return (
-    <EnhancedThemeProvider defaultTheme="supreme">
-      <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen">
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
           <Switch>
-            <Route path="/" component={HomeSupreme} />
-            <Route path="/login" component={LoginSupremo} />
-            <Route path="/register" component={Register} />
-            <Route path="/dashboard" component={PostLoginDashboard} />
-            <Route path="/platform" component={AIPlatformFixed} />
-            <Route path="/canvas" component={CanvasInfinito} />
-            <Route path="/canvas-supreme" component={() => <CaktoStyleInfiniteCanvas />} />
-            <Route path="/supreme" component={SupremeDashboard} />
-            <Route path="/checkout" component={Checkout} />
+            <Route path="/" component={RenderStyleInfiniteBoard} />
+            <Route path="/board" component={RenderStyleInfiniteBoard} />
             <Route>
-              <HomeSupreme />
+              {/* 404 - redirect to main board */}
+              <RenderStyleInfiniteBoard />
             </Route>
           </Switch>
-          <Toaster />
         </div>
-      </QueryClientProvider>
-    </EnhancedThemeProvider>
+      </Router>
+      <Toaster />
+    </QueryClientProvider>
   );
 }
+
+export default App;

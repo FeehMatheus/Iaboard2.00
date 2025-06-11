@@ -51,7 +51,7 @@ export const projects = pgTable("projects", {
 export const furionSessions = pgTable("furion_sessions", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id),
+  projectId: varchar("project_id").references(() => projects.id),
   type: varchar("type").notNull(), // produto, copy, anuncio, funil, estrategia
   prompt: text("prompt").notNull(),
   response: jsonb("response").notNull(),
@@ -64,7 +64,7 @@ export const furionSessions = pgTable("furion_sessions", {
 export const campaigns = pgTable("campaigns", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
+  projectId: varchar("project_id").references(() => projects.id).notNull(),
   name: varchar("name").notNull(),
   type: varchar("type").notNull(), // meta_ads, google_ads, email, organic
   platform: varchar("platform"), // facebook, instagram, google, etc
@@ -80,7 +80,7 @@ export const campaigns = pgTable("campaigns", {
 export const analytics = pgTable("analytics", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id),
+  projectId: varchar("project_id").references(() => projects.id),
   campaignId: integer("campaign_id").references(() => campaigns.id),
   event: varchar("event").notNull(), // view, click, conversion, sale
   data: jsonb("data"),

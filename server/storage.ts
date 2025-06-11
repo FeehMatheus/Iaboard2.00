@@ -464,4 +464,385 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Implementação completa do DatabaseStorage com PostgreSQL
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: string): Promise<User | undefined> {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return user || undefined;
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return undefined;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    try {
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      return user || undefined;
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return undefined;
+    }
+  }
+
+  async createUser(user: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    plan?: string;
+    subscriptionStatus?: string;
+    furionCredits?: number;
+  }): Promise<User> {
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        password: user.password,
+        plan: user.plan || 'starter',
+        subscriptionStatus: user.subscriptionStatus || 'trial',
+        furionCredits: user.furionCredits || 1000,
+      })
+      .returning();
+    return newUser;
+  }
+
+  async upsertUser(user: UpsertUser): Promise<User> {
+    const [existingUser] = await db.select().from(users).where(eq(users.email, user.email));
+    
+    if (existingUser) {
+      const [updatedUser] = await db
+        .update(users)
+        .set(user)
+        .where(eq(users.id, existingUser.id))
+        .returning();
+      return updatedUser;
+    } else {
+      return this.createUser(user as any);
+    }
+  }
+
+  async updateUserCredits(id: string, credits: number): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ furionCredits: credits })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
+  // Project operations
+  async createProject(project: any): Promise<any> {
+    const [newProject] = await db
+      .insert(projects)
+      .values({
+        id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        ...project,
+      })
+      .returning();
+    return newProject;
+  }
+
+  async getProject(id: string): Promise<any | undefined> {
+    const [project] = await db.select().from(projects).where(eq(projects.id, id));
+    return project || undefined;
+  }
+
+  async getProjectsByUser(userId: string): Promise<any[]> {
+    return await db.select().from(projects).where(eq(projects.userId, userId)).orderBy(desc(projects.createdAt));
+  }
+
+  async getUserProjects(userId: string): Promise<Project[]> {
+    return await db.select().from(projects).where(eq(projects.userId, userId)).orderBy(desc(projects.createdAt));
+  }
+
+  async updateProject(id: string, data: Partial<any>): Promise<any> {
+    const [updatedProject] = await db
+      .update(projects)
+      .set(data)
+      .where(eq(projects.id, id))
+      .returning();
+    return updatedProject;
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    await db.delete(projects).where(eq(projects.id, id));
+  }
+
+  // Funnel operations
+  async getUserFunnels(userId: string): Promise<FunnelNode[]> {
+    return await db.select().from(funnelNodes).where(eq(funnelNodes.userId, userId)).orderBy(desc(funnelNodes.createdAt));
+  }
+
+  async createFunnel(funnel: InsertFunnel): Promise<Funnel> {
+    const [newFunnel] = await db
+      .insert(funnels)
+      .values(funnel)
+      .returning();
+    return newFunnel;
+  }
+
+  async getFunnel(id: string): Promise<Funnel | undefined> {
+    const [funnel] = await db.select().from(funnels).where(eq(funnels.id, id));
+    return funnel || undefined;
+  }
+
+  async updateFunnel(id: string, data: Partial<Funnel>): Promise<Funnel> {
+    const [updatedFunnel] = await db
+      .update(funnels)
+      .set(data)
+      .where(eq(funnels.id, id))
+      .returning();
+    return updatedFunnel;
+  }
+
+  async deleteFunnel(id: string): Promise<void> {
+    await db.delete(funnelNodes).where(eq(funnelNodes.funnelId, id));
+    await db.delete(funnels).where(eq(funnels.id, id));
+  }
+
+  // Funnel Node operations
+  async createFunnelNode(node: InsertFunnelNode): Promise<FunnelNode> {
+    const [newNode] = await db
+      .insert(funnelNodes)
+      .values(node)
+      .returning();
+    return newNode;
+  }
+
+  async getFunnelNode(id: string): Promise<FunnelNode | undefined> {
+    const [node] = await db.select().from(funnelNodes).where(eq(funnelNodes.id, id));
+    return node || undefined;
+  }
+
+  async updateFunnelNode(id: string, data: Partial<FunnelNode>): Promise<FunnelNode> {
+    const [updatedNode] = await db
+      .update(funnelNodes)
+      .set(data)
+      .where(eq(funnelNodes.id, id))
+      .returning();
+    return updatedNode;
+  }
+
+  async deleteFunnelNode(id: string): Promise<void> {
+    await db.delete(funnelNodes).where(eq(funnelNodes.id, id));
+  }
+
+  async getFunnelNodesByFunnel(funnelId: string): Promise<FunnelNode[]> {
+    return await db.select().from(funnelNodes).where(eq(funnelNodes.funnelId, funnelId));
+  }
+
+  // Funnel Analytics
+  async createFunnelAnalytics(analytics: InsertFunnelAnalytics): Promise<FunnelAnalytics> {
+    const [newAnalytics] = await db
+      .insert(funnelAnalytics)
+      .values(analytics)
+      .returning();
+    return newAnalytics;
+  }
+
+  async getFunnelAnalytics(nodeId: string, timeframe: string): Promise<any> {
+    const days = timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 1;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const analyticsData = await db
+      .select()
+      .from(funnelAnalytics)
+      .where(
+        and(
+          eq(funnelAnalytics.nodeId, nodeId),
+          gte(funnelAnalytics.timestamp, startDate)
+        )
+      )
+      .orderBy(desc(funnelAnalytics.timestamp));
+
+    const totalViews = analyticsData.filter(a => a.event === 'view').length;
+    const totalClicks = analyticsData.filter(a => a.event === 'click').length;
+    const totalConversions = analyticsData.filter(a => a.event === 'conversion').length;
+    const totalRevenue = analyticsData
+      .filter(a => a.event === 'purchase' && a.value)
+      .reduce((sum, a) => sum + parseFloat(a.value || '0'), 0);
+
+    return {
+      totalViews,
+      totalClicks,
+      totalConversions,
+      totalRevenue,
+      conversionRate: totalViews > 0 ? (totalConversions / totalViews) * 100 : 0,
+      rawData: analyticsData
+    };
+  }
+
+  async getFunnelMetrics(funnelId: string): Promise<any> {
+    const nodes = await this.getFunnelNodesByFunnel(funnelId);
+    const metrics = await Promise.all(
+      nodes.map(node => this.getFunnelAnalytics(node.id, '30d'))
+    );
+
+    return {
+      totalNodes: nodes.length,
+      totalRevenue: metrics.reduce((sum, m) => sum + m.totalRevenue, 0),
+      totalConversions: metrics.reduce((sum, m) => sum + m.totalConversions, 0),
+      avgConversionRate: metrics.reduce((sum, m) => sum + m.conversionRate, 0) / metrics.length
+    };
+  }
+
+  // A/B Testing
+  async createABTest(test: InsertABTest): Promise<ABTest> {
+    const [newTest] = await db
+      .insert(abTests)
+      .values(test)
+      .returning();
+    return newTest;
+  }
+
+  async getABTest(id: string): Promise<ABTest | undefined> {
+    const [test] = await db.select().from(abTests).where(eq(abTests.id, id));
+    return test || undefined;
+  }
+
+  async updateABTest(id: string, data: Partial<ABTest>): Promise<ABTest> {
+    const [updatedTest] = await db
+      .update(abTests)
+      .set(data)
+      .where(eq(abTests.id, id))
+      .returning();
+    return updatedTest;
+  }
+
+  async getActiveABTests(userId: string): Promise<ABTest[]> {
+    return await db
+      .select()
+      .from(abTests)
+      .where(
+        and(
+          eq(abTests.userId, userId),
+          eq(abTests.status, 'active')
+        )
+      );
+  }
+
+  // Canvas state management
+  async saveCanvasState(userId: string, canvasData: any): Promise<void> {
+    const existingState = await db
+      .select()
+      .from(canvasStates)
+      .where(eq(canvasStates.userId, userId))
+      .limit(1);
+
+    if (existingState.length > 0) {
+      await db
+        .update(canvasStates)
+        .set({
+          viewport: canvasData.viewport,
+          selectedNodes: canvasData.selectedNodes,
+          gridSettings: canvasData.gridSettings,
+          minimapSettings: canvasData.minimapSettings,
+          boardSettings: canvasData.boardSettings,
+          lastSaved: new Date(),
+        })
+        .where(eq(canvasStates.userId, userId));
+    } else {
+      await db
+        .insert(canvasStates)
+        .values({
+          userId,
+          viewport: canvasData.viewport,
+          selectedNodes: canvasData.selectedNodes,
+          gridSettings: canvasData.gridSettings,
+          minimapSettings: canvasData.minimapSettings,
+          boardSettings: canvasData.boardSettings,
+        });
+    }
+  }
+
+  async getCanvasState(userId: string): Promise<any | null> {
+    const [state] = await db
+      .select()
+      .from(canvasStates)
+      .where(eq(canvasStates.userId, userId))
+      .limit(1);
+    return state || null;
+  }
+
+  // Furion operations
+  async createFurionSession(session: InsertFurionSession): Promise<FurionSession> {
+    const [newSession] = await db
+      .insert(furionSessions)
+      .values(session)
+      .returning();
+    return newSession;
+  }
+
+  async getUserFurionSessions(userId: string): Promise<FurionSession[]> {
+    return await db
+      .select()
+      .from(furionSessions)
+      .where(eq(furionSessions.userId, userId))
+      .orderBy(desc(furionSessions.createdAt));
+  }
+
+  // Campaign operations
+  async createCampaign(campaign: InsertCampaign): Promise<Campaign> {
+    const [newCampaign] = await db
+      .insert(campaigns)
+      .values(campaign)
+      .returning();
+    return newCampaign;
+  }
+
+  async getCampaign(id: number): Promise<Campaign | undefined> {
+    const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, id));
+    return campaign || undefined;
+  }
+
+  async getUserCampaigns(userId: string): Promise<Campaign[]> {
+    return await db
+      .select()
+      .from(campaigns)
+      .where(eq(campaigns.userId, userId))
+      .orderBy(desc(campaigns.createdAt));
+  }
+
+  // Analytics operations
+  async createAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
+    const [newAnalytics] = await db
+      .insert(analytics)
+      .values(analyticsData)
+      .returning();
+    return newAnalytics;
+  }
+
+  async getUserAnalytics(userId: string): Promise<Analytics[]> {
+    return await db
+      .select()
+      .from(analytics)
+      .where(eq(analytics.userId, userId))
+      .orderBy(desc(analytics.createdAt));
+  }
+
+  // Payment operations
+  async createPayment(payment: InsertPayment): Promise<Payment> {
+    const [newPayment] = await db
+      .insert(payments)
+      .values(payment)
+      .returning();
+    return newPayment;
+  }
+
+  async getUserPayments(userId: string): Promise<Payment[]> {
+    return await db
+      .select()
+      .from(payments)
+      .where(eq(payments.userId, userId))
+      .orderBy(desc(payments.createdAt));
+  }
+}
+
+export const storage = new DatabaseStorage();
