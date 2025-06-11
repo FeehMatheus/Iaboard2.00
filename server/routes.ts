@@ -1712,6 +1712,89 @@ Retorne um conteúdo profissional, detalhado e otimizado para conversão no merc
     }
   });
 
+  // AI Content Generation for Canvas
+  app.post('/api/ai/generate', async (req, res) => {
+    try {
+      const { type, prompt } = req.body;
+      
+      const content = await AIService.generateContent(type, prompt, {
+        targetAudience: 'Empreendedores digitais',
+        productType: 'Digital',
+        platform: 'Facebook'
+      });
+
+      res.json({
+        success: true,
+        content: content.content || content,
+        type,
+        metadata: {
+          generatedAt: new Date(),
+          model: content.model || 'AI Supreme',
+          tokens: content.tokens || 1000
+        }
+      });
+    } catch (error) {
+      console.error('AI generation error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro na geração de conteúdo'
+      });
+    }
+  });
+
+  // Projects API for Canvas
+  app.get('/api/projects', async (req, res) => {
+    try {
+      const projects = await storage.getAllProjects();
+      res.json(projects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      res.status(500).json({ message: 'Failed to fetch projects' });
+    }
+  });
+
+  app.post('/api/projects', async (req, res) => {
+    try {
+      const projectData = req.body;
+      const project = await storage.createProject({
+        ...projectData,
+        id: Date.now().toString(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      res.status(201).json(project);
+    } catch (error) {
+      console.error('Error creating project:', error);
+      res.status(500).json({ message: 'Failed to create project' });
+    }
+  });
+
+  app.put('/api/projects/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const projectData = req.body;
+      const project = await storage.updateProject(id, {
+        ...projectData,
+        updatedAt: new Date()
+      });
+      res.json(project);
+    } catch (error) {
+      console.error('Error updating project:', error);
+      res.status(500).json({ message: 'Failed to update project' });
+    }
+  });
+
+  app.delete('/api/projects/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteProject(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      res.status(500).json({ message: 'Failed to delete project' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

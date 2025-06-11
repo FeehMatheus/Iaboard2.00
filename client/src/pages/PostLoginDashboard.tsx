@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Crown, Target, Brain, TrendingUp, Users, DollarSign, 
   BarChart3, Zap, Award, Rocket, Sparkles, ArrowRight,
-  Play, Clock, CheckCircle, Star
+  Play, Clock, CheckCircle, Star, Plus, Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
-import { SupremeNotificationSystem } from '@/components/ui/supreme-notification-system';
-import { AdvancedCTAModal, QuickActionCTA } from '@/components/ui/advanced-cta-system';
 
 export default function PostLoginDashboard() {
   const [, setLocation] = useLocation();
-  const [showNotification, setShowNotification] = useState(true);
-  const [showCTAModal, setShowCTAModal] = useState(false);
-  const [userName, setUserName] = useState('Empreendedor');
 
   // Mock data with realistic values
   const dashboardData = {
@@ -120,21 +115,30 @@ export default function PostLoginDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
       {/* Header */}
       <div className="border-b border-gray-800 bg-black/20 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
                 <Crown className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white">Dashboard Supremo</h1>
-                <p className="text-gray-400">Bem-vindo, {dashboardData.user.name}</p>
+              <div className="text-center sm:text-left">
+                <h1 className="text-xl sm:text-2xl font-bold text-white">Dashboard Supremo</h1>
+                <p className="text-gray-400 text-sm">Bem-vindo, {dashboardData.user.name}</p>
               </div>
             </div>
-            <Badge className="bg-green-600 text-white px-4 py-2">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Sistema Ativo
-            </Badge>
+            <div className="flex items-center gap-3">
+              <Badge className="bg-green-600 text-white px-3 py-1">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Sistema Ativo
+              </Badge>
+              <Button
+                onClick={() => setLocation('/canvas')}
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold"
+              >
+                <Target className="w-4 h-4 mr-2" />
+                Canvas
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -278,33 +282,16 @@ export default function PostLoginDashboard() {
           className="mt-12 text-center"
         >
           <Button
-            onClick={() => setShowCTAModal(true)}
+            onClick={() => setLocation('/canvas')}
             size="lg"
             className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-8 py-4 text-lg rounded-xl"
           >
             <Rocket className="w-5 h-5 mr-3" />
-            EXPLORAR TODAS AS FUNCIONALIDADES
+            ACESSAR CANVAS INFINITO
             <Sparkles className="w-5 h-5 ml-3" />
           </Button>
         </motion.div>
       </div>
-
-      {/* Notification System */}
-      <SupremeNotificationSystem
-        isVisible={showNotification}
-        onComplete={() => setShowNotification(false)}
-        type="success"
-      />
-
-      {/* Advanced CTA Modal */}
-      <AdvancedCTAModal
-        isOpen={showCTAModal}
-        onClose={() => setShowCTAModal(false)}
-        onNavigate={(path) => setLocation(path)}
-      />
-
-      {/* Quick Action CTA */}
-      <QuickActionCTA onOpenModal={() => setShowCTAModal(true)} />
     </div>
   );
 }
