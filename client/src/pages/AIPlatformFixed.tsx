@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { InfiniteCanvasFixed } from '@/components/ui/infinite-canvas-fixed';
+import { InfiniteCanvasSupreme } from '@/components/ui/infinite-canvas-supreme';
 import { 
   Home, Settings, User, LogOut, Crown, Zap, 
   BarChart3, Target, Sparkles 
@@ -64,7 +64,7 @@ export default function AIPlatformFixed() {
 
       {/* Canvas Area */}
       <div className="flex-1 relative">
-        <InfiniteCanvasFixed onProjectCreate={handleProjectCreate} />
+        <InfiniteCanvasSupreme />
       </div>
 
       {/* Bottom Toolbar */}
