@@ -6,6 +6,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AIPlatformNew from '@/pages/AIPlatformNew';
 import Checkout from '@/pages/Checkout';
+import PostLoginDashboard from '@/pages/PostLoginDashboard';
 import { SupremeDashboard } from '@/components/ui/supreme-dashboard';
 
 const queryClient = new QueryClient({
@@ -25,7 +26,7 @@ export default function App() {
           <Route path="/" component={Home} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
-          <Route path="/dashboard" component={AIPlatformNew} />
+          <Route path="/dashboard" component={PostLoginDashboard} />
           <Route path="/platform" component={AIPlatformNew} />
           <Route path="/supreme" component={SupremeDashboard} />
           <Route path="/checkout" component={Checkout} />
