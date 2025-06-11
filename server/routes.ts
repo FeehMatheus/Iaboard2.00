@@ -430,63 +430,6 @@ Desenvolva:
 }
 
 // Advanced fallback content generator
-// Helper functions for funnel system
-function generateRealisticFunnelMetrics(nodeType: string): any {
-  const baseMetrics = {
-    visitors: Math.floor(Math.random() * 10000 + 1000),
-    conversions: Math.floor(Math.random() * 500 + 50),
-    ctr: Math.random() * 15 + 2,
-    cost: Math.random() * 5000 + 500,
-    revenue: Math.random() * 50000 + 5000
-  };
-
-  // Adjust metrics based on node type
-  switch (nodeType) {
-    case 'landing':
-      return { ...baseMetrics, ctr: baseMetrics.ctr * 1.2 };
-    case 'vsl':
-      return { ...baseMetrics, conversions: baseMetrics.conversions * 0.8, revenue: baseMetrics.revenue * 1.5 };
-    case 'checkout':
-      return { ...baseMetrics, conversions: baseMetrics.conversions * 0.6, revenue: baseMetrics.revenue * 2 };
-    case 'traffic':
-      return { ...baseMetrics, visitors: baseMetrics.visitors * 2, cost: baseMetrics.cost * 1.8 };
-    default:
-      return baseMetrics;
-  }
-}
-
-function incrementVersion(version: string): string {
-  const parts = version.split('.');
-  const patch = parseInt(parts[2] || '0') + 1;
-  return `${parts[0]}.${parts[1]}.${patch}`;
-}
-
-function generateTrendData(timeframe: string): number[] {
-  const days = timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 1;
-  return Array.from({ length: days }, () => Math.floor(Math.random() * 1000 + 100));
-}
-
-function generateHeatmapData(): any {
-  return {
-    clicks: Array.from({ length: 10 }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      intensity: Math.random()
-    })),
-    scrollDepth: Math.random() * 100,
-    timeOnPage: Math.random() * 300 + 60
-  };
-}
-
-function generateUserJourneyData(): any {
-  const steps = ['landing', 'product_view', 'add_to_cart', 'checkout', 'purchase'];
-  return steps.map((step, index) => ({
-    step,
-    users: Math.floor(Math.random() * 1000 * (1 - index * 0.2)),
-    dropoffRate: Math.random() * 30 + 10
-  }));
-}
-
 function generateAdvancedFallback(type: string, options: any): string {
   const { title, prompt, niche, budget, target } = options;
   

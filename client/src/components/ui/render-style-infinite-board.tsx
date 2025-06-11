@@ -144,7 +144,7 @@ const NODE_TYPES = {
     features: ['Script persuasivo', 'CTAs dinâmicos', 'Analytics de engajamento']
   },
   checkout: { 
-    icon: DollarSign, 
+    icon: CreditCard, 
     color: 'from-green-500 to-emerald-500',
     description: 'Sistema de pagamento otimizado',
     features: ['Múltiplos gateways', 'One-click checkout', 'Carrinho abandonado']
