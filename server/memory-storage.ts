@@ -111,22 +111,30 @@ class MemoryStorage {
 
   // Project operations
   async createProject(projectData: {
-    userId: string;
+    userId?: string;
     type: string;
     title: string;
     status?: string;
     progress?: number;
     content?: any;
+    position?: { x: number; y: number };
+    size?: { width: number; height: number };
+    zIndex?: number;
+    isExpanded?: boolean;
   }): Promise<Project> {
     const id = Date.now().toString();
     const project: Project = {
       id,
-      userId: projectData.userId,
+      userId: projectData.userId || 'demo-user',
       type: projectData.type,
       title: projectData.title,
       status: projectData.status || 'processing',
       progress: projectData.progress || 0,
       content: projectData.content,
+      position: projectData.position || { x: Math.random() * 500 + 200, y: Math.random() * 300 + 200 },
+      size: projectData.size || { width: 320, height: 200 },
+      zIndex: projectData.zIndex || Date.now(),
+      isExpanded: projectData.isExpanded || false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -156,6 +164,20 @@ class MemoryStorage {
       this.projects.set(id, project);
     }
     return project;
+  }
+
+  async getAllProjects(): Promise<Project[]> {
+    return Array.from(this.projects.values());
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    const project = this.projects.get(id);
+    if (project) {
+      this.projects.delete(id);
+      const userProjectIds = this.userProjects.get(project.userId) || [];
+      const updatedIds = userProjectIds.filter(pid => pid !== id);
+      this.userProjects.set(project.userId, updatedIds);
+    }
   }
 }
 

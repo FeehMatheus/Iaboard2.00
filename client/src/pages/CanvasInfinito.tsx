@@ -209,12 +209,12 @@ export default function CanvasInfinito() {
     mutationFn: async ({ type, prompt }: { type: string; prompt: string }) => {
       return apiRequest('POST', '/api/ai/generate', { type, prompt });
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (data: any, variables) => {
       // Create new project with AI-generated content
       const newProject: Partial<Project> = {
         title: `${variables.type.charAt(0).toUpperCase() + variables.type.slice(1)} AI Supremo`,
         type: variables.type,
-        content: data.content || data,
+        content: data.content || data.message || `Conteúdo ${variables.type} gerado com sucesso!`,
         position: { 
           x: Math.random() * 500 + 200, 
           y: Math.random() * 300 + 200 
