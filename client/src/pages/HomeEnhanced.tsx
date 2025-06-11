@@ -172,29 +172,29 @@ export default function HomeEnhanced() {
             className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-8 py-4 text-lg rounded-xl shadow-2xl">
-                <Link href="/dashboard">
-                  <Rocket className="w-6 h-6 mr-3" />
-                  Iniciar Transformação
-                  <ArrowRight className="w-6 h-6 ml-3" />
+              <Button asChild size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-10 py-5 text-xl rounded-xl shadow-2xl hover:shadow-orange-500/50 transform transition-all duration-300">
+                <Link href="/canvas">
+                  <Crown className="w-7 h-7 mr-3" />
+                  CANVAS INFINITO SUPREMO
+                  <Sparkles className="w-7 h-7 ml-3 animate-pulse" />
                 </Link>
               </Button>
             </motion.div>
 
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button asChild variant="outline" size="lg" className="border-2 border-purple-500 text-purple-400 hover:bg-purple-500 hover:text-white font-bold px-8 py-4 text-lg rounded-xl backdrop-blur-sm">
-                <Link href="/platform">
-                  <Sparkles className="w-6 h-6 mr-3" />
-                  Canvas IA Infinito
+              <Button asChild variant="outline" size="lg" className="border-2 border-green-500 text-green-400 hover:bg-green-500 hover:text-white font-bold px-8 py-4 text-lg rounded-xl backdrop-blur-sm">
+                <Link href="/dashboard">
+                  <BarChart3 className="w-6 h-6 mr-3" />
+                  Dashboard Completo
                 </Link>
               </Button>
             </motion.div>
 
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button asChild variant="outline" size="lg" className="border-2 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white font-bold px-8 py-4 text-lg rounded-xl backdrop-blur-sm">
-                <Link href="/supreme">
-                  <BarChart3 className="w-6 h-6 mr-3" />
-                  Dashboard Supremo
+                <Link href="/login">
+                  <Rocket className="w-6 h-6 mr-3" />
+                  Entrar Agora
                 </Link>
               </Button>
             </motion.div>

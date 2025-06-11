@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { EnhancedThemeProvider } from '@/components/ui/enhanced-theme-provider';
 import HomeEnhanced from '@/pages/HomeEnhanced';
+import LoginSupremo from '@/pages/LoginSupremo';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AIPlatformFixed from '@/pages/AIPlatformFixed';
@@ -27,7 +28,7 @@ export default function App() {
         <div className="min-h-screen">
           <Switch>
             <Route path="/" component={HomeEnhanced} />
-            <Route path="/login" component={Login} />
+            <Route path="/login" component={LoginSupremo} />
             <Route path="/register" component={Register} />
             <Route path="/dashboard" component={PostLoginDashboard} />
             <Route path="/platform" component={AIPlatformFixed} />
