@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { 
   Crown, Zap, Brain, Target, TrendingUp, Star, 
@@ -12,10 +12,13 @@ import {
   ChevronDown, MousePointer, Video,
   FileText, Mail, Image, PieChart
 } from 'lucide-react';
+import { AdvancedCTAModal, QuickActionCTA } from '@/components/ui/advanced-cta-system';
 
 export default function HomeEnhanced() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState({});
+  const [showCTAModal, setShowCTAModal] = useState(false);
+  const [, setLocation] = useLocation();
   const { scrollY } = useScroll();
   
   const backgroundY = useTransform(scrollY, [0, 500], [0, 150]);
@@ -139,7 +142,7 @@ export default function HomeEnhanced() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 leading-tight"
+            className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
           >
             Transforme{' '}
             <span className="bg-gradient-to-r from-orange-400 via-red-500 to-purple-600 bg-clip-text text-transparent">
@@ -261,10 +264,10 @@ export default function HomeEnhanced() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Tecnologia{' '}
-              <span className="bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-                Suprema
+              <span className="bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
+                Avançada
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -315,10 +318,10 @@ export default function HomeEnhanced() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Resultados{' '}
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Comprovados
+              <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+                Reais
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -390,12 +393,14 @@ export default function HomeEnhanced() {
               whileTap={{ scale: 0.95 }}
               className="mb-8"
             >
-              <Button asChild size="lg" className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-12 py-6 text-xl rounded-xl shadow-2xl">
-                <Link href="/canvas">
-                  <Crown className="w-6 h-6 mr-3" />
-                  Acessar Canvas Infinito
-                  <Sparkles className="w-6 h-6 ml-3" />
-                </Link>
+              <Button 
+                onClick={() => setShowCTAModal(true)}
+                size="lg" 
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-12 py-6 text-xl rounded-xl shadow-2xl"
+              >
+                <Crown className="w-6 h-6 mr-3" />
+                Acessar Canvas Infinito
+                <Sparkles className="w-6 h-6 ml-3" />
               </Button>
             </motion.div>
 
