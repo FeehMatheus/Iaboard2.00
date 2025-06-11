@@ -1,189 +1,276 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Crown, Mail, Lock, User, ArrowRight, Home } from 'lucide-react';
-import { useLocation } from 'wouter';
-import { useMutation } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { ArrowRight, Sparkles, Zap, Target } from "lucide-react";
 
 export default function Signup() {
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
-    acceptTerms: false
+    confirmPassword: ''
   });
+  const { toast } = useToast();
 
-  const signupMutation = useMutation({
+  const registerMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest('POST', '/api/auth/register', data);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Conta Criada com Sucesso!",
-        description: "Bem-vindo à Máquina Milionária AI.",
+      return apiRequest('/api/auth/register', {
+        method: 'POST',
+        body: data
       });
-      setLocation('/dashboard');
+    },
+    onSuccess: (response) => {
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo à Máquina Milionária AI. Redirecionando para o dashboard...",
+      });
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1500);
     },
     onError: (error: any) => {
       toast({
-        title: "Erro no Cadastro",
-        description: error.message || "Erro ao criar conta. Tente novamente.",
+        title: "Erro no cadastro",
+        description: error.message || "Tente novamente em alguns minutos.",
         variant: "destructive",
       });
-    },
+    }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.acceptTerms) {
+    
+    if (formData.password !== formData.confirmPassword) {
       toast({
-        title: "Termos Necessários",
-        description: "Aceite os termos de uso para continuar.",
+        title: "Erro",
+        description: "As senhas não coincidem.",
         variant: "destructive",
       });
       return;
     }
-    signupMutation.mutate(formData);
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    registerMutation.mutate({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password
+    });
   };
 
   const handleDemoAccess = () => {
-    setLocation('/dashboard');
+    const demoMutation = useMutation({
+      mutationFn: async () => {
+        return apiRequest('/api/auth/demo-login', {
+          method: 'POST'
+        });
+      },
+      onSuccess: () => {
+        toast({
+          title: "Acesso demo ativado!",
+          description: "Explore todas as funcionalidades gratuitamente.",
+        });
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 1000);
+      }
+    });
+    
+    demoMutation.mutate();
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-              <Crown className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
+        {/* Left Side - Benefits */}
+        <div className="text-white space-y-8">
+          <div>
+            <h1 className="text-5xl font-bold mb-4">
+              Transforme seu Negócio com 
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"> IA Suprema</span>
+            </h1>
+            <p className="text-xl text-blue-100">
+              Junte-se a milhares de empreendedores que já revolucionaram seus resultados
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex items-start space-x-4">
+              <div className="bg-yellow-400/20 p-3 rounded-lg">
+                <Zap className="h-6 w-6 text-yellow-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Geração de Conteúdo Instantânea</h3>
+                <p className="text-blue-100">
+                  Crie copies, VSLs, e-mails e campanhas de tráfego em segundos com nossa IA avançada
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="bg-green-400/20 p-3 rounded-lg">
+                <Target className="h-6 w-6 text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Funis de Alta Conversão</h3>
+                <p className="text-blue-100">
+                  Construa funis completos que convertem até 25% mais que a média do mercado
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="bg-purple-400/20 p-3 rounded-lg">
+                <Sparkles className="h-6 w-6 text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Canvas Infinito</h3>
+                <p className="text-blue-100">
+                  Organize todos seus projetos em um espaço visual intuitivo e colaborativo
+                </p>
+              </div>
             </div>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Máquina Milionária AI</h1>
-          <p className="text-gray-400">Crie sua conta e transforme seu negócio</p>
-        </motion.div>
 
-        <Card className="bg-gray-800/50 border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-center">Criar Conta</CardTitle>
+          <div className="bg-white/10 p-6 rounded-lg border border-white/20">
+            <p className="text-sm text-blue-200 mb-2">💎 Garantia de 30 dias</p>
+            <p className="text-white">
+              Se não aumentar seus resultados em 30 dias, devolvemos 100% do seu investimento
+            </p>
+          </div>
+        </div>
+
+        {/* Right Side - Signup Form */}
+        <Card className="bg-white/10 border-white/20 backdrop-blur-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl text-white">Criar Conta Gratuita</CardTitle>
+            <CardDescription className="text-blue-200">
+              Comece sua transformação digital agora mesmo
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
+                  <Label htmlFor="firstName" className="text-white">Nome</Label>
                   <Input
+                    id="firstName"
                     type="text"
-                    placeholder="Nome"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                    className="bg-gray-700 border-gray-600"
+                    onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                    className="bg-white/10 border-white/20 text-white placeholder-blue-300"
+                    placeholder="Seu nome"
                     required
                   />
                 </div>
                 <div>
+                  <Label htmlFor="lastName" className="text-white">Sobrenome</Label>
                   <Input
+                    id="lastName"
                     type="text"
-                    placeholder="Sobrenome"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                    className="bg-gray-700 border-gray-600"
+                    onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                    className="bg-white/10 border-white/20 text-white placeholder-blue-300"
+                    placeholder="Sobrenome"
                     required
                   />
                 </div>
               </div>
               
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <div>
+                <Label htmlFor="email" className="text-white">E-mail</Label>
                 <Input
+                  id="email"
                   type="email"
-                  placeholder="Email"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="bg-gray-700 border-gray-600 pl-10"
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-blue-300"
+                  placeholder="seu@email.com"
                   required
                 />
               </div>
               
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <div>
+                <Label htmlFor="password" className="text-white">Senha</Label>
                 <Input
+                  id="password"
                   type="password"
-                  placeholder="Senha"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  className="bg-gray-700 border-gray-600 pl-10"
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-blue-300"
+                  placeholder="Mínimo 6 caracteres"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="confirmPassword" className="text-white">Confirmar Senha</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                  className="bg-white/10 border-white/20 text-white placeholder-blue-300"
+                  placeholder="Digite a senha novamente"
                   required
                 />
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={formData.acceptTerms}
-                  onCheckedChange={(checked) => setFormData({...formData, acceptTerms: !!checked})}
-                />
-                <label htmlFor="terms" className="text-sm text-gray-300">
-                  Aceito os <a href="#" className="text-blue-400 hover:underline">termos de uso</a> e <a href="#" className="text-blue-400 hover:underline">política de privacidade</a>
-                </label>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
-                disabled={signupMutation.isPending}
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold py-3"
+                disabled={registerMutation.isPending}
               >
-                {signupMutation.isPending ? (
-                  "Criando conta..."
-                ) : (
-                  <>
-                    <User className="w-4 h-4 mr-2" />
-                    Criar Conta
-                  </>
-                )}
+                {registerMutation.isPending ? 'Criando conta...' : 'Criar Conta Gratuita'}
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-600" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gray-800 text-gray-400">ou</span>
-                </div>
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-white/20" />
               </div>
-
-              <Button
-                variant="outline"
-                className="w-full mt-4 border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white"
-                onClick={handleDemoAccess}
-              >
-                <Crown className="w-4 h-4 mr-2" />
-                Acessar Demo Gratuito
-              </Button>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-transparent px-2 text-blue-200">Ou</span>
+              </div>
             </div>
 
-            <div className="mt-6 text-center">
-              <Button
-                variant="ghost"
-                onClick={() => setLocation('/')}
-                className="text-gray-400 hover:text-white"
-              >
-                <Home className="w-4 h-4 mr-2" />
-                Voltar ao Início
-              </Button>
+            <Button 
+              onClick={handleDemoAccess}
+              variant="outline" 
+              className="w-full border-white/20 text-white hover:bg-white/10"
+            >
+              Acessar Versão Demo Gratuita
+            </Button>
+
+            <p className="text-xs text-blue-200 text-center">
+              Ao criar uma conta, você concorda com nossos{' '}
+              <a href="#" className="text-yellow-400 hover:underline">Termos de Uso</a>{' '}
+              e{' '}
+              <a href="#" className="text-yellow-400 hover:underline">Política de Privacidade</a>
+            </p>
+
+            <div className="text-center">
+              <p className="text-blue-200">
+                Já tem uma conta?{' '}
+                <a href="/login" className="text-yellow-400 hover:underline font-medium">
+                  Faça login
+                </a>
+              </p>
             </div>
           </CardContent>
         </Card>

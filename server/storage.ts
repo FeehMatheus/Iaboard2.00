@@ -119,7 +119,7 @@ export class MemoryStorage implements IStorage {
       const [user] = await db.select().from(users).where(eq(users.email, email));
       return user || undefined;
     } catch (error) {
-      for (const user of this.memoryUsers.values()) {
+      for (const user of Array.from(this.memoryUsers.values())) {
         if (user.email === email) return user;
       }
       return undefined;
@@ -258,20 +258,18 @@ export class MemoryStorage implements IStorage {
     }
   }
 
-  async createAIGeneration(insertGeneration: any): Promise<AIGeneration> {
+  async createAIGeneration(insertGeneration: any): Promise<any> {
     try {
-      const [generation] = await db
-        .insert(aiGenerations)
-        .values({
-          ...insertGeneration,
-          id: Date.now(),
-          createdAt: new Date(),
-          metadata: insertGeneration.metadata || {},
-          projectId: insertGeneration.projectId || null,
-          creditsUsed: insertGeneration.creditsUsed || 1
-        })
-        .returning();
-      return generation;
+      const newGeneration = {
+        id: Date.now(),
+        ...insertGeneration,
+        createdAt: new Date(),
+        metadata: insertGeneration.metadata || {},
+        projectId: insertGeneration.projectId || null,
+        creditsUsed: insertGeneration.creditsUsed || 1
+      };
+      this.memoryGenerations.set(newGeneration.id.toString(), newGeneration);
+      return newGeneration;
     } catch (error) {
       const newGeneration = {
         id: Date.now(),
@@ -286,10 +284,9 @@ export class MemoryStorage implements IStorage {
     }
   }
 
-  async getAIGenerations(userId: string): Promise<AIGeneration[]> {
+  async getAIGenerations(userId: string): Promise<any[]> {
     try {
-      const generations = await db.select().from(aiGenerations).where(eq(aiGenerations.userId, userId));
-      return generations;
+      return Array.from(this.memoryGenerations.values()).filter(gen => gen.userId === userId);
     } catch (error) {
       return Array.from(this.memoryGenerations.values()).filter(gen => gen.userId === userId);
     }

@@ -1,168 +1,323 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
-  Brain, FileText, Video, Mail, Target, TrendingUp,
-  Zap, Globe, BarChart3, Users, Crown, Home, Play
-} from 'lucide-react';
-import { useLocation } from 'wouter';
+  Brain, 
+  Zap, 
+  Target, 
+  PenTool, 
+  Video, 
+  Mail, 
+  TrendingUp, 
+  Users, 
+  Globe, 
+  BarChart3,
+  Palette,
+  Shield,
+  ArrowRight
+} from "lucide-react";
+
+interface Feature {
+  icon: any;
+  title: string;
+  description: string;
+  benefits: string[];
+  category: string;
+}
 
 export default function Features() {
-  const [, setLocation] = useLocation();
-
-  const features = [
+  const features: Feature[] = [
     {
       icon: Brain,
-      title: "IA Avançada para Marketing",
-      description: "Nossa IA analisa seu mercado e gera estratégias personalizadas com precisão cirúrgica.",
-      benefits: ["Análise de mercado instantânea", "Estratégias personalizadas", "Otimização contínua"]
+      title: "IA Suprema Furion",
+      description: "Nossa IA proprietária que entende seu negócio e gera conteúdo personalizado de alta conversão",
+      benefits: [
+        "Aprende com seu histórico de vendas",
+        "Adapta tom de voz da sua marca",
+        "Otimização contínua baseada em resultados"
+      ],
+      category: "IA Avançada"
     },
     {
-      icon: FileText,
-      title: "Geração de Copy de Alta Conversão",
-      description: "Crie textos persuasivos que convertem usando técnicas comprovadas de copywriting.",
-      benefits: ["Templates testados", "Personalização automática", "A/B testing integrado"]
+      icon: PenTool,
+      title: "Gerador de Copy",
+      description: "Crie headlines, descrições de produtos e textos persuasivos que convertem",
+      benefits: [
+        "Headlines que aumentam CTR em 300%",
+        "Copies baseadas em gatilhos mentais",
+        "A/B testing automático de variações"
+      ],
+      category: "Copywriting"
     },
     {
       icon: Video,
-      title: "Criação de VSL Automática",
-      description: "Gere roteiros de vídeo sales letter otimizados para máxima conversão.",
-      benefits: ["Roteiros profissionais", "Estrutura AIDA", "Timing otimizado"]
+      title: "Scripts de VSL",
+      description: "Roteiros completos para Video Sales Letters que hipnotizam e vendem",
+      benefits: [
+        "Estrutura de storytelling comprovada",
+        "Ganchos emocionais poderosos",
+        "CTAs irresistíveis"
+      ],
+      category: "Vídeo Marketing"
     },
     {
       icon: Mail,
-      title: "Sequências de Email Marketing",
-      description: "Automatize campanhas de email com sequências inteligentes e personalizadas.",
-      benefits: ["Automação completa", "Segmentação avançada", "Taxa de abertura otimizada"]
+      title: "Sequências de E-mail",
+      description: "Campanhas automatizadas que nutrem leads e convertem em vendas",
+      benefits: [
+        "Sequências de relacionamento",
+        "E-mails de abandono de carrinho",
+        "Campanhas de reativação"
+      ],
+      category: "E-mail Marketing"
     },
     {
       icon: Target,
-      title: "Campanhas de Anúncios Pagos",
-      description: "Crie anúncios de alta performance para Facebook, Google e outras plataformas.",
-      benefits: ["Multi-plataforma", "Targeting preciso", "ROI maximizado"]
+      title: "Funis Completos",
+      description: "Construa funis de vendas otimizados do lead à conversão",
+      benefits: [
+        "Templates de alta conversão",
+        "Fluxos automatizados",
+        "Otimização por IA"
+      ],
+      category: "Funis de Vendas"
     },
     {
       icon: TrendingUp,
-      title: "Funnels de Vendas Inteligentes",
-      description: "Construa funis de vendas otimizados com base em dados e comportamento do usuário.",
-      benefits: ["Conversão otimizada", "Multi-etapas", "Analytics integrados"]
+      title: "Campanhas de Tráfego",
+      description: "Estratégias e anúncios para Facebook, Google e outras plataformas",
+      benefits: [
+        "Segmentação inteligente",
+        "Criativos de alta performance",
+        "Otimização de budget automática"
+      ],
+      category: "Tráfego Pago"
     },
     {
       icon: Globe,
       title: "Canvas Infinito",
-      description: "Visualize e organize seus projetos em um espaço infinito e colaborativo.",
-      benefits: ["Interface intuitiva", "Colaboração em tempo real", "Organização visual"]
+      description: "Organize todos seus projetos em um espaço visual colaborativo",
+      benefits: [
+        "Interface intuitiva tipo Miro",
+        "Colaboração em tempo real",
+        "Organização visual de projetos"
+      ],
+      category: "Produtividade"
     },
     {
       icon: BarChart3,
-      title: "Analytics Avançados",
-      description: "Monitore performance e otimize resultados com métricas detalhadas.",
-      benefits: ["Dashboards personalizados", "Relatórios automáticos", "Insights acionáveis"]
+      title: "Analytics Avançado",
+      description: "Métricas detalhadas e insights acionáveis sobre seu desempenho",
+      benefits: [
+        "Dashboard completo de KPIs",
+        "Relatórios automatizados",
+        "Sugestões de otimização"
+      ],
+      category: "Analytics"
+    },
+    {
+      icon: Users,
+      title: "Análise de Concorrência",
+      description: "Monitore e aprenda com seus concorrentes automaticamente",
+      benefits: [
+        "Tracking de campanhas rivais",
+        "Análise de estratégias",
+        "Alertas de oportunidades"
+      ],
+      category: "Inteligência Competitiva"
+    },
+    {
+      icon: Palette,
+      title: "Templates Premium",
+      description: "Biblioteca com centenas de templates testados e aprovados",
+      benefits: [
+        "Designs responsivos",
+        "Otimizados para conversão",
+        "Atualizações constantes"
+      ],
+      category: "Design"
+    },
+    {
+      icon: Shield,
+      title: "Segurança Enterprise",
+      description: "Proteção de dados e privacidade de nível corporativo",
+      benefits: [
+        "Criptografia end-to-end",
+        "Compliance LGPD",
+        "Backups automáticos"
+      ],
+      category: "Segurança"
+    },
+    {
+      icon: Zap,
+      title: "Automações Inteligentes",
+      description: "Workflows que funcionam 24/7 para escalar seu negócio",
+      benefits: [
+        "Leads scoring automático",
+        "Nutrição personalizada",
+        "Follow-ups inteligentes"
+      ],
+      category: "Automação"
     }
   ];
 
+  const categories = [...new Set(features.map(f => f.category))];
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation('/')}
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Início
-            </Button>
-            <Button
-              onClick={() => setLocation('/dashboard')}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Experimentar Agora
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div className="container mx-auto px-4 py-16">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-bold text-white mb-6">
+            Funcionalidades <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Revolucionárias</span>
+          </h1>
+          <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
+            Descubra como nossa plataforma de IA pode transformar completamente 
+            sua estratégia de marketing digital e multiplicar seus resultados.
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {categories.map((category, index) => (
+              <Badge 
+                key={index}
+                variant="outline" 
+                className="border-white/30 text-white hover:bg-white/10 px-4 py-2"
+              >
+                {category}
+              </Badge>
+            ))}
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-6 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Funcionalidades <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Poderosas</span>
-          </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Descubra todas as ferramentas que vão transformar seu marketing digital
-          </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card className="bg-gray-800/50 border-gray-700 h-full hover:border-blue-500/50 transition-all duration-300">
+        {/* Features Grid */}
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mb-16">
+          {features.map((feature, index) => {
+            const IconComponent = feature.icon;
+            return (
+              <Card 
+                key={index} 
+                className="bg-white/10 border-white/20 backdrop-blur-lg hover:bg-white/15 transition-all duration-300 group"
+              >
                 <CardHeader>
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-white" />
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-3 rounded-lg group-hover:scale-110 transition-transform">
+                      <IconComponent className="h-6 w-6 text-black" />
+                    </div>
+                    <Badge variant="outline" className="border-blue-300/30 text-blue-300">
+                      {feature.category}
+                    </Badge>
                   </div>
-                  <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl text-white group-hover:text-yellow-300 transition-colors">
+                    {feature.title}
+                  </CardTitle>
+                  <CardDescription className="text-blue-100">
+                    {feature.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-300 mb-4">{feature.description}</p>
                   <ul className="space-y-2">
-                    {feature.benefits.map((benefit, i) => (
-                      <li key={i} className="flex items-center text-sm text-gray-400">
-                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2" />
-                        {benefit}
+                    {feature.benefits.map((benefit, idx) => (
+                      <li key={idx} className="flex items-center space-x-2 text-blue-100">
+                        <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full flex-shrink-0"></div>
+                        <span className="text-sm">{benefit}</span>
                       </li>
                     ))}
                   </ul>
                 </CardContent>
               </Card>
-            </motion.div>
-          ))}
+            );
+          })}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl p-12"
-        >
-          <Crown className="w-16 h-16 text-blue-400 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Pronto para Começar?
-          </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Experimente todas essas funcionalidades agora mesmo
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              onClick={() => setLocation('/dashboard')}
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-xl px-8 py-4"
-            >
-              <Zap className="w-5 h-5 mr-2" />
-              Demo Gratuito
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => setLocation('/pricing')}
-              className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white text-xl px-8 py-4"
-            >
-              Ver Preços
-            </Button>
+        {/* Integration Section */}
+        <div className="bg-white/5 rounded-2xl p-8 mb-16 border border-white/10">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Integrações Poderosas
+            </h2>
+            <p className="text-blue-100 max-w-2xl mx-auto">
+              Conecte nossa IA com suas ferramentas favoritas e potencialize ainda mais seus resultados
+            </p>
           </div>
-        </motion.div>
+          
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              { name: "Facebook Ads", logo: "📘" },
+              { name: "Google Ads", logo: "🔍" },
+              { name: "Mailchimp", logo: "📧" },
+              { name: "HubSpot", logo: "🎯" },
+              { name: "Shopify", logo: "🛒" },
+              { name: "WordPress", logo: "📝" },
+              { name: "Zapier", logo: "⚡" },
+              { name: "Stripe", logo: "💳" }
+            ].map((integration, index) => (
+              <Card key={index} className="bg-white/10 border-white/20 backdrop-blur-lg text-center p-4">
+                <div className="text-3xl mb-2">{integration.logo}</div>
+                <div className="text-white font-medium">{integration.name}</div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Performance Stats */}
+        <div className="grid md:grid-cols-4 gap-6 mb-16">
+          {[
+            { metric: "+385%", label: "Aumento médio em vendas", icon: TrendingUp },
+            { metric: "25.7%", label: "Taxa de conversão média", icon: Target },
+            { metric: "72h", label: "ROI positivo garantido", icon: Zap },
+            { metric: "98%", label: "Satisfação dos clientes", icon: Users }
+          ].map((stat, index) => {
+            const IconComponent = stat.icon;
+            return (
+              <Card key={index} className="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border-yellow-400/30 backdrop-blur-lg text-center">
+                <CardContent className="p-6">
+                  <IconComponent className="h-8 w-8 text-yellow-400 mx-auto mb-3" />
+                  <div className="text-3xl font-bold text-white mb-1">{stat.metric}</div>
+                  <div className="text-blue-200 text-sm">{stat.label}</div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* CTA Section */}
+        <div className="text-center">
+          <Card className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border-white/20 backdrop-blur-lg p-12">
+            <CardContent className="space-y-6">
+              <h2 className="text-4xl font-bold text-white">
+                Pronto para Revolucionar seu Negócio?
+              </h2>
+              <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+                Junte-se a milhares de empreendedores que já estão usando nossa IA 
+                para gerar resultados extraordinários todos os dias.
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-4 pt-4">
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold px-8 py-4"
+                  onClick={() => window.location.href = '/signup'}
+                >
+                  Começar Gratuitamente
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10 px-8 py-4"
+                  onClick={() => window.location.href = '/pricing'}
+                >
+                  Ver Preços
+                </Button>
+              </div>
+              
+              <div className="text-sm text-blue-200 pt-4">
+                ✓ Teste grátis por 7 dias • ✓ Sem cartão de crédito • ✓ Suporte em português
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
