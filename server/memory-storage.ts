@@ -141,9 +141,10 @@ class MemoryStorage {
 
     this.projects.set(id, project);
     
-    const userProjectIds = this.userProjects.get(projectData.userId) || [];
+    const userId = projectData.userId || 'demo-user';
+    const userProjectIds = this.userProjects.get(userId) || [];
     userProjectIds.push(id);
-    this.userProjects.set(projectData.userId, userProjectIds);
+    this.userProjects.set(userId, userProjectIds);
 
     return project;
   }
