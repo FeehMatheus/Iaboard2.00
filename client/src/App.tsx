@@ -3,16 +3,23 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import Landing from '@/pages/Landing';
-import PostLoginDashboard from '@/pages/PostLoginDashboard';
-import { RenderStyleInfiniteBoard } from '@/components/ui/render-style-infinite-board';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
+import Dashboard from '@/pages/Dashboard';
+import Board from '@/pages/Board';
+import CaseStudies from '@/pages/CaseStudies';
+import Signup from '@/pages/Signup';
+import Pricing from '@/pages/Pricing';
+import Features from '@/pages/Features';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      queryFn: async ({ queryKey }) => {
+        const res = await fetch(queryKey[0] as string);
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        return res.json();
+      },
     },
   },
 });
@@ -24,10 +31,12 @@ export default function App() {
         <div className="min-h-screen bg-gray-900">
           <Switch>
             <Route path="/" component={Landing} />
-            <Route path="/login" component={Login} />
-            <Route path="/register" component={Register} />
-            <Route path="/dashboard" component={PostLoginDashboard} />
-            <Route path="/board" component={() => <RenderStyleInfiniteBoard />} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/board" component={Board} />
+            <Route path="/case-studies" component={CaseStudies} />
+            <Route path="/signup" component={Signup} />
+            <Route path="/pricing" component={Pricing} />
+            <Route path="/features" component={Features} />
             <Route>
               <Landing />
             </Route>

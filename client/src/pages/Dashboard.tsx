@@ -1,617 +1,438 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  Brain, 
-  TrendingUp, 
-  Target, 
-  Rocket, 
-  Crown, 
-  Play,
-  FileText,
-  Download,
-  Eye,
-  Plus,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Users,
-  BarChart3,
-  Settings,
-  BookOpen,
-  Video,
-  Mail,
-  Globe,
-  Cpu
+  BarChart3, TrendingUp, Users, DollarSign, Crown, Zap, 
+  Play, Pause, Settings, Plus, FileText, Video, Mail,
+  Target, Brain, Rocket, Award, Globe, Download,
+  RefreshCw, AlertCircle, CheckCircle, Clock
 } from 'lucide-react';
-import VideoStudio from '@/components/VideoStudio';
-import { motion } from 'framer-motion';
+import { useLocation } from 'wouter';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 interface Project {
-  id: number;
-  name: string;
-  type: string;
-  phase: number;
-  status: string;
-  data: any;
-  furionResults: any;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface User {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  plan: string;
-  furionCredits: number;
+  title: string;
+  type: string;
+  status: string;
+  progress: number;
+  content?: any;
+  createdAt: string;
 }
 
-interface DashboardProps {
-  user?: any;
-  onOpenFurionCanvas?: () => void;
-  onOpenThiagoFinchAI?: () => void;
+interface UserStats {
+  totalProjects: number;
+  completedProjects: number;
+  creditsUsed: number;
+  creditsRemaining: number;
+  conversionRate: number;
 }
 
-export default function Dashboard({ user: currentUser, onOpenFurionCanvas, onOpenThiagoFinchAI }: DashboardProps) {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [activePhase, setActivePhase] = useState(1);
-  const [showVideoStudio, setShowVideoStudio] = useState(false);
-  const queryClient = useQueryClient();
+export default function Dashboard() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [selectedType, setSelectedType] = useState('copywriting');
+  const [prompt, setPrompt] = useState('');
+  const [audience, setAudience] = useState('');
+  const [product, setProduct] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  // Usar dados do usuário passados como prop ou buscar da API
-  const { data: apiUser } = useQuery<User>({
-    queryKey: ['/api/user'],
-    retry: false,
-    enabled: !currentUser
-  });
-
-  const user = currentUser || apiUser;
-
-  // Buscar projetos do usuário
-  const { data: projects = [], isLoading: projectsLoading } = useQuery<Project[]>({
+  // Fetch user projects
+  const { data: projects = [], refetch: refetchProjects } = useQuery({
     queryKey: ['/api/projects'],
-    retry: false,
+    retry: 1,
   });
 
-  // Criar novo projeto
-  const createProjectMutation = useMutation({
-    mutationFn: async (projectData: any) => {
-      const response = await apiRequest('POST', '/api/projects', projectData);
-      return response.json();
+  // Fetch user stats
+  const { data: stats } = useQuery({
+    queryKey: ['/api/analytics/stats'],
+    retry: 1,
+  });
+
+  // Generate content mutation
+  const generateContentMutation = useMutation({
+    mutationFn: async (data: any) => {
+      setIsGenerating(true);
+      const response = await apiRequest('POST', '/api/ai/generate', data);
+      return response;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+    onSuccess: (data) => {
+      toast({
+        title: "Conteúdo Gerado com Sucesso!",
+        description: "Seu projeto foi criado e está pronto para uso.",
+      });
+      refetchProjects();
+      setPrompt('');
+      setAudience('');
+      setProduct('');
+      setIsGenerating(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro na Geração",
+        description: error.message || "Erro ao gerar conteúdo. Tente novamente.",
+        variant: "destructive",
+      });
+      setIsGenerating(false);
     },
   });
 
-  // Avançar fase do projeto
-  const advancePhase = useMutation({
-    mutationFn: async ({ projectId, phase }: { projectId: number; phase: number }) => {
-      const response = await apiRequest('PUT', `/api/projects/${projectId}/phase`, { phase });
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
-    },
-  });
-
-  const phases = [
-    {
-      number: 1,
-      title: "O seu ponto de partida",
-      description: "Entenda como funciona e receba o mapa completo",
-      icon: <Play className="w-6 h-6" />,
-      color: "bg-blue-500",
-      tasks: [
-        "Assistir vídeo de boas-vindas",
-        "Configurar perfil na plataforma",
-        "Acessar materiais de apoio",
-        "Definir objetivo principal"
-      ]
-    },
-    {
-      number: 2,
-      title: "Dominando a Inteligência Artificial",
-      description: "Crie seu produto do zero com o Furion.AI",
-      icon: <Brain className="w-6 h-6" />,
-      color: "bg-purple-500",
-      tasks: [
-        "Definir nicho e público-alvo",
-        "Usar Furion para criar produto",
-        "Estruturar conteúdo",
-        "Validar com mercado"
-      ]
-    },
-    {
-      number: 3,
-      title: "Criando sua Máquina Milionária",
-      description: "Monte o sistema completo de vendas",
-      icon: <Target className="w-6 h-6" />,
-      color: "bg-green-500",
-      tasks: [
-        "Criar página de vendas",
-        "Configurar funil de conversão",
-        "Integrar sistema de pagamento",
-        "Testar todo o processo"
-      ]
-    },
-    {
-      number: 4,
-      title: "Hora de imprimir dinheiro",
-      description: "Lance campanhas no Meta Ads",
-      icon: <Rocket className="w-6 h-6" />,
-      color: "bg-orange-500",
-      tasks: [
-        "Configurar Facebook Business",
-        "Criar campanhas de tráfego",
-        "Otimizar anúncios",
-        "Escalar resultados"
-      ]
-    },
-    {
-      number: 5,
-      title: "Escalando seu faturamento",
-      description: "Multiplique seus resultados",
-      icon: <Crown className="w-6 h-6" />,
-      color: "bg-red-500",
-      tasks: [
-        "Análise avançada de métricas",
-        "Estratégias de escala",
-        "Automações avançadas",
-        "Expansão para novos mercados"
-      ]
+  const handleGenerate = () => {
+    if (!prompt || !audience || !product) {
+      toast({
+        title: "Campos Obrigatórios",
+        description: "Preencha todos os campos para gerar o conteúdo.",
+        variant: "destructive",
+      });
+      return;
     }
-  ];
 
-  const currentProject = selectedProject || projects[0];
-  const currentPhase = phases[activePhase - 1];
-
-  useEffect(() => {
-    if (projects.length > 0 && !selectedProject) {
-      setSelectedProject(projects[0]);
-      setActivePhase(projects[0].phase || 1);
-    }
-  }, [projects, selectedProject]);
-
-  const handleCreateProject = () => {
-    createProjectMutation.mutate({
-      name: "Novo Projeto Digital",
-      type: "infoproduto",
-      data: {
-        description: "Projeto criado através da plataforma",
-        targetAudience: "A definir",
-      }
+    generateContentMutation.mutate({
+      type: selectedType,
+      prompt,
+      audience,
+      product,
     });
   };
 
-  const handleAdvancePhase = () => {
-    if (currentProject && activePhase < 5) {
-      const nextPhase = activePhase + 1;
-      advancePhase.mutate({ 
-        projectId: currentProject.id, 
-        phase: nextPhase 
-      });
-      setActivePhase(nextPhase);
-    }
+  const contentTypes = [
+    { id: 'copywriting', name: 'Copy de Vendas', icon: FileText, description: 'Textos persuasivos para vendas' },
+    { id: 'vsl', name: 'Vídeo Sales Letter', icon: Video, description: 'Roteiros para vídeos de vendas' },
+    { id: 'email', name: 'Sequência de Emails', icon: Mail, description: 'Campanhas de email marketing' },
+    { id: 'ads', name: 'Anúncios Pagos', icon: Target, description: 'Anúncios para Facebook e Google' },
+    { id: 'funnel', name: 'Funil de Vendas', icon: TrendingUp, description: 'Estratégias de funil completo' },
+    { id: 'strategy', name: 'Estratégia Digital', icon: Brain, description: 'Planejamento estratégico completo' },
+  ];
+
+  const userStats: UserStats = stats || {
+    totalProjects: projects.length || 0,
+    completedProjects: projects.filter((p: Project) => p.status === 'completed').length || 0,
+    creditsUsed: 0,
+    creditsRemaining: 1000,
+    conversionRate: 0,
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-950 text-white">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">M</span>
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <Crown className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Máquina Milionária
-                </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Bem-vindo, {user?.firstName}! Plano: {user?.plan?.toUpperCase()}
-                </p>
+                <h1 className="text-xl font-bold">Máquina Milionária AI</h1>
+                <p className="text-sm text-gray-400">Dashboard Principal</p>
               </div>
             </div>
-            
             <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="text-purple-600 border-purple-600">
-                <Brain className="w-4 h-4 mr-1" />
-                {user?.furionCredits || 0} Créditos Furion
+              <Badge variant="outline" className="text-green-400 border-green-400">
+                {userStats.creditsRemaining} Créditos
               </Badge>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                Configurações
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation('/board')}
+              >
+                <Globe className="w-4 h-4 mr-2" />
+                Canvas Infinito
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation('/')}
+              >
+                <Settings className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Sidebar - Fases do Método */}
-          <div className="lg:col-span-1">
-            <Card>
+      <div className="container mx-auto px-6 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Total de Projetos</p>
+                  <p className="text-2xl font-bold">{userStats.totalProjects}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Concluídos</p>
+                  <p className="text-2xl font-bold">{userStats.completedProjects}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Créditos Restantes</p>
+                  <p className="text-2xl font-bold">{userStats.creditsRemaining}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gray-800/50 border-gray-700">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-yellow-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400">Taxa de Conversão</p>
+                  <p className="text-2xl font-bold">{userStats.conversionRate.toFixed(1)}%</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <Tabs defaultValue="generator" className="space-y-8">
+          <TabsList className="bg-gray-800 border-gray-700">
+            <TabsTrigger value="generator" className="data-[state=active]:bg-blue-600">
+              <Rocket className="w-4 h-4 mr-2" />
+              Gerador IA
+            </TabsTrigger>
+            <TabsTrigger value="projects" className="data-[state=active]:bg-blue-600">
+              <FileText className="w-4 h-4 mr-2" />
+              Projetos
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Content Generator */}
+          <TabsContent value="generator" className="space-y-6">
+            <Card className="bg-gray-800/50 border-gray-700">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <BookOpen className="w-5 h-5" />
-                  <span>Método 5 Fases</span>
+                  <Brain className="w-5 h-5 text-blue-400" />
+                  <span>Gerador de Conteúdo IA</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {phases.map((phase) => (
-                  <motion.div
-                    key={phase.number}
-                    whileHover={{ scale: 1.02 }}
-                    className={`p-3 rounded-lg cursor-pointer transition-all ${
-                      activePhase === phase.number
-                        ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
-                    }`}
-                    onClick={() => setActivePhase(phase.number)}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={`p-2 rounded-lg ${
-                        activePhase === phase.number ? 'bg-white/20' : phase.color
-                      }`}>
-                        <div className={activePhase === phase.number ? 'text-white' : 'text-white'}>
-                          {phase.icon}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm">Fase {phase.number}</p>
-                        <p className="text-xs opacity-90 truncate">{phase.title}</p>
-                      </div>
-                      {(currentProject?.phase || 1) >= phase.number && (
-                        <CheckCircle className="w-4 h-4 text-green-400" />
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Projetos */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center space-x-2">
-                    <FileText className="w-5 h-5" />
-                    <span>Meus Projetos</span>
-                  </span>
-                  <Button size="sm" onClick={handleCreateProject}>
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {projectsLoading ? (
-                  <div className="text-center py-4">
-                    <Clock className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Carregando...</p>
-                  </div>
-                ) : projects.length === 0 ? (
-                  <div className="text-center py-4">
-                    <Plus className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-600">Nenhum projeto ainda</p>
-                    <Button size="sm" className="mt-2" onClick={handleCreateProject}>
-                      Criar Primeiro Projeto
-                    </Button>
-                  </div>
-                ) : (
-                  projects.map((project) => (
-                    <div
-                      key={project.id}
-                      className={`p-3 rounded-lg cursor-pointer transition-all ${
-                        selectedProject?.id === project.id
-                          ? 'bg-blue-100 dark:bg-blue-900/20 border border-blue-300'
-                          : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {contentTypes.map((type) => (
+                    <Card
+                      key={type.id}
+                      className={`cursor-pointer transition-all ${
+                        selectedType === type.id
+                          ? 'bg-blue-600/20 border-blue-500'
+                          : 'bg-gray-700/50 border-gray-600 hover:border-gray-500'
                       }`}
-                      onClick={() => setSelectedProject(project)}
+                      onClick={() => setSelectedType(type.id)}
                     >
-                      <p className="font-semibold text-sm">{project.name}</p>
-                      <p className="text-xs text-gray-600 capitalize">{project.type}</p>
-                      <div className="mt-2">
-                        <Progress value={(project.phase / 5) * 100} className="h-2" />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Fase {project.phase}/5
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Conteúdo Principal */}
-          <div className="lg:col-span-3">
-            {currentPhase && (
-              <motion.div
-                key={activePhase}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="space-y-6"
-              >
-                {/* Header da Fase */}
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className={`p-3 rounded-lg ${currentPhase.color}`}>
-                          <div className="text-white">
-                            {currentPhase.icon}
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3">
+                          <type.icon className="w-5 h-5 text-blue-400" />
+                          <div>
+                            <h3 className="font-semibold">{type.name}</h3>
+                            <p className="text-sm text-gray-400">{type.description}</p>
                           </div>
                         </div>
-                        <div>
-                          <h2 className="text-2xl font-bold">
-                            Fase {currentPhase.number}: {currentPhase.title}
-                          </h2>
-                          <p className="text-gray-600 dark:text-gray-400">
-                            {currentPhase.description}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <Progress value={(activePhase / 5) * 100} className="w-32 mb-2" />
-                        <p className="text-sm text-gray-600">
-                          {activePhase}/5 Fases Concluídas
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Conteúdo da Fase */}
-                <Tabs defaultValue="overview" className="space-y-6">
-                  <TabsList>
-                    <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-                    <TabsTrigger value="tasks">Tarefas</TabsTrigger>
-                    <TabsTrigger value="resources">Recursos</TabsTrigger>
-                    <TabsTrigger value="results">Resultados</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="overview" className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center space-x-2">
-                            <Video className="w-5 h-5" />
-                            <span>Aulas da Fase {activePhase}</span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          {['Introdução', 'Conceitos Principais', 'Prática Guiada', 'Exercícios'].map((lesson, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                              <div className="flex items-center space-x-3">
-                                <Play className="w-4 h-4 text-blue-600" />
-                                <span className="text-sm font-medium">{lesson}</span>
-                              </div>
-                              <Badge variant="outline">15 min</Badge>
-                            </div>
-                          ))}
-                        </CardContent>
-                      </Card>
-
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center space-x-2">
-                            <Brain className="w-5 h-5" />
-                            <span>Furion.AI Disponível</span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-gray-600 mb-4">
-                            Use a inteligência artificial para acelerar seu progresso nesta fase.
-                          </p>
-                          <div className="space-y-2">
-                            <Button 
-                              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white" 
-                              onClick={onOpenFurionCanvas}
-                            >
-                              <Brain className="w-4 h-4 mr-2" />
-                              Abrir Canvas Infinito Furion
-                            </Button>
-                            <Button 
-                              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white" 
-                              onClick={onOpenThiagoFinchAI}
-                            >
-                              <Cpu className="w-4 h-4 mr-2" />
-                              Sistema IA Avançado
-                            </Button>
-                            <Button 
-                              className="w-full" 
-                              variant="outline"
-                              onClick={() => setShowVideoStudio(true)}
-                            >
-                              <Video className="w-4 h-4 mr-2" />
-                              Criar Vídeo com IA
-                            </Button>
-                            <Button className="w-full" variant="outline">
-                              <FileText className="w-4 h-4 mr-2" />
-                              Gerar Copy de Vendas
-                            </Button>
-                            <Button className="w-full" variant="outline">
-                              <Target className="w-4 h-4 mr-2" />
-                              Criar Anúncios
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="tasks" className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Lista de Tarefas - Fase {activePhase}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        {currentPhase.tasks.map((task, index) => (
-                          <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <span className="flex-1">{task}</span>
-                            <Badge variant="secondary">Concluído</Badge>
-                          </div>
-                        ))}
                       </CardContent>
                     </Card>
-                  </TabsContent>
+                  ))}
+                </div>
 
-                  <TabsContent value="resources" className="space-y-6">
-                    <div className="grid md:grid-cols-3 gap-6">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center space-x-2">
-                            <FileText className="w-5 h-5" />
-                            <span>Materiais</span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          {['Guia Completo PDF', 'Templates', 'Checklists', 'Planilhas'].map((material, index) => (
-                            <Button key={index} variant="ghost" className="w-full justify-start">
-                              <Download className="w-4 h-4 mr-2" />
-                              {material}
-                            </Button>
-                          ))}
-                        </CardContent>
-                      </Card>
-
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center space-x-2">
-                            <Globe className="w-5 h-5" />
-                            <span>Ferramentas</span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          {['Plataforma de Vendas', 'Sistema de Email', 'Analytics', 'CRM'].map((tool, index) => (
-                            <Button key={index} variant="ghost" className="w-full justify-start">
-                              <Eye className="w-4 h-4 mr-2" />
-                              {tool}
-                            </Button>
-                          ))}
-                        </CardContent>
-                      </Card>
-
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center space-x-2">
-                            <Users className="w-5 h-5" />
-                            <span>Comunidade</span>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          <Button variant="ghost" className="w-full justify-start">
-                            <Mail className="w-4 h-4 mr-2" />
-                            Grupo Telegram
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start">
-                            <Users className="w-4 h-4 mr-2" />
-                            Fórum de Dúvidas
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start">
-                            <Video className="w-4 h-4 mr-2" />
-                            Lives Semanais
-                          </Button>
-                        </CardContent>
-                      </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Público-Alvo</label>
+                      <Input
+                        placeholder="Ex: Empreendedores iniciantes de 25-40 anos"
+                        value={audience}
+                        onChange={(e) => setAudience(e.target.value)}
+                        className="bg-gray-700 border-gray-600"
+                      />
                     </div>
-                  </TabsContent>
-
-                  <TabsContent value="results" className="space-y-6">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <Card>
-                        <CardContent className="p-6 text-center">
-                          <DollarSign className="w-8 h-8 mx-auto mb-2 text-green-600" />
-                          <p className="text-2xl font-bold">R$ 0</p>
-                          <p className="text-sm text-gray-600">Faturamento</p>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-6 text-center">
-                          <Users className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                          <p className="text-2xl font-bold">0</p>
-                          <p className="text-sm text-gray-600">Clientes</p>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-6 text-center">
-                          <TrendingUp className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-                          <p className="text-2xl font-bold">0%</p>
-                          <p className="text-sm text-gray-600">Conversão</p>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card>
-                        <CardContent className="p-6 text-center">
-                          <BarChart3 className="w-8 h-8 mx-auto mb-2 text-orange-600" />
-                          <p className="text-2xl font-bold">0</p>
-                          <p className="text-sm text-gray-600">Leads</p>
-                        </CardContent>
-                      </Card>
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Produto/Serviço</label>
+                      <Input
+                        placeholder="Ex: Curso de marketing digital"
+                        value={product}
+                        onChange={(e) => setProduct(e.target.value)}
+                        className="bg-gray-700 border-gray-600"
+                      />
                     </div>
-                  </TabsContent>
-                </Tabs>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Prompt Detalhado</label>
+                    <Textarea
+                      placeholder="Descreva detalhadamente o que você quer gerar..."
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="bg-gray-700 border-gray-600 h-32"
+                    />
+                  </div>
+                </div>
 
-                {/* Ações da Fase */}
-                <Card>
-                  <CardContent className="p-6">
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || generateContentMutation.isPending}
+                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600"
+                  size="lg"
+                >
+                  {isGenerating || generateContentMutation.isPending ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Gerando Conteúdo...
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="w-4 h-4 mr-2" />
+                      Gerar Conteúdo
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Projects */}
+          <TabsContent value="projects" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Seus Projetos</h2>
+              <Button
+                onClick={() => setLocation('/board')}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Novo Projeto
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projects.length > 0 ? (
+                projects.map((project: Project) => (
+                  <Card key={project.id} className="bg-gray-800/50 border-gray-700">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg">{project.title}</CardTitle>
+                        <Badge variant={project.status === 'completed' ? 'default' : 'secondary'}>
+                          {project.status}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="w-4 h-4 text-gray-400" />
+                          <span className="text-sm text-gray-400">{project.type}</span>
+                        </div>
+                        <Progress value={project.progress} className="h-2" />
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-400">
+                            {new Date(project.createdAt).toLocaleDateString()}
+                          </span>
+                          <Button size="sm" variant="outline">
+                            <Play className="w-3 h-3 mr-1" />
+                            Abrir
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Nenhum projeto encontrado</h3>
+                  <p className="text-gray-400 mb-4">Comece criando seu primeiro projeto IA</p>
+                  <Button onClick={() => setLocation('/board')} className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Primeiro Projeto
+                  </Button>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Analytics */}
+          <TabsContent value="analytics" className="space-y-6">
+            <h2 className="text-2xl font-bold">Analytics e Performance</h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle>Performance dos Projetos</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold mb-1">Próximo Passo</h3>
-                        <p className="text-sm text-gray-600">
-                          {activePhase < 5 
-                            ? `Complete as tarefas desta fase para avançar para a Fase ${activePhase + 1}`
-                            : 'Parabéns! Você completou todas as fases do método.'
-                          }
-                        </p>
-                      </div>
-                      
-                      <div className="flex space-x-2">
-                        {activePhase > 1 && (
-                          <Button 
-                            variant="outline" 
-                            onClick={() => setActivePhase(activePhase - 1)}
-                          >
-                            Fase Anterior
-                          </Button>
-                        )}
-                        {activePhase < 5 && (
-                          <Button 
-                            onClick={handleAdvancePhase}
-                            className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-                          >
-                            Avançar para Fase {activePhase + 1}
-                          </Button>
-                        )}
-                      </div>
+                      <span>Taxa de Conclusão</span>
+                      <span className="font-bold">
+                        {userStats.totalProjects > 0 
+                          ? Math.round((userStats.completedProjects / userStats.totalProjects) * 100)
+                          : 0}%
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </div>
-        </div>
-      </div>
+                    <Progress 
+                      value={userStats.totalProjects > 0 
+                        ? (userStats.completedProjects / userStats.totalProjects) * 100
+                        : 0} 
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-      {/* Video Studio Modal */}
-      {showVideoStudio && (
-        <VideoStudio onClose={() => setShowVideoStudio(false)} />
-      )}
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle>Uso de Créditos</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span>Créditos Utilizados</span>
+                      <span className="font-bold">{userStats.creditsUsed}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Créditos Restantes</span>
+                      <span className="font-bold text-green-400">{userStats.creditsRemaining}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
