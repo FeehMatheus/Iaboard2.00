@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./memory-storage";
 import { z } from "zod";
+import { quantumAI } from "./quantum-ai-engine";
 
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
@@ -1483,10 +1484,8 @@ Retorne um conteúdo profissional, detalhado e otimizado para conversão no merc
       const quantumResponse = await quantumAI.processQuantumRequest({
         type: supremeMode ? 'supreme-generation' : 'quantum-analysis',
         prompt,
-        quantumLevel,
-        dimensions: supremeMode ? 12 : 7,
-        supremeMode,
-        cosmicAlignment: supremeMode
+        intensity: quantumLevel,
+        dimensions: supremeMode ? 12 : 7
       });
 
       // Update user credits
@@ -1512,7 +1511,7 @@ Retorne um conteúdo profissional, detalhado e otimizado para conversão no merc
   app.get('/api/quantum/status', authenticate, async (req, res) => {
     try {
       const { quantumAI } = await import('./quantum-ai-engine');
-      const fieldStatus = quantumAI.getQuantumFieldStatus();
+      const fieldStatus = quantumAI.getQuantumStatus();
       
       res.json({
         success: true,

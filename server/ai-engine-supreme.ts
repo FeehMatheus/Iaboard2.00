@@ -490,7 +490,7 @@ OTIMIZAÇÃO:
 - Recommendations automáticas`
     };
 
-    return templates[type] || templates.copy;
+    return templates[type as keyof typeof templates] || templates.copy;
   }
 }
 
