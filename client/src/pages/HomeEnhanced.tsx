@@ -439,6 +439,15 @@ export default function HomeEnhanced() {
           </div>
         </div>
       </footer>
+
+      {/* Advanced CTA System */}
+      <AdvancedCTAModal
+        isOpen={showCTAModal}
+        onClose={() => setShowCTAModal(false)}
+        onNavigate={(path) => setLocation(path)}
+      />
+      
+      <QuickActionCTA onOpenModal={() => setShowCTAModal(true)} />
     </div>
   );
 }
