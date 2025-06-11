@@ -14,11 +14,18 @@ interface User {
 interface Project {
   id: string;
   userId: string;
-  type: string;
   title: string;
+  type: string;
   status: string;
   progress: number;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
   content?: any;
+  videoUrl?: string;
+  links?: Array<{ id: string; url: string; title: string; type: string }>;
+  connections?: string[];
+  zIndex: number;
+  isExpanded: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

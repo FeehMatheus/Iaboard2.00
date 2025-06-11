@@ -191,7 +191,7 @@ Projete um funil com:
     return this.parseFunnelResponse(content);
   }
 
-  private static async analyzeVideo(videoUrl: string, prompt: string): Promise<any> {
+  static async analyzeVideo(videoUrl: string, prompt: string): Promise<any> {
     if (!videoUrl) {
       throw new Error('URL do vídeo é obrigatória para análise');
     }
@@ -627,10 +627,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI PROCESSING ENDPOINTS
   // ================================
 
-  // Generate AI content
+  // Generate AI content with enhanced options
   app.post('/api/ai/generate', authenticate, async (req, res) => {
     try {
-      const { type, prompt, title } = req.body;
+      const { type, prompt, options = {} } = req.body;
       const userId = req.user.id;
 
       if (!type || !prompt) {
@@ -639,25 +639,180 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check user credits
       const user = await storage.getUser(userId);
-      if (!user || user.furionCredits < 5) {
+      const creditsRequired = getCreditsForType(type);
+      
+      if (!user || user.furionCredits < creditsRequired) {
         return res.status(400).json({ error: 'Créditos insuficientes' });
       }
 
-      // Generate content
-      const content = await AIService.generateContent(type, prompt);
+      // Generate content with real AI
+      const content = await AIService.generateContent(type, prompt, options);
 
       // Update user credits
-      await storage.updateUserCredits(userId, user.furionCredits - 5);
+      await storage.updateUserCredits(userId, user.furionCredits - creditsRequired);
 
       res.json({
         success: true,
         content,
-        creditsUsed: 5,
-        remainingCredits: user.furionCredits - 5
+        creditsUsed: creditsRequired,
+        remainingCredits: user.furionCredits - creditsRequired
       });
     } catch (error) {
       console.error('AI generation error:', error);
-      res.status(500).json({ error: 'Erro na geração de conteúdo' });
+      res.status(500).json({ error: error.message || 'Erro na geração de conteúdo' });
+    }
+  });
+
+  // Add link to project
+  app.post('/api/projects/:id/links', authenticate, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { url, title, type } = req.body;
+      const userId = req.user.id;
+
+      if (!url || !title || !type) {
+        return res.status(400).json({ error: 'URL, título e tipo são obrigatórios' });
+      }
+
+      const project = await storage.getProject(id);
+      if (!project || project.userId !== userId) {
+        return res.status(404).json({ error: 'Projeto não encontrado' });
+      }
+
+      // Validate URL format
+      try {
+        new URL(url);
+      } catch {
+        return res.status(400).json({ error: 'URL inválida' });
+      }
+
+      const linkData = {
+        id: Date.now().toString(),
+        url,
+        title,
+        type,
+        createdAt: new Date().toISOString()
+      };
+
+      const updatedProject = await storage.updateProject(id, {
+        links: [...(project.links || []), linkData]
+      });
+
+      res.json({
+        success: true,
+        link: linkData,
+        project: updatedProject
+      });
+    } catch (error) {
+      console.error('Error adding link:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Remove link from project
+  app.delete('/api/projects/:id/links/:linkId', authenticate, async (req, res) => {
+    try {
+      const { id, linkId } = req.params;
+      const userId = req.user.id;
+
+      const project = await storage.getProject(id);
+      if (!project || project.userId !== userId) {
+        return res.status(404).json({ error: 'Projeto não encontrado' });
+      }
+
+      const updatedLinks = (project.links || []).filter(link => link.id !== linkId);
+      const updatedProject = await storage.updateProject(id, {
+        links: updatedLinks
+      });
+
+      res.json({
+        success: true,
+        project: updatedProject
+      });
+    } catch (error) {
+      console.error('Error removing link:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Analyze video URL
+  app.post('/api/analyze-video', authenticate, async (req, res) => {
+    try {
+      const { videoUrl, prompt = 'Análise geral' } = req.body;
+      const userId = req.user.id;
+
+      if (!videoUrl) {
+        return res.status(400).json({ error: 'URL do vídeo é obrigatória' });
+      }
+
+      // Validate video URL
+      if (!isValidVideoUrl(videoUrl)) {
+        return res.status(400).json({ error: 'URL de vídeo inválida. Use URLs do YouTube, Vimeo ou similares.' });
+      }
+
+      // Check user credits
+      const user = await storage.getUser(userId);
+      if (!user || user.furionCredits < 12) {
+        return res.status(400).json({ error: 'Créditos insuficientes para análise de vídeo' });
+      }
+
+      // Analyze video with AI
+      const analysis = await AIService.analyzeVideo(videoUrl, prompt);
+
+      // Update user credits
+      await storage.updateUserCredits(userId, user.furionCredits - 12);
+
+      res.json({
+        success: true,
+        analysis,
+        creditsUsed: 12,
+        remainingCredits: user.furionCredits - 12
+      });
+    } catch (error) {
+      console.error('Video analysis error:', error);
+      res.status(500).json({ error: error.message || 'Erro na análise do vídeo' });
+    }
+  });
+
+  // Export project content
+  app.get('/api/projects/:id/export', authenticate, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { format = 'json' } = req.query;
+      const userId = req.user.id;
+
+      const project = await storage.getProject(id);
+      if (!project || project.userId !== userId) {
+        return res.status(404).json({ error: 'Projeto não encontrado' });
+      }
+
+      if (project.status !== 'completed') {
+        return res.status(400).json({ error: 'Projeto ainda não foi concluído' });
+      }
+
+      const exportData = {
+        id: project.id,
+        title: project.title,
+        type: project.type,
+        content: project.content,
+        links: project.links || [],
+        createdAt: project.createdAt,
+        exportedAt: new Date().toISOString()
+      };
+
+      if (format === 'pdf') {
+        // Generate PDF export (placeholder for now)
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${project.title}.pdf"`);
+        res.json({ error: 'Exportação PDF em desenvolvimento' });
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', `attachment; filename="${project.title}.json"`);
+        res.json(exportData);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      res.status(500).json({ error: 'Erro na exportação' });
     }
   });
 
@@ -696,4 +851,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// Helper functions
+function getCreditsForType(type: string): number {
+  const creditMap: Record<string, number> = {
+    'copy': 8,
+    'vsl': 15,
+    'ads': 10,
+    'email': 12,
+    'funnel': 20,
+    'landing': 12,
+    'analysis': 12,
+    'strategy': 18
+  };
+  return creditMap[type] || 8;
+}
+
+function isValidVideoUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    const domain = urlObj.hostname.toLowerCase();
+    return ['youtube.com', 'www.youtube.com', 'youtu.be', 'vimeo.com', 'www.vimeo.com'].includes(domain);
+  } catch {
+    return false;
+  }
+}
+
+// Authentication middleware
+function authenticate(req: any, res: any, next: any) {
+  // For development, create a mock user
+  req.user = {
+    id: 'user_1',
+    name: 'Demo User',
+    email: 'demo@example.com',
+    furionCredits: 1000
+  };
+  next();
 }

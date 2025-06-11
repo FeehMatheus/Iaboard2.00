@@ -27,16 +27,22 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Projetos criados pelos usuários
+// Projetos criados pelos usuários no canvas
 export const projects = pgTable("projects", {
-  id: serial("id").primaryKey(),
+  id: varchar("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  name: varchar("name").notNull(),
-  type: varchar("type").notNull(), // produto, servico, infoproduto, curso
-  phase: integer("phase").default(1), // Fase atual do método (1-5)
-  status: varchar("status").default("active"), // active, completed, archived
-  data: jsonb("data"), // Dados específicos do projeto
-  furionResults: jsonb("furion_results"), // Resultados gerados pelo Furion
+  title: varchar("title").notNull(),
+  type: varchar("type").notNull(), // copy, vsl, funnel, ads, email, landing, analysis, strategy
+  status: varchar("status").default("draft"), // processing, completed, failed, draft
+  progress: integer("progress").default(0),
+  position: jsonb("position").notNull(), // { x: number, y: number }
+  size: jsonb("size").notNull(), // { width: number, height: number }
+  content: jsonb("content"), // Generated content
+  videoUrl: varchar("video_url"), // Associated video URL
+  links: jsonb("links"), // Array of CTA links
+  connections: jsonb("connections"), // Connected project IDs
+  zIndex: integer("z_index").default(1),
+  isExpanded: boolean("is_expanded").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -36,12 +36,12 @@ export interface IStorage {
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserCredits(id: string, credits: number): Promise<User>;
   
-  // Project operations
+  // Project operations (Canvas)
   createProject(project: InsertProject): Promise<Project>;
-  getProject(id: number): Promise<Project | undefined>;
+  getProject(id: string): Promise<Project | undefined>;
   getUserProjects(userId: string): Promise<Project[]>;
-  updateProject(id: number, data: Partial<Project>): Promise<Project>;
-  updateProjectPhase(id: number, phase: number): Promise<Project>;
+  updateProject(id: string, data: Partial<Project>): Promise<Project>;
+  deleteProject(id: string): Promise<void>;
   
   // Furion operations
   createFurionSession(session: InsertFurionSession): Promise<FurionSession>;
