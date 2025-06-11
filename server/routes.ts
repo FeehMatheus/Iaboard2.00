@@ -3,88 +3,428 @@ import { createServer, type Server } from "http";
 import { storage } from "./memory-storage";
 import { z } from "zod";
 
-// Simple AI service for processing requests
+import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
+
+// Real AI service with multiple providers
 class AIService {
-  static async generateContent(type: string, prompt: string): Promise<any> {
-    // Simulate AI processing with realistic content
-    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
-    
-    const responses = {
-      copy: {
-        headline: "Transforme Sua Vida com Esta Oportunidade Única",
-        subheadline: "Descubra os segredos que apenas 1% das pessoas conhecem para alcançar sucesso extraordinário",
-        body: `Você já se perguntou por que algumas pessoas conseguem resultados incríveis enquanto outras lutam constantemente?
+  private static openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
 
-A resposta está nos métodos e estratégias que você está prestes a descobrir.
+  private static anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY
+  });
 
-Durante anos, estudei e apliquei as técnicas mais eficazes...
-
-[BENEFÍCIO 1] - Resultados em tempo recorde
-[BENEFÍCIO 2] - Sistema comprovado
-[BENEFÍCIO 3] - Garantia de satisfação
-
-Não deixe essa oportunidade passar. Clique no botão abaixo e garante sua vaga agora!`,
-        cta: "QUERO TRANSFORMAR MINHA VIDA AGORA"
-      },
-      vsl: {
-        script: `HOOK (0-15s):
-"Se você tem apenas 47 minutos livres, eu vou te mostrar como pessoas comuns estão conquistando resultados extraordinários..."
-
-IDENTIFICAÇÃO DO PROBLEMA (15s-2min):
-Você já percebeu que...
-- Trabalha muito mas os resultados não vêm
-- Outras pessoas conseguem o que você quer
-- Parece que existe um "segredo" que você não conhece
-
-APRESENTAÇÃO DA SOLUÇÃO (2-8min):
-O que eu descobri vai mudar tudo...
-[Contar história pessoal]
-[Mostrar prova social]
-[Explicar o método]
-
-OFERTA (8-12min):
-Por apenas R$ 297 (12x de R$ 29,70)
-Você terá acesso completo ao sistema...
-
-CHAMADA PARA AÇÃO:
-Clique no botão abaixo AGORA e garanta sua vaga!`,
-        duration: "12 minutos",
-        hooks: ["Attention grabber inicial", "Problema específico", "Solução única"]
-      },
-      ads: {
-        headline: "🚀 Descubra o Método Que Está Mudando Vidas",
-        text: "Pessoas comuns usando esta estratégia simples para alcançar resultados extraordinários. Quer saber como? Clique e descubra!",
-        cta: "Quero Saber Mais",
-        targeting: "Interessados em desenvolvimento pessoal, empreendedorismo, 25-55 anos"
-      },
-      email: {
-        subject: "O segredo que ninguém te conta...",
-        preview: "Abra para descobrir",
-        body: `Oi [NOME],
-
-Posso fazer uma pergunta sincera?
-
-Você já se sentiu frustrado por ver outras pessoas conseguindo o que você tanto quer?
-
-Eu entendo perfeitamente essa sensação...
-
-[HISTÓRIA ENVOLVENTE]
-
-[VALOR ENTREGUE]
-
-[CALL TO ACTION SUAVE]
-
-Um abraço,
-[ASSINATURA]
-
-P.S.: Amanhã vou te contar sobre o erro #1 que 99% das pessoas cometem...`,
-        sequence: "Email 1 de 7 - Introdução e Engajamento"
+  static async generateContent(type: string, prompt: string, options: any = {}): Promise<any> {
+    try {
+      const { targetAudience, productType, budget, platform, videoUrl } = options;
+      
+      switch (type) {
+        case 'copy':
+          return await this.generateCopywriting(prompt, targetAudience, productType);
+        case 'vsl':
+          return await this.generateVSL(prompt, targetAudience, productType);
+        case 'ads':
+          return await this.generateAds(prompt, targetAudience, platform, budget);
+        case 'email':
+          return await this.generateEmailSequence(prompt, targetAudience, productType);
+        case 'funnel':
+          return await this.generateFunnel(prompt, targetAudience, productType);
+        case 'analysis':
+          return await this.analyzeVideo(videoUrl, prompt);
+        case 'strategy':
+          return await this.generateStrategy(prompt, targetAudience, productType);
+        default:
+          return await this.generateGeneric(prompt, type);
       }
-    };
+    } catch (error) {
+      console.error('AI Generation Error:', error);
+      throw new Error('Erro na geração de conteúdo. Verifique suas chaves de API.');
+    }
+  }
 
-    return responses[type as keyof typeof responses] || {
-      content: `Conteúdo gerado para: ${type}\n\nPrompt: ${prompt}\n\nEste é um exemplo de conteúdo criado pela IA com base no seu pedido.`
+  private static async generateCopywriting(prompt: string, audience: string, product: string): Promise<any> {
+    const systemPrompt = `Você é um copywriter expert em vendas diretas no mercado brasileiro. Crie uma copy persuasiva e otimizada para conversão.
+
+Público-alvo: ${audience || 'Não especificado'}
+Produto/Serviço: ${product || 'Não especificado'}
+
+Estruture a resposta em:
+1. Headline principal (impactante e específica)
+2. Subheadline (complementa e detalha)
+3. Abertura (hook emocional)
+4. Problema (dor específica do público)
+5. Solução (seu produto/serviço)
+6. Benefícios (3-5 benefícios claros)
+7. Prova social (credibilidade)
+8. Oferta (proposta de valor)
+9. Urgência/Escassez
+10. CTA (call-to-action persuasivo)
+
+Use gatilhos mentais, storytelling e técnicas de persuasão comprovadas.`;
+
+    const response = await this.anthropic.messages.create({
+      model: "claude-sonnet-4-20250514", // the newest Anthropic model is "claude-sonnet-4-20250514" which was released May 14, 2025. Use this by default unless user has already selected claude-3-7-sonnet-20250219
+      max_tokens: 2000,
+      system: systemPrompt,
+      messages: [{ role: "user", content: prompt }]
+    });
+
+    const content = response.content[0].type === 'text' ? response.content[0].text : '';
+    return this.parseCopywritingResponse(content);
+  }
+
+  private static async generateVSL(prompt: string, audience: string, product: string): Promise<any> {
+    const systemPrompt = `Você é um especialista em Video Sales Letters (VSL) para o mercado brasileiro. Crie um roteiro completo e persuasivo.
+
+Público-alvo: ${audience || 'Não especificado'}
+Produto/Serviço: ${product || 'Não especificado'}
+
+Estruture o VSL em:
+1. Hook (0-30s) - Capturar atenção imediatamente
+2. Identificação (30s-2min) - Conectar com o público
+3. Problema (2-5min) - Amplificar a dor
+4. Solução (5-10min) - Apresentar o método
+5. Prova (10-15min) - Demonstrações e cases
+6. Oferta (15-18min) - Proposta de valor
+7. Urgência (18-20min) - Escassez genuína
+8. CTA (20-22min) - Chamada para ação
+
+Inclua timing, elementos visuais sugeridos e CTAs específicos.`;
+
+    const response = await this.anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 3000,
+      system: systemPrompt,
+      messages: [{ role: "user", content: prompt }]
+    });
+
+    const content = response.content[0].type === 'text' ? response.content[0].text : '';
+    return this.parseVSLResponse(content);
+  }
+
+  private static async generateAds(prompt: string, audience: string, platform: string, budget: string): Promise<any> {
+    const systemPrompt = `Você é um especialista em tráfego pago e criação de anúncios para ${platform || 'Facebook/Instagram'}.
+
+Público-alvo: ${audience || 'Não especificado'}
+Plataforma: ${platform || 'Facebook/Instagram'}
+Orçamento: ${budget || 'Não especificado'}
+
+Crie múltiplas variações de anúncios otimizados para conversão:
+1. Headlines (5 variações)
+2. Textos primários (3 versões)
+3. CTAs específicos
+4. Segmentação detalhada
+5. Estratégia de bidding
+6. Criativos sugeridos
+7. Público lookalike
+8. Interesses específicos`;
+
+    const response = await this.openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      max_tokens: 2000,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt }
+      ]
+    });
+
+    const content = response.choices[0].message.content || '';
+    return this.parseAdsResponse(content);
+  }
+
+  private static async generateEmailSequence(prompt: string, audience: string, product: string): Promise<any> {
+    const systemPrompt = `Você é um especialista em email marketing e automações. Crie uma sequência estratégica de emails.
+
+Público-alvo: ${audience || 'Não especificado'}
+Produto/Serviço: ${product || 'Não especificado'}
+
+Crie uma sequência de 7 emails:
+1. Boas-vindas + Primeiro valor
+2. História pessoal + Conexão
+3. Problema + Agitação
+4. Solução + Método
+5. Prova social + Cases
+6. Oferta + Benefícios
+7. Urgência + Última chance
+
+Para cada email inclua: assunto, preview, estrutura e CTA específico.`;
+
+    const response = await this.anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 3000,
+      system: systemPrompt,
+      messages: [{ role: "user", content: prompt }]
+    });
+
+    const content = response.content[0].type === 'text' ? response.content[0].text : '';
+    return this.parseEmailResponse(content);
+  }
+
+  private static async generateFunnel(prompt: string, audience: string, product: string): Promise<any> {
+    const systemPrompt = `Você é um especialista em funis de vendas digitais. Crie um funil completo e otimizado.
+
+Público-alvo: ${audience || 'Não especificado'}
+Produto/Serviço: ${product || 'Não especificado'}
+
+Projete um funil com:
+1. Estratégia de atração (lead magnet)
+2. Página de captura otimizada
+3. Sequência de emails automatizada
+4. Página de vendas persuasiva
+5. Upsells e downsells
+6. Follow-up pós-venda
+7. Métricas e KPIs
+8. Estimativa de conversão`;
+
+    const response = await this.openai.chat.completions.create({
+      model: "gpt-4o",
+      max_tokens: 2500,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt }
+      ]
+    });
+
+    const content = response.choices[0].message.content || '';
+    return this.parseFunnelResponse(content);
+  }
+
+  private static async analyzeVideo(videoUrl: string, prompt: string): Promise<any> {
+    if (!videoUrl) {
+      throw new Error('URL do vídeo é obrigatória para análise');
+    }
+
+    const systemPrompt = `Você é um especialista em análise de vídeos de marketing e vendas. Com base na URL fornecida, analise os elementos-chave do vídeo.
+
+Analise:
+1. Estrutura narrativa
+2. Gatilhos mentais utilizados
+3. CTAs e ofertas
+4. Pontos fortes e fracos
+5. Sugestões de otimização
+6. Estratégias replicáveis
+7. Timing e ritmo
+8. Elementos visuais eficazes`;
+
+    const response = await this.anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2000,
+      system: systemPrompt,
+      messages: [{ 
+        role: "user", 
+        content: `Analise este vídeo: ${videoUrl}\n\nFoco da análise: ${prompt}` 
+      }]
+    });
+
+    const content = response.content[0].type === 'text' ? response.content[0].text : '';
+    return this.parseAnalysisResponse(content, videoUrl);
+  }
+
+  private static async generateStrategy(prompt: string, audience: string, product: string): Promise<any> {
+    const systemPrompt = `Você é um consultor estratégico de marketing digital. Crie uma estratégia completa e acionável.
+
+Público-alvo: ${audience || 'Não especificado'}
+Produto/Serviço: ${product || 'Não especificado'}
+
+Desenvolva:
+1. Análise de mercado
+2. Posicionamento estratégico
+3. Jornada do cliente
+4. Canais de aquisição
+5. Estratégia de conteúdo
+6. Funis de conversão
+7. Métricas e KPIs
+8. Cronograma de execução
+9. Orçamento sugerido
+10. Riscos e mitigações`;
+
+    const response = await this.openai.chat.completions.create({
+      model: "gpt-4o",
+      max_tokens: 3000,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: prompt }
+      ]
+    });
+
+    const content = response.choices[0].message.content || '';
+    return this.parseStrategyResponse(content);
+  }
+
+  private static async generateGeneric(prompt: string, type: string): Promise<any> {
+    const response = await this.anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1500,
+      messages: [{ 
+        role: "user", 
+        content: `Crie conteúdo de marketing de alta qualidade para: ${type}\n\nDescrição: ${prompt}` 
+      }]
+    });
+
+    const content = response.content[0].type === 'text' ? response.content[0].text : '';
+    return {
+      type,
+      content,
+      timestamp: new Date().toISOString()
     };
+  }
+
+  // Response parsing methods
+  private static parseCopywritingResponse(content: string): any {
+    return {
+      type: 'copy',
+      headline: this.extractSection(content, ['headline', 'título']),
+      subheadline: this.extractSection(content, ['subheadline', 'subtítulo']),
+      opening: this.extractSection(content, ['abertura', 'hook']),
+      problem: this.extractSection(content, ['problema', 'dor']),
+      solution: this.extractSection(content, ['solução', 'método']),
+      benefits: this.extractSection(content, ['benefícios', 'vantagens']),
+      social_proof: this.extractSection(content, ['prova social', 'credibilidade']),
+      offer: this.extractSection(content, ['oferta', 'proposta']),
+      urgency: this.extractSection(content, ['urgência', 'escassez']),
+      cta: this.extractSection(content, ['cta', 'call-to-action', 'chamada']),
+      full_content: content
+    };
+  }
+
+  private static parseVSLResponse(content: string): any {
+    return {
+      type: 'vsl',
+      hook: this.extractSection(content, ['hook', '0-30s', 'abertura']),
+      identification: this.extractSection(content, ['identificação', '30s-2min']),
+      problem: this.extractSection(content, ['problema', '2-5min']),
+      solution: this.extractSection(content, ['solução', '5-10min']),
+      proof: this.extractSection(content, ['prova', '10-15min']),
+      offer: this.extractSection(content, ['oferta', '15-18min']),
+      urgency: this.extractSection(content, ['urgência', '18-20min']),
+      cta: this.extractSection(content, ['cta', '20-22min']),
+      duration: "22 minutos",
+      full_script: content
+    };
+  }
+
+  private static parseAdsResponse(content: string): any {
+    return {
+      type: 'ads',
+      headlines: this.extractList(content, ['headlines', 'títulos']),
+      primary_text: this.extractSection(content, ['texto primário', 'descrição']),
+      ctas: this.extractList(content, ['ctas', 'chamadas']),
+      targeting: this.extractSection(content, ['segmentação', 'público']),
+      interests: this.extractList(content, ['interesses', 'targeting']),
+      creatives: this.extractSection(content, ['criativos', 'visuais']),
+      full_strategy: content
+    };
+  }
+
+  private static parseEmailResponse(content: string): any {
+    return {
+      type: 'email',
+      sequence: this.extractEmailSequence(content),
+      full_sequence: content
+    };
+  }
+
+  private static parseFunnelResponse(content: string): any {
+    return {
+      type: 'funnel',
+      strategy: this.extractSection(content, ['estratégia', 'atração']),
+      landing_page: this.extractSection(content, ['página de captura', 'landing']),
+      email_sequence: this.extractSection(content, ['sequência', 'emails']),
+      sales_page: this.extractSection(content, ['página de vendas', 'checkout']),
+      upsells: this.extractSection(content, ['upsells', 'ofertas adicionais']),
+      metrics: this.extractSection(content, ['métricas', 'kpis']),
+      full_funnel: content
+    };
+  }
+
+  private static parseAnalysisResponse(content: string, videoUrl: string): any {
+    return {
+      type: 'analysis',
+      video_url: videoUrl,
+      structure: this.extractSection(content, ['estrutura', 'narrativa']),
+      triggers: this.extractSection(content, ['gatilhos', 'persuasão']),
+      ctas: this.extractSection(content, ['ctas', 'ofertas']),
+      strengths: this.extractSection(content, ['pontos fortes', 'forças']),
+      weaknesses: this.extractSection(content, ['pontos fracos', 'fraquezas']),
+      optimizations: this.extractSection(content, ['otimizações', 'melhorias']),
+      full_analysis: content
+    };
+  }
+
+  private static parseStrategyResponse(content: string): any {
+    return {
+      type: 'strategy',
+      market_analysis: this.extractSection(content, ['análise de mercado', 'mercado']),
+      positioning: this.extractSection(content, ['posicionamento', 'estratégico']),
+      customer_journey: this.extractSection(content, ['jornada', 'cliente']),
+      channels: this.extractSection(content, ['canais', 'aquisição']),
+      content_strategy: this.extractSection(content, ['conteúdo', 'estratégia']),
+      metrics: this.extractSection(content, ['métricas', 'kpis']),
+      timeline: this.extractSection(content, ['cronograma', 'execução']),
+      budget: this.extractSection(content, ['orçamento', 'investimento']),
+      full_strategy: content
+    };
+  }
+
+  // Utility methods for content extraction
+  private static extractSection(content: string, keywords: string[]): string {
+    const lines = content.split('\n');
+    let sectionStart = -1;
+    let sectionEnd = -1;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].toLowerCase();
+      if (keywords.some(keyword => line.includes(keyword.toLowerCase()))) {
+        sectionStart = i;
+        break;
+      }
+    }
+
+    if (sectionStart === -1) return '';
+
+    for (let i = sectionStart + 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.match(/^\d+\./) || line.match(/^[A-Z][^:]*:/) || line === '') {
+        if (line === '' && i < lines.length - 1) continue;
+        sectionEnd = i;
+        break;
+      }
+    }
+
+    if (sectionEnd === -1) sectionEnd = lines.length;
+
+    return lines.slice(sectionStart, sectionEnd).join('\n').trim();
+  }
+
+  private static extractList(content: string, keywords: string[]): string[] {
+    const section = this.extractSection(content, keywords);
+    return section.split('\n')
+      .filter(line => line.trim().length > 0)
+      .map(line => line.replace(/^[-*•]\s*/, '').trim())
+      .filter(line => line.length > 0);
+  }
+
+  private static extractEmailSequence(content: string): any[] {
+    const emails = [];
+    const lines = content.split('\n');
+    let currentEmail: any = null;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.match(/email\s*\d+/i) || trimmed.match(/dia\s*\d+/i)) {
+        if (currentEmail) emails.push(currentEmail);
+        currentEmail = { day: emails.length + 1, subject: '', content: '' };
+      } else if (trimmed.toLowerCase().includes('assunto:') || trimmed.toLowerCase().includes('subject:')) {
+        if (currentEmail) currentEmail.subject = trimmed.replace(/assunto:|subject:/i, '').trim();
+      } else if (currentEmail && trimmed.length > 0) {
+        currentEmail.content += trimmed + '\n';
+      }
+    }
+
+    if (currentEmail) emails.push(currentEmail);
+    return emails;
   }
 }
 

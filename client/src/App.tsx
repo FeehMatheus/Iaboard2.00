@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
-import AIPlatform from '@/pages/AIPlatform';
+import AIPlatformNew from '@/pages/AIPlatformNew';
 import Checkout from '@/pages/Checkout';
 
 const queryClient = new QueryClient({
@@ -24,7 +24,8 @@ export default function App() {
           <Route path="/" component={Home} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
-          <Route path="/dashboard" component={AIPlatform} />
+          <Route path="/dashboard" component={AIPlatformNew} />
+          <Route path="/platform" component={AIPlatformNew} />
           <Route path="/checkout" component={Checkout} />
           <Route>
             <Home />
