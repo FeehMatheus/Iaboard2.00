@@ -103,6 +103,91 @@ export const payments = pgTable("payments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Funis completos do sistema infinite board
+export const funnels = pgTable("funnels", {
+  id: varchar("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  templateId: varchar("template_id"),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  category: varchar("category").notNull(), // acquisition, conversion, retention, monetization
+  status: varchar("status").default("draft"), // draft, active, paused, completed, archived
+  nodes: jsonb("nodes").default([]), // Array of node IDs
+  connections: jsonb("connections").default([]), // Node connections
+  metrics: jsonb("metrics").default({}), // Overall funnel metrics
+  settings: jsonb("settings").default({}), // Funnel configuration
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Nodes individuais dos funis (landing pages, VSLs, etc.)
+export const funnelNodes = pgTable("funnel_nodes", {
+  id: varchar("id").primaryKey(),
+  funnelId: varchar("funnel_id").references(() => funnels.id),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  title: varchar("title").notNull(),
+  type: varchar("type").notNull(), // landing, vsl, checkout, upsell, email, traffic, analytics, api
+  category: varchar("category").notNull(), // acquisition, conversion, retention, monetization
+  status: varchar("status").default("draft"), // draft, active, processing, completed, paused, error
+  position: jsonb("position").notNull(), // { x: number, y: number }
+  size: jsonb("size").notNull(), // { width: number, height: number }
+  connections: jsonb("connections").default([]), // Connected node IDs
+  content: jsonb("content").default({}), // Node configuration and generated content
+  metrics: jsonb("metrics").default({}), // Node-specific metrics
+  assets: jsonb("assets").default({}), // Images, videos, scripts
+  metadata: jsonb("metadata").default({}), // Tags, priority, version, etc.
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Analytics avançado para funis
+export const funnelAnalytics = pgTable("funnel_analytics", {
+  id: serial("id").primaryKey(),
+  funnelId: varchar("funnel_id").references(() => funnels.id),
+  nodeId: varchar("node_id").references(() => funnelNodes.id),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  event: varchar("event").notNull(), // view, click, conversion, purchase, exit
+  sessionId: varchar("session_id"),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  data: jsonb("data").default({}), // Event-specific data
+  value: varchar("value"), // Monetary value if applicable
+  timestamp: timestamp("timestamp").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Testes A/B para componentes dos funis
+export const abTests = pgTable("ab_tests", {
+  id: varchar("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  nodeId: varchar("node_id").references(() => funnelNodes.id),
+  name: varchar("name").notNull(),
+  testType: varchar("test_type").notNull(), // headline, cta, layout, color, copy
+  status: varchar("status").default("draft"), // draft, active, paused, completed
+  variants: jsonb("variants").notNull(), // Test variants with content and metrics
+  settings: jsonb("settings").default({}), // Traffic split, duration, confidence level
+  results: jsonb("results").default({}), // Test results and winner
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Estados do canvas infinito
+export const canvasStates = pgTable("canvas_states", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  name: varchar("name").default("Workspace"),
+  viewport: jsonb("viewport").default({}), // Zoom, pan, viewport settings
+  selectedNodes: jsonb("selected_nodes").default([]),
+  gridSettings: jsonb("grid_settings").default({}),
+  minimapSettings: jsonb("minimap_settings").default({}),
+  boardSettings: jsonb("board_settings").default({}),
+  lastSaved: timestamp("last_saved").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Sessões para autenticação
 export const sessions = pgTable("sessions", {
   sid: varchar("sid").primaryKey(),
@@ -143,6 +228,34 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
   createdAt: true,
 });
 
+export const insertFunnelSchema = createInsertSchema(funnels).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertFunnelNodeSchema = createInsertSchema(funnelNodes).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertFunnelAnalyticsSchema = createInsertSchema(funnelAnalytics).omit({
+  id: true,
+  timestamp: true,
+  createdAt: true,
+});
+
+export const insertABTestSchema = createInsertSchema(abTests).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCanvasStateSchema = createInsertSchema(canvasStates).omit({
+  id: true,
+  lastSaved: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Tipos TypeScript
 export type User = typeof users.$inferSelect;
 export type UpsertUser = z.infer<typeof insertUserSchema>;
@@ -162,3 +275,18 @@ export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+
+export type Funnel = typeof funnels.$inferSelect;
+export type InsertFunnel = z.infer<typeof insertFunnelSchema>;
+
+export type FunnelNode = typeof funnelNodes.$inferSelect;
+export type InsertFunnelNode = z.infer<typeof insertFunnelNodeSchema>;
+
+export type FunnelAnalytics = typeof funnelAnalytics.$inferSelect;
+export type InsertFunnelAnalytics = z.infer<typeof insertFunnelAnalyticsSchema>;
+
+export type ABTest = typeof abTests.$inferSelect;
+export type InsertABTest = z.infer<typeof insertABTestSchema>;
+
+export type CanvasState = typeof canvasStates.$inferSelect;
+export type InsertCanvasState = z.infer<typeof insertCanvasStateSchema>;

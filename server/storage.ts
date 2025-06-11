@@ -1,6 +1,11 @@
 import {
   users,
   projects,
+  funnels,
+  funnelNodes,
+  funnelAnalytics,
+  abTests,
+  canvasStates,
   furionSessions,
   campaigns,
   analytics,
@@ -9,6 +14,16 @@ import {
   type UpsertUser,
   type Project,
   type InsertProject,
+  type Funnel,
+  type InsertFunnel,
+  type FunnelNode,
+  type InsertFunnelNode,
+  type FunnelAnalytics,
+  type InsertFunnelAnalytics,
+  type ABTest,
+  type InsertABTest,
+  type CanvasState,
+  type InsertCanvasState,
   type FurionSession,
   type InsertFurionSession,
   type Campaign,
@@ -18,6 +33,8 @@ import {
   type Payment,
   type InsertPayment,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, and, gte, lte } from "drizzle-orm";
 
 // Interface completa para todas as operações do sistema
 export interface IStorage {
@@ -43,6 +60,31 @@ export interface IStorage {
   getUserProjects(userId: string): Promise<Project[]>;
   updateProject(id: string, data: Partial<any>): Promise<any>;
   deleteProject(id: string): Promise<void>;
+  
+  // Funnel operations (Infinite Board)
+  getUserFunnels(userId: string): Promise<FunnelNode[]>;
+  createFunnel(funnel: InsertFunnel): Promise<Funnel>;
+  getFunnel(id: string): Promise<Funnel | undefined>;
+  updateFunnel(id: string, data: Partial<Funnel>): Promise<Funnel>;
+  deleteFunnel(id: string): Promise<void>;
+  
+  // Funnel Node operations
+  createFunnelNode(node: InsertFunnelNode): Promise<FunnelNode>;
+  getFunnelNode(id: string): Promise<FunnelNode | undefined>;
+  updateFunnelNode(id: string, data: Partial<FunnelNode>): Promise<FunnelNode>;
+  deleteFunnelNode(id: string): Promise<void>;
+  getFunnelNodesByFunnel(funnelId: string): Promise<FunnelNode[]>;
+  
+  // Funnel Analytics
+  createFunnelAnalytics(analytics: InsertFunnelAnalytics): Promise<FunnelAnalytics>;
+  getFunnelAnalytics(nodeId: string, timeframe: string): Promise<any>;
+  getFunnelMetrics(funnelId: string): Promise<any>;
+  
+  // A/B Testing
+  createABTest(test: InsertABTest): Promise<ABTest>;
+  getABTest(id: string): Promise<ABTest | undefined>;
+  updateABTest(id: string, data: Partial<ABTest>): Promise<ABTest>;
+  getActiveABTests(userId: string): Promise<ABTest[]>;
   
   // Canvas state management
   saveCanvasState(userId: string, canvasData: any): Promise<void>;
