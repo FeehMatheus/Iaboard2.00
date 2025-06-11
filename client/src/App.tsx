@@ -1,7 +1,7 @@
 import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
-import Home from '@/pages/Home';
+import HomeEnhanced from '@/pages/HomeEnhanced';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import AIPlatformFixed from '@/pages/AIPlatformFixed';
@@ -23,7 +23,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen">
         <Switch>
-          <Route path="/" component={Home} />
+          <Route path="/" component={HomeEnhanced} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/dashboard" component={PostLoginDashboard} />
@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/supreme" component={SupremeDashboard} />
           <Route path="/checkout" component={Checkout} />
           <Route>
-            <Home />
+            <HomeEnhanced />
           </Route>
         </Switch>
         <Toaster />
