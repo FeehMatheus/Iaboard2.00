@@ -1,17 +1,12 @@
 import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
-import { EnhancedThemeProvider } from '@/components/ui/enhanced-theme-provider';
-import HomeSupreme from '@/pages/HomeSupreme';
-import LoginSupremo from '@/pages/LoginSupremo';
+import { ThemeProvider } from '@/components/ui/theme-provider';
+import Landing from '@/pages/Landing';
+import PostLoginDashboard from '@/pages/PostLoginDashboard';
+import { RenderStyleInfiniteBoard } from '@/components/ui/render-style-infinite-board';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
-import AIPlatformFixed from '@/pages/AIPlatformFixed';
-import CanvasInfinito from '@/pages/CanvasInfinito';
-import { CaktoStyleInfiniteCanvas } from '@/components/ui/cakto-style-infinite-canvas';
-import Checkout from '@/pages/Checkout';
-import PostLoginDashboard from '@/pages/PostLoginDashboard';
-import { SupremeDashboard } from '@/components/ui/supreme-dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,26 +19,22 @@ const queryClient = new QueryClient({
 
 export default function App() {
   return (
-    <EnhancedThemeProvider defaultTheme="supreme">
+    <ThemeProvider defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-gray-900">
           <Switch>
-            <Route path="/" component={HomeSupreme} />
-            <Route path="/login" component={LoginSupremo} />
+            <Route path="/" component={Landing} />
+            <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/dashboard" component={PostLoginDashboard} />
-            <Route path="/platform" component={AIPlatformFixed} />
-            <Route path="/canvas" component={CanvasInfinito} />
-            <Route path="/canvas-supreme" component={() => <CaktoStyleInfiniteCanvas />} />
-            <Route path="/supreme" component={SupremeDashboard} />
-            <Route path="/checkout" component={Checkout} />
+            <Route path="/board" component={() => <RenderStyleInfiniteBoard />} />
             <Route>
-              <HomeSupreme />
+              <Landing />
             </Route>
           </Switch>
           <Toaster />
         </div>
       </QueryClientProvider>
-    </EnhancedThemeProvider>
+    </ThemeProvider>
   );
 }
