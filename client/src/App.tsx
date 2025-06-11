@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
-import AIPlatformNew from '@/pages/AIPlatformNew';
+import AIPlatformFixed from '@/pages/AIPlatformFixed';
 import Checkout from '@/pages/Checkout';
 import PostLoginDashboard from '@/pages/PostLoginDashboard';
 import { SupremeDashboard } from '@/components/ui/supreme-dashboard';
@@ -27,7 +27,7 @@ export default function App() {
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/dashboard" component={PostLoginDashboard} />
-          <Route path="/platform" component={AIPlatformNew} />
+          <Route path="/platform" component={AIPlatformFixed} />
           <Route path="/supreme" component={SupremeDashboard} />
           <Route path="/checkout" component={Checkout} />
           <Route>
