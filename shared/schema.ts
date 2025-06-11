@@ -5,8 +5,7 @@ import {
   timestamp, 
   integer, 
   boolean, 
-  jsonb,
-  serial 
+  jsonb
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -49,9 +48,9 @@ export const projects = pgTable("projects", {
 
 // Interações com Furion.AI
 export const furionSessions = pgTable("furion_sessions", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id),
+  projectId: varchar("project_id").references(() => projects.id),
   type: varchar("type").notNull(), // produto, copy, anuncio, funil, estrategia
   prompt: text("prompt").notNull(),
   response: jsonb("response").notNull(),
@@ -62,9 +61,9 @@ export const furionSessions = pgTable("furion_sessions", {
 
 // Campanhas de marketing criadas
 export const campaigns = pgTable("campaigns", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id).notNull(),
-  projectId: integer("project_id").references(() => projects.id).notNull(),
+  projectId: varchar("project_id").references(() => projects.id).notNull(),
   name: varchar("name").notNull(),
   type: varchar("type").notNull(), // meta_ads, google_ads, email, organic
   platform: varchar("platform"), // facebook, instagram, google, etc
