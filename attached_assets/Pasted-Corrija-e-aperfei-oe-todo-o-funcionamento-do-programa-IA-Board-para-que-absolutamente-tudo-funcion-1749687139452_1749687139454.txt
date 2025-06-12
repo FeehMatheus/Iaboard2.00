@@ -1,0 +1,46 @@
+Corrija e aperfeiçoe todo o funcionamento do programa IA Board para que **absolutamente tudo funcione perfeitamente** agora, em tempo real, sem erros, travamentos ou interações falsas.
+
+Atualmente, diversos elementos da interface — especialmente os botões visuais dentro do quadro infinito e os blocos do funil — possuem apenas animações ou aparência visual, mas **não executam nenhuma ação funcional de verdade**.
+
+🚨 EXIJO QUE AGORA:
+- Todos os **botões do sistema**, tanto da interface principal quanto dos módulos e janelas flutuantes, sejam **100% funcionais, acionáveis e operacionais**.
+- Cada botão deve estar vinculado a uma **função real JavaScript com `addEventListener`**, que execute uma tarefa concreta imediatamente após o clique.
+- As ações devem ser visíveis, com feedback fluido e responsivo diretamente no botão e na interface geral.
+
+📌 O SISTEMA DEVE FUNCIONAR DE VERDADE, COMO UM SOFTWARE PROFISSIONAL:
+- Nenhum botão pode ficar sem ação.
+- Nenhum componente visual pode ser "apenas decorativo".
+- Nenhum processo pode depender de interação manual oculta.
+- O sistema completo deve estar pronto para **uso imediato por qualquer usuário**, com execução funcional de todos os módulos de IA.
+
+⚙️ TODAS AS FUNÇÕES DEVEM SER CRIADAS E CONECTADAS AGORA:
+- Gerar Produto com IA → `gerarProdutoIA()`
+- Criar Página de Vendas → `criarPaginaVendas()`
+- Criar Avatar → `gerarAvatarIA()`
+- Gerar Copy/Headline → `gerarCopy()`
+- Criar Vídeo com IA → `gerarVideoIA()`
+- Lançar Tráfego Pago → `iniciarCampanhaAds()`
+- Exportar PDF Final → `baixarPDF()`
+- Ativar IA Espiã → `ativarIAEspia()`
+
+💡 EXIJO:
+- Feedback visual imediato nos botões (ex: “Gerando…”, “Concluído ✅”, “Erro ❌”)
+- Interface reativa com animações de loading suaves
+- Execução fluida e contínua de todos os fluxos, sem reinício
+- Organização de código profissional e modular
+
+📦 TECNOLOGIAS MODERNAS APLICADAS:
+- JavaScript moderno com `async/await`
+- Estrutura modular de código (`/actions`, `/components`, `/core`)
+- TailwindCSS para visual clean responsivo
+- Eventualmente Canvas API + Framer Motion para animações avançadas
+- Código limpo, comentado e pronto para escalar
+
+🎯 OBJETIVO FINAL:
+O **IA Board deve estar pronto para ser usado agora mesmo**, como um software real:
+- Com botões inteligentes que realmente executam ações
+- Com feedback fluido e imediato
+- Com cada bloco do funil operando sem intervenção externa
+- Com design e estrutura profissional, intuitiva e confiável
+
+Nenhum elemento visual deve ser estático ou apenas ilustrativo. **Tudo no sistema deve funcionar perfeitamente e gerar resultados reais agora**, com a mesma experiência de uma plataforma SaaS de alta performance.

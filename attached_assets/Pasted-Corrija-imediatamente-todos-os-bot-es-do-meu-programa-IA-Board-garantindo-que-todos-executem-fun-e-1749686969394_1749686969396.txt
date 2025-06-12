@@ -1,0 +1,46 @@
+Corrija imediatamente todos os botões do meu programa IA Board, garantindo que todos executem funções reais com interatividade completa. Atualmente, os botões apenas possuem animações visuais, mas não realizam ações funcionais. Ative os CTAs de forma funcional, tanto na interface principal quanto nos pop-ups e módulos do quadro infinito.
+
+🔧 OBJETIVO:
+Transformar todos os botões em elementos funcionais com ações JavaScript reais conectadas a cada etapa do funil de vendas com IA, exibindo feedback visual em tempo real (carregando, sucesso, erro), sem travamentos ou recarregamentos de página.
+
+✅ IMPLEMENTAR:
+1. **Funções JavaScript com `onclick`** usando `addEventListener`
+2. **Execução assíncrona real** via `async/await` simulando chamadas de IA ou APIs
+3. **Mensagens visuais inteligentes** com status da ação no próprio botão (ex: "Gerando produto...", "Concluído ✅", "Erro ❌")
+4. **Sistema de loading animado no botão** durante o processo
+5. **Conexão direta com os blocos do funil** — cada botão executa um módulo (produto, oferta, vídeo, tráfego, página etc)
+6. **Movimentação fluída no quadro infinito com reconexão visual inteligente**
+7. **Sistema de logs em tempo real no console para depuração**
+8. **Execução automática em sequência se ativado o Modo IA Total™**
+
+🧠 EXEMPLOS DE FUNÇÕES A SEREM CRIADAS E CONECTADAS:
+```js
+async function gerarProdutoIA() {
+  mostrarStatus("Gerando Produto com IA...");
+  await delaySimulado();
+  mostrarStatus("Produto gerado com sucesso ✅");
+}
+
+async function criarPaginaVendas() {
+  mostrarStatus("Criando Página de Vendas...");
+  await delaySimulado();
+  mostrarStatus("Página criada com sucesso ✅");
+}
+
+async function iniciarCampanhaAds() {
+  mostrarStatus("Iniciando campanha de tráfego...");
+  await delaySimulado();
+  mostrarStatus("Campanha iniciada com sucesso ✅");
+}
+
+async function gerarVideoIA() {
+  mostrarStatus("Gerando vídeo promocional...");
+  await delaySimulado();
+  mostrarStatus("Vídeo finalizado com sucesso ✅");
+}
+
+async function baixarPDF() {
+  mostrarStatus("Exportando PDF final...");
+  await delaySimulado();
+  downloadArquivo("funil-inteligente.pdf");
+}

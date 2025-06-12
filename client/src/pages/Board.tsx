@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { NodePopup } from '@/components/NodePopup';
 import { ActionButton, DownloadButton } from '@/components/ActionButton';
+import { InteractiveFeedback, FeedbackButton } from '@/components/InteractiveFeedback';
 import { 
   Plus, Move, ZoomIn, ZoomOut, Grid, Save, Download,
   FileText, Video, Mail, Target, TrendingUp, Brain,
@@ -66,21 +67,26 @@ export default function Board() {
 
   // Load canvas state
   const { data: canvasData } = useQuery({
-    queryKey: ['/api/canvas/state'],
-    onSuccess: (data) => {
-      if (data) {
-        setCanvasState(data);
-      }
-    }
+    queryKey: ['/api/canvas/state']
   });
+
+  // Initialize canvas state when data loads
+  React.useEffect(() => {
+    if (canvasData) {
+      setCanvasState(canvasData);
+    }
+  }, [canvasData]);
 
   // Save canvas state
   const saveCanvasMutation = useMutation({
     mutationFn: async (state: CanvasState) => {
-      return apiRequest('/api/canvas/save', {
+      const response = await fetch('/api/canvas/save', {
         method: 'POST',
-        body: state
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
       });
+      if (!response.ok) throw new Error('Failed to save canvas');
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -93,15 +99,18 @@ export default function Board() {
   // Create new node
   const createNodeMutation = useMutation({
     mutationFn: async (nodeData: Partial<Node>) => {
-      return apiRequest('/api/canvas/nodes', {
+      const response = await fetch('/api/canvas/nodes', {
         method: 'POST',
-        body: nodeData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nodeData)
       });
+      if (!response.ok) throw new Error('Failed to create node');
+      return response.json();
     },
-    onSuccess: (newNode) => {
+    onSuccess: (newNode: Node) => {
       setCanvasState(prev => ({
         ...prev,
-        nodes: [...prev.nodes, newNode as Node]
+        nodes: [...prev.nodes, newNode]
       }));
       setShowNodeCreator(false);
       toast({
@@ -395,7 +404,7 @@ export default function Board() {
                 tipo: 'canvas',
                 conteudo: canvasState
               })}
-              size="sm"
+              className="text-sm"
             />
           </div>
         </div>
