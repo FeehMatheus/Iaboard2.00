@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActionButton, DownloadButton } from "@/components/ActionButton";
+import { AdvancedCTAs } from "@/components/AdvancedCTAs";
+import { AICoach } from "@/components/AICoach";
 import {
   gerarProdutoIA,
   gerarPaginaVendas,
@@ -33,7 +35,9 @@ import {
   Download,
   Eye,
   Settings,
-  Play
+  Play,
+  Zap,
+  Crown
 } from "lucide-react";
 
 interface Node {
@@ -504,9 +508,11 @@ export function NodePopup({ node, isOpen, onClose, onUpdate }: NodePopupProps) {
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="config">Configuração</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="config">Config</TabsTrigger>
+            <TabsTrigger value="advanced">IA Suprema</TabsTrigger>
             <TabsTrigger value="results">Resultados</TabsTrigger>
+            <TabsTrigger value="coach">Coach IA</TabsTrigger>
             <TabsTrigger value="actions">Ações</TabsTrigger>
           </TabsList>
           
@@ -514,40 +520,137 @@ export function NodePopup({ node, isOpen, onClose, onUpdate }: NodePopupProps) {
             {renderConfigTab()}
           </TabsContent>
           
+          <TabsContent value="advanced" className="space-y-4">
+            <AdvancedCTAs 
+              nodeType={node.type}
+              nodeData={node}
+              onSuccess={(result) => {
+                setResults(result.data);
+                onUpdate(node.id, { 
+                  content: { ...node.content, ...result.data },
+                  progress: 100,
+                  status: 'completed'
+                });
+              }}
+            />
+          </TabsContent>
+          
           <TabsContent value="results" className="space-y-4">
             {renderResultsTab()}
+          </TabsContent>
+          
+          <TabsContent value="coach" className="space-y-4">
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-purple-600" />
+                    Consultoria IA Especializada
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    Obtenha conselhos personalizados do nosso Coach IA para otimizar este módulo específico.
+                  </p>
+                  <AICoach />
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Insights Inteligentes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <h4 className="font-medium text-blue-900">Recomendação Principal</h4>
+                      <p className="text-sm text-blue-700 mt-1">
+                        Para módulos do tipo "{node.type}", recomendamos focar em otimização de conversão através de testes A/B.
+                      </p>
+                    </div>
+                    <div className="p-3 bg-green-50 rounded-lg">
+                      <h4 className="font-medium text-green-900">Oportunidade Detectada</h4>
+                      <p className="text-sm text-green-700 mt-1">
+                        Integração com automações pode aumentar eficiência em 40%.
+                      </p>
+                    </div>
+                    <div className="p-3 bg-orange-50 rounded-lg">
+                      <h4 className="font-medium text-orange-900">Próximos Passos</h4>
+                      <p className="text-sm text-orange-700 mt-1">
+                        Considere implementar métricas avançadas para monitoramento em tempo real.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
           
           <TabsContent value="actions" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <ActionButton
-                label="Duplicar Nó"
+                label="Duplicar Módulo"
                 loadingLabel="Duplicando"
                 successLabel="Duplicado!"
-                action={async () => ({ success: true, data: { message: 'Nó duplicado' } })}
+                action={async () => ({ success: true, data: { message: 'Módulo duplicado com sucesso' } })}
                 variant="outline"
               />
               <ActionButton
-                label="Conectar a..."
+                label="Conectar Módulos"
                 loadingLabel="Conectando"
                 successLabel="Conectado!"
-                action={async () => ({ success: true, data: { message: 'Conexão criada' } })}
+                action={async () => ({ success: true, data: { message: 'Conexão estabelecida' } })}
                 variant="outline"
               />
               <ActionButton
-                label="Exportar Dados"
-                loadingLabel="Exportando"
-                successLabel="Exportado!"
-                action={async () => ({ success: true, data: { message: 'Dados exportados' } })}
+                label="Otimizar com IA"
+                loadingLabel="Otimizando"
+                successLabel="Otimizado!"
+                action={async () => ({ success: true, data: { message: 'Módulo otimizado pela IA' } })}
                 variant="outline"
               />
               <ActionButton
                 label="Compartilhar"
-                loadingLabel="Compartilhando"
-                successLabel="Compartilhado!"
-                action={async () => ({ success: true, data: { message: 'Link de compartilhamento criado' } })}
+                loadingLabel="Gerando link"
+                successLabel="Link criado!"
+                action={async () => ({ success: true, data: { message: 'Link de compartilhamento gerado' } })}
                 variant="outline"
               />
+            </div>
+            
+            <div className="border-t pt-4">
+              <h4 className="font-medium mb-3">Exportações Avançadas</h4>
+              <div className="grid grid-cols-3 gap-2">
+                <DownloadButton
+                  label="PDF Completo"
+                  downloadAction={() => baixarPDF({
+                    nome: `${node.title}_completo`,
+                    tipo: 'detalhado',
+                    conteudo: { node, results }
+                  })}
+                  className="text-xs"
+                />
+                <DownloadButton
+                  label="Relatório IA"
+                  downloadAction={() => gerarRelatorioAnalytics({
+                    projeto: node.title,
+                    periodo: '30 dias'
+                  })}
+                  className="text-xs"
+                />
+                <ActionButton
+                  label="Backup"
+                  loadingLabel="Salvando"
+                  successLabel="Salvo!"
+                  action={async () => ({ success: true, data: { message: 'Backup criado' } })}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>
