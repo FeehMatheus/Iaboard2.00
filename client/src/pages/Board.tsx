@@ -411,6 +411,20 @@ export default function Board() {
           </div>
           
           <div className="flex items-center gap-2">
+            <FeedbackButton
+              nodeId="pensamento-poderoso"
+              nodeType="automation"
+              actionName="Modo Pensamento Poderoso™"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold shadow-lg"
+              onClick={async () => {
+                setShowPensamentoPoderoso(true);
+                return { success: true, data: { message: 'Modo Pensamento Poderoso™ ativado' } };
+              }}
+            >
+              <Crown className="w-4 h-4 mr-2" />
+              Pensamento Poderoso™
+            </FeedbackButton>
+
             <Button
               variant="outline"
               size="sm"
@@ -577,6 +591,28 @@ export default function Board() {
         nodeType="canvas"
         onFeedback={(feedback) => {
           console.log('Board feedback:', feedback);
+        }}
+      />
+
+      {/* Modo Pensamento Poderoso™ */}
+      <ModoPensamentoPoderoso
+        open={showPensamentoPoderoso}
+        onClose={() => setShowPensamentoPoderoso(false)}
+        onExecutionStart={(executionData) => {
+          // Automatically add all generated nodes to the canvas
+          if (executionData.nodes) {
+            setCanvasState(prev => ({
+              ...prev,
+              nodes: [...prev.nodes, ...executionData.nodes]
+            }));
+            
+            toast({
+              title: "Projeto Gerado com Sucesso!",
+              description: `${executionData.nodes.length} módulos adicionados ao canvas. Valor estimado: ${executionData.estimatedValue}`,
+            });
+          }
+          
+          setShowPensamentoPoderoso(false);
         }}
       />
     </div>
