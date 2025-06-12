@@ -189,7 +189,7 @@ export function ModoPensamentoPoderoso({ open, onClose, onExecutionStart }: Modo
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-purple-900/95 via-black/95 to-blue-900/95 border-purple-500/30">
+      <DialogContent className="modo-pensamento max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-purple-900/95 via-black/95 to-blue-900/95 border-purple-500/30">
         <DialogHeader>
           <DialogTitle className="flex items-center text-2xl text-white">
             <Crown className="w-8 h-8 text-purple-400 mr-3" />
