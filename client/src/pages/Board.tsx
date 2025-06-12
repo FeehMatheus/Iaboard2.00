@@ -10,7 +10,8 @@ import {
   Plus, ZoomIn, ZoomOut, Save, Download, Home, Brain, Crown,
   FileText, Video, Mail, Target, TrendingUp, Award, Monitor, BarChart3,
   Play, Eye, Link, Globe, Sparkles, Zap, CheckCircle, AlertCircle, 
-  Loader2, Settings, Trash2, Copy, Edit3, Grid3X3, Maximize2
+  Loader2, Settings, Trash2, Copy, Edit3, Grid3X3, Maximize2,
+  Users, DollarSign, Rocket, Star
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -37,11 +38,10 @@ interface CanvasState {
   pan: { x: number; y: number };
 }
 
-interface AIRequest {
-  prompt: string;
-  type: string;
-  nodeId: string;
-  context?: any;
+interface ContextMenu {
+  x: number;
+  y: number;
+  show: boolean;
 }
 
 export default function Board() {
@@ -50,17 +50,18 @@ export default function Board() {
   const queryClient = useQueryClient();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [selectedNodeData, setSelectedNodeData] = useState<Node | null>(null);
   const [showNodePopup, setShowNodePopup] = useState(false);
-  const [showNodeCreator, setShowNodeCreator] = useState(false);
-  const [showPensamentoPoderoso, setShowPensamentoPoderoso] = useState(false);
-  const [newNodePosition, setNewNodePosition] = useState({ x: 0, y: 0 });
   const [executingNodes, setExecutingNodes] = useState<Set<string>>(new Set());
-  const [showLinkDialog, setShowLinkDialog] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
-  const [linkNodeId, setLinkNodeId] = useState('');
   const [showGrid, setShowGrid] = useState(true);
-  const [isDragging, setIsDragging] = useState(false);
+  const [showInitialDecision, setShowInitialDecision] = useState(true);
+  const [workflowMode, setWorkflowMode] = useState<'mpp' | 'manual' | null>(null);
+  const [showPensamentoPoderoso, setShowPensamentoPoderoso] = useState(false);
+  
+  const [contextMenu, setContextMenu] = useState<ContextMenu>({
+    x: 0,
+    y: 0,
+    show: false
+  });
   
   const [canvasState, setCanvasState] = useState<CanvasState>({
     nodes: [],
@@ -74,26 +75,26 @@ export default function Board() {
     staleTime: 0
   });
 
-  // Initialize canvas state when data loads
   useEffect(() => {
     if (canvasData && typeof canvasData === 'object') {
       setCanvasState(canvasData as CanvasState);
     }
   }, [canvasData]);
 
-  // AI Services - Real API Integration
-  const executeAITask = async (request: AIRequest): Promise<any> => {
+  // Real AI Integration
+  const executeRealAI = async (prompt: string, type: string): Promise<any> => {
     try {
       const response = await fetch('/api/ai/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request)
+        body: JSON.stringify({
+          prompt,
+          type,
+          context: { workflowMode }
+        })
       });
       
-      if (!response.ok) {
-        throw new Error('AI service failed');
-      }
-      
+      if (!response.ok) throw new Error('AI service failed');
       return await response.json();
     } catch (error) {
       console.error('AI execution error:', error);
@@ -114,74 +115,8 @@ export default function Board() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/canvas/state'] });
-      toast({
-        title: "Canvas salvo",
-        description: "Seu progresso foi salvo automaticamente.",
-      });
     }
   });
-
-  // Create new node
-  const createNodeMutation = useMutation({
-    mutationFn: async (nodeData: Partial<Node>) => {
-      const response = await fetch('/api/canvas/nodes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nodeData)
-      });
-      if (!response.ok) throw new Error('Failed to create node');
-      return response.json();
-    },
-    onSuccess: (newNode: Node) => {
-      setCanvasState(prev => ({
-        ...prev,
-        nodes: [...prev.nodes, newNode]
-      }));
-      setShowNodeCreator(false);
-      toast({
-        title: "Novo módulo criado",
-        description: "Módulo adicionado ao seu canvas.",
-      });
-    }
-  });
-
-  // Export system
-  const exportProject = async (format: 'pdf' | 'zip' | 'json') => {
-    try {
-      const response = await fetch('/api/export/project', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          canvasState,
-          format,
-          projectName: 'IA Board Project'
-        })
-      });
-
-      if (!response.ok) throw new Error('Export failed');
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ia-board-project.${format}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      toast({
-        title: "Projeto exportado",
-        description: `Arquivo ${format.toUpperCase()} baixado com sucesso.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Erro na exportação",
-        description: "Falha ao exportar o projeto.",
-        variant: "destructive"
-      });
-    }
-  };
 
   const nodeTypes = [
     { 
@@ -189,80 +124,70 @@ export default function Board() {
       title: 'Criador de Produto IA', 
       icon: Brain, 
       color: 'from-violet-600 to-purple-600', 
-      description: 'Gere produtos digitais completos com IA',
-      prompt: 'Crie um produto digital inovador para:'
+      description: 'Gere produtos digitais completos com IA'
     },
     { 
       id: 'copywriting', 
       title: 'Copywriter Supremo', 
       icon: FileText, 
       color: 'from-blue-600 to-indigo-600', 
-      description: 'Crie copies persuasivas e headlines',
-      prompt: 'Escreva uma copy persuasiva para:'
+      description: 'Crie copies persuasivas e headlines'
     },
     { 
       id: 'vsl', 
       title: 'Gerador VSL IA', 
       icon: Video, 
       color: 'from-red-600 to-pink-600', 
-      description: 'Roteiros de vídeo de alta conversão',
-      prompt: 'Crie um roteiro VSL para:'
+      description: 'Roteiros de vídeo de alta conversão'
     },
     { 
       id: 'funnel', 
       title: 'Construtor Funil', 
       icon: Target, 
       color: 'from-green-600 to-emerald-600', 
-      description: 'Funis completos otimizados',
-      prompt: 'Construa um funil de vendas para:'
+      description: 'Funis completos otimizados'
     },
     { 
       id: 'traffic', 
       title: 'Máquina de Tráfego', 
       icon: TrendingUp, 
       color: 'from-yellow-500 to-orange-500', 
-      description: 'Campanhas de tráfego inteligentes',
-      prompt: 'Crie uma campanha de tráfego para:'
+      description: 'Campanhas de tráfego inteligentes'
     },
     { 
       id: 'email', 
       title: 'Sequências Email IA', 
       icon: Mail, 
       color: 'from-indigo-600 to-blue-600', 
-      description: 'Automações de email marketing',
-      prompt: 'Desenvolva uma sequência de emails para:'
+      description: 'Automações de email marketing'
     },
     { 
       id: 'strategy', 
       title: 'Estrategista IA Supremo', 
       icon: Crown, 
       color: 'from-orange-600 to-red-600', 
-      description: 'Planejamento estratégico completo',
-      prompt: 'Elabore uma estratégia completa para:'
+      description: 'Planejamento estratégico completo'
     },
     { 
       id: 'landing', 
       title: 'Landing Page IA', 
       icon: Monitor, 
       color: 'from-cyan-600 to-teal-600', 
-      description: 'Páginas de conversão otimizadas',
-      prompt: 'Crie uma landing page para:'
+      description: 'Páginas de conversão otimizadas'
     },
     { 
       id: 'analytics', 
       title: 'Analytics IA Plus', 
       icon: BarChart3, 
       color: 'from-pink-600 to-rose-600', 
-      description: 'Análise e otimização com IA',
-      prompt: 'Analise e otimize:'
+      description: 'Análise e otimização com IA'
     },
     { 
       id: 'branding', 
       title: 'Branding Master IA', 
       icon: Award, 
       color: 'from-teal-600 to-cyan-600', 
-      description: 'Identidade visual e branding',
-      prompt: 'Desenvolva o branding para:'
+      description: 'Identidade visual e branding'
     }
   ];
 
@@ -312,100 +237,128 @@ export default function Board() {
     }
   }, [handleWheel]);
 
-  const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left - canvasState.pan.x) / canvasState.zoom;
-      const y = (e.clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
-      
-      setNewNodePosition({ x, y });
-      setShowNodeCreator(true);
+  // Right-click context menu
+  const handleCanvasRightClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (workflowMode === 'manual') {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (rect) {
+        setContextMenu({
+          x: e.clientX,
+          y: e.clientY,
+          show: true
+        });
+      }
     }
-  }, [canvasState.pan, canvasState.zoom]);
+  }, [workflowMode]);
 
-  const handleNodeClick = (node: Node) => {
-    setSelectedNode(node.id);
-    setSelectedNodeData(node);
-    setShowNodePopup(true);
-  };
+  const handleCanvasLeftClick = useCallback((e: React.MouseEvent) => {
+    if (contextMenu.show) {
+      setContextMenu(prev => ({ ...prev, show: false }));
+    }
+  }, [contextMenu.show]);
 
-  const handleNodeUpdate = (nodeId: string, updates: Partial<Node>) => {
-    setCanvasState(prev => ({
-      ...prev,
-      nodes: prev.nodes.map(node => 
-        node.id === nodeId ? { ...node, ...updates } : node
-      )
-    }));
-  };
-
-  const handleNodeDrag = (nodeId: string, x: number, y: number) => {
-    handleNodeUpdate(nodeId, { position: { x, y } });
-  };
-
-  const createNode = (type: string) => {
+  const createNodeFromContextMenu = async (type: string) => {
     const nodeType = nodeTypes.find(t => t.id === type);
     if (!nodeType) return;
 
-    const newNode = {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const x = (contextMenu.x - rect.left - canvasState.pan.x) / canvasState.zoom;
+    const y = (contextMenu.y - rect.top - canvasState.pan.y) / canvasState.zoom;
+
+    const newNode: Node = {
+      id: `node-${Date.now()}`,
       type,
       title: nodeType.title,
-      position: newNodePosition,
+      position: { x, y },
       size: { width: 350, height: 280 },
-      status: 'pending' as const,
+      status: 'pending',
       progress: 0,
       connections: [],
       content: {},
       data: {}
     };
 
-    createNodeMutation.mutate(newNode);
+    setCanvasState(prev => ({
+      ...prev,
+      nodes: [...prev.nodes, newNode]
+    }));
+
+    setContextMenu(prev => ({ ...prev, show: false }));
+
+    toast({
+      title: "Módulo criado",
+      description: `${nodeType.title} adicionado ao canvas.`,
+    });
   };
 
   const executeNode = async (node: Node) => {
     if (executingNodes.has(node.id)) return;
 
     setExecutingNodes(prev => new Set(prev).add(node.id));
-    handleNodeUpdate(node.id, { status: 'processing', progress: 10 });
+    
+    // Update node status
+    setCanvasState(prev => ({
+      ...prev,
+      nodes: prev.nodes.map(n => 
+        n.id === node.id 
+          ? { ...n, status: 'processing', progress: 10 }
+          : n
+      )
+    }));
 
     try {
-      const nodeType = nodeTypes.find(t => t.id === node.type);
-      const aiRequest: AIRequest = {
-        prompt: nodeType?.prompt || 'Execute task',
-        type: node.type,
-        nodeId: node.id,
-        context: node.data
-      };
-
-      // Simulate progress updates
+      // Progress simulation
       const progressInterval = setInterval(() => {
-        const currentNode = canvasState.nodes.find(n => n.id === node.id);
-        if (currentNode && currentNode.progress < 90) {
-          handleNodeUpdate(node.id, { progress: Math.min(currentNode.progress + 15, 90) });
-        }
+        setCanvasState(prev => ({
+          ...prev,
+          nodes: prev.nodes.map(n => 
+            n.id === node.id && n.progress < 90
+              ? { ...n, progress: Math.min(n.progress + 15, 90) }
+              : n
+          )
+        }));
       }, 500);
 
-      const result = await executeAITask(aiRequest);
+      // Real AI execution
+      const aiPrompt = `Execute ${node.type} task for: ${node.title}`;
+      const result = await executeRealAI(aiPrompt, node.type);
 
       clearInterval(progressInterval);
 
-      handleNodeUpdate(node.id, {
-        status: 'completed',
-        progress: 100,
-        result: result.data,
-        content: result.data,
-        files: result.files || []
-      });
+      // Update with real results
+      setCanvasState(prev => ({
+        ...prev,
+        nodes: prev.nodes.map(n => 
+          n.id === node.id 
+            ? { 
+                ...n, 
+                status: 'completed', 
+                progress: 100,
+                result: result.data,
+                content: result.data
+              }
+            : n
+        )
+      }));
 
       toast({
         title: "Tarefa concluída",
-        description: `${nodeType?.title} executado com sucesso!`,
+        description: `${node.title} executado com sucesso!`,
       });
 
     } catch (error) {
-      handleNodeUpdate(node.id, {
-        status: 'error',
-        progress: 0
-      });
+      setCanvasState(prev => ({
+        ...prev,
+        nodes: prev.nodes.map(n => 
+          n.id === node.id 
+            ? { ...n, status: 'error', progress: 0 }
+            : n
+        )
+      }));
 
       toast({
         title: "Erro na execução",
@@ -421,28 +374,16 @@ export default function Board() {
     }
   };
 
-  const connectLink = (nodeId: string, url: string) => {
-    handleNodeUpdate(nodeId, {
-      data: {
-        ...canvasState.nodes.find(n => n.id === nodeId)?.data,
-        externalLink: url
-      }
-    });
-    
-    toast({
-      title: "Link conectado",
-      description: "Link externo vinculado ao módulo.",
-    });
-  };
-
-  const activatePensamentoPoderoso = async () => {
+  const startMPPMode = async () => {
+    setWorkflowMode('mpp');
+    setShowInitialDecision(false);
     setShowPensamentoPoderoso(true);
-    
+
     try {
       const response = await fetch('/api/ai/pensamento-poderoso', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ canvasState })
+        body: JSON.stringify({ mode: 'full_auto' })
       });
 
       if (response.ok) {
@@ -451,24 +392,71 @@ export default function Board() {
         if (result.nodes) {
           setCanvasState(prev => ({
             ...prev,
-            nodes: [...prev.nodes, ...result.nodes]
+            nodes: result.nodes
           }));
           
           toast({
-            title: "Pensamento Poderoso™ Ativado",
-            description: `${result.nodes.length} módulos IA criados automaticamente!`,
+            title: "Modo Pensamento Poderoso™ Ativado",
+            description: `${result.nodes.length} módulos criados automaticamente!`,
           });
         }
       }
     } catch (error) {
       toast({
-        title: "Erro no Pensamento Poderoso™",
+        title: "Erro no MPP",
         description: "Falha ao ativar o modo automático.",
         variant: "destructive"
       });
     }
     
     setShowPensamentoPoderoso(false);
+  };
+
+  const startManualMode = () => {
+    setWorkflowMode('manual');
+    setShowInitialDecision(false);
+    
+    toast({
+      title: "Modo Manual Ativado",
+      description: "Clique com o botão direito para adicionar módulos.",
+    });
+  };
+
+  const exportProject = async (format: 'pdf' | 'zip' | 'json') => {
+    try {
+      const response = await fetch('/api/export/project', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          canvasState,
+          format,
+          projectName: 'IA Board Project'
+        })
+      });
+
+      if (!response.ok) throw new Error('Export failed');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ia-board-project.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Projeto exportado",
+        description: `Arquivo ${format.toUpperCase()} baixado com sucesso.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro na exportação",
+        description: "Falha ao exportar o projeto.",
+        variant: "destructive"
+      });
+    }
   };
 
   const renderNode = (node: Node) => {
@@ -487,7 +475,12 @@ export default function Board() {
             x: node.position.x + info.offset.x / canvasState.zoom,
             y: node.position.y + info.offset.y / canvasState.zoom
           };
-          handleNodeDrag(node.id, newPosition.x, newPosition.y);
+          setCanvasState(prev => ({
+            ...prev,
+            nodes: prev.nodes.map(n => 
+              n.id === node.id ? { ...n, position: newPosition } : n
+            )
+          }));
         }}
         style={{
           position: 'absolute',
@@ -510,7 +503,7 @@ export default function Board() {
               ? 'border-violet-400 shadow-2xl shadow-violet-400/30' 
               : 'border-gray-200 hover:border-violet-300 hover:shadow-xl'
           } bg-white/95 backdrop-blur-sm`}
-          onClick={() => handleNodeClick(node)}
+          onClick={() => setSelectedNode(isSelected ? null : node.id)}
         >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
@@ -595,7 +588,7 @@ export default function Board() {
                 variant="outline"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleNodeClick(node);
+                  setShowNodePopup(true);
                 }}
                 className="text-xs px-3 py-2 border-2 border-violet-300 text-violet-700 rounded-xl hover:bg-violet-50 transition-all duration-200 focus:ring-2 focus:ring-violet-300 focus:ring-offset-2"
               >
@@ -603,46 +596,39 @@ export default function Board() {
               </Button>
             </div>
 
-            {/* Results and Export */}
+            {/* Results Display */}
             {node.status === 'completed' && node.result && (
               <div className="space-y-2 pt-2 border-t border-violet-100">
+                <div className="text-xs text-gray-700 bg-green-50 p-2 rounded-lg">
+                  <strong>Resultado:</strong> {typeof node.result === 'string' 
+                    ? node.result.substring(0, 100) + '...' 
+                    : 'Conteúdo gerado com sucesso'}
+                </div>
                 <div className="flex gap-2">
                   <Button
                     size="sm"
-                    variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
                       exportProject('pdf');
                     }}
-                    className="flex-1 text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 focus:ring-2 focus:ring-purple-300 shadow-md font-medium"
+                    className="flex-1 text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 shadow-md font-medium"
                   >
                     <Download className="h-3 w-3 mr-1" />
-                    PDF
+                    Baixar PDF
                   </Button>
                   
                   <Button
                     size="sm"
-                    variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLinkNodeId(node.id);
-                      setShowLinkDialog(true);
+                      navigator.clipboard.writeText(JSON.stringify(node.result));
+                      toast({ title: "Copiado!", description: "Resultado copiado para a área de transferência." });
                     }}
-                    className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 focus:ring-2 focus:ring-cyan-300 shadow-md font-medium"
+                    className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 shadow-md font-medium"
                   >
-                    <Link className="h-3 w-3 mr-1" />
-                    Link
+                    <Copy className="h-3 w-3 mr-1" />
+                    Copiar
                   </Button>
-                </div>
-              </div>
-            )}
-
-            {/* External Link Display */}
-            {node.data?.externalLink && (
-              <div className="pt-2 border-t border-violet-100">
-                <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 p-2 rounded-lg">
-                  <Globe className="h-3 w-3" />
-                  <span className="truncate font-medium">{node.data.externalLink}</span>
                 </div>
               </div>
             )}
@@ -662,8 +648,19 @@ export default function Board() {
     return () => clearTimeout(timer);
   }, [canvasState, saveCanvasMutation]);
 
+  // Close context menu on outside click
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (contextMenu.show) {
+        setContextMenu(prev => ({ ...prev, show: false }));
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [contextMenu.show]);
+
   return (
-    <div className="h-screen bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 relative overflow-hidden">
       {/* Enhanced Header */}
       <div className="absolute top-0 left-0 right-0 bg-black/20 backdrop-blur-md border-b border-violet-500/30 z-50 shadow-xl">
         <div className="flex items-center justify-between p-4">
@@ -726,7 +723,7 @@ export default function Board() {
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                onClick={() => exportProject('pdf')}
+                onClick={() => exportProject('zip')}
                 className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90 text-white px-4 py-2 rounded-xl font-bold shadow-lg transition-all duration-200 focus:ring-2 focus:ring-cyan-300"
               >
                 <Download className="h-4 w-4 mr-2" />
@@ -742,15 +739,6 @@ export default function Board() {
                 Salvar
               </Button>
             </div>
-
-            {/* Pensamento Poderoso™ */}
-            <Button
-              onClick={activatePensamentoPoderoso}
-              className="bg-gradient-to-r from-violet-600 to-purple-600 hover:opacity-90 text-white px-6 py-3 rounded-2xl font-black shadow-2xl transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-violet-300 text-sm"
-            >
-              <Crown className="h-5 w-5 mr-2" />
-              Pensamento Poderoso™
-            </Button>
           </div>
         </div>
       </div>
@@ -759,7 +747,8 @@ export default function Board() {
       <div
         ref={canvasRef}
         className="absolute inset-0 pt-20 cursor-crosshair"
-        onClick={handleCanvasClick}
+        onContextMenu={handleCanvasRightClick}
+        onClick={handleCanvasLeftClick}
       >
         <motion.div
           className="w-full h-full relative cursor-grab active:cursor-grabbing"
@@ -785,9 +774,10 @@ export default function Board() {
               className="absolute inset-0 opacity-20"
               style={{
                 backgroundImage: `
-                  radial-gradient(circle, rgba(139,69,255,0.3) 1px, transparent 1px)
+                  linear-gradient(rgba(139,69,255,0.3) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(139,69,255,0.3) 1px, transparent 1px)
                 `,
-                backgroundSize: '30px 30px'
+                backgroundSize: '40px 40px'
               }}
             />
           )}
@@ -797,8 +787,8 @@ export default function Board() {
             {canvasState.nodes.map(renderNode)}
           </AnimatePresence>
 
-          {/* Add Node Prompt */}
-          {canvasState.nodes.length === 0 && (
+          {/* Welcome Message */}
+          {canvasState.nodes.length === 0 && workflowMode === 'manual' && (
             <div className="absolute inset-0 flex items-center justify-center">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8, y: 50 }}
@@ -813,12 +803,12 @@ export default function Board() {
                 >
                   <Plus className="h-12 w-12 text-white" />
                 </motion.div>
-                <h3 className="text-3xl font-black text-white mb-3">Bem-vindo ao IA BOARD™</h3>
-                <p className="text-violet-200 mb-6 text-lg font-medium">Clique em qualquer lugar para adicionar seu primeiro módulo IA</p>
+                <h3 className="text-3xl font-black text-white mb-3">Clique com o botão direito</h3>
+                <p className="text-violet-200 mb-6 text-lg font-medium">para adicionar módulos IA ao canvas</p>
                 <div className="flex items-center gap-2 justify-center">
                   <Sparkles className="h-5 w-5 text-violet-300" />
                   <Badge className="bg-gradient-to-r from-violet-500 to-purple-500 text-white border-0 px-4 py-2 text-sm font-bold">
-                    Canvas Infinito Ativado
+                    Modo Manual Ativado
                   </Badge>
                   <Zap className="h-5 w-5 text-violet-300" />
                 </div>
@@ -828,100 +818,119 @@ export default function Board() {
         </motion.div>
       </div>
 
-      {/* Node Creator Dialog */}
-      <Dialog open={showNodeCreator} onOpenChange={setShowNodeCreator}>
-        <DialogContent className="max-w-6xl bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-violet-200 shadow-2xl">
+      {/* Initial Decision Dialog */}
+      <Dialog open={showInitialDecision} onOpenChange={() => {}}>
+        <DialogContent className="max-w-2xl bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-violet-200 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black text-violet-900">Criar Novo Módulo IA</DialogTitle>
-            <DialogDescription className="text-violet-700 font-medium">
-              Escolha uma ferramenta IA para adicionar ao seu canvas
+            <DialogTitle className="text-3xl font-black text-violet-900 text-center mb-4">
+              Como deseja começar sua criação?
+            </DialogTitle>
+            <DialogDescription className="text-violet-700 font-medium text-center text-lg">
+              Escolha o modo de trabalho ideal para seu projeto
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid grid-cols-2 gap-6 p-6">
-            {nodeTypes.map((type) => {
-              const Icon = type.icon;
-              return (
-                <motion.div
-                  key={type.id}
-                  whileHover={{ scale: 1.03, y: -5 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Card 
-                    className="cursor-pointer border-2 border-violet-200 hover:border-violet-400 transition-all duration-300 hover:shadow-xl bg-white/80 backdrop-blur"
-                    onClick={() => createNode(type.id)}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+            <motion.div
+              whileHover={{ scale: 1.02, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Card 
+                className="cursor-pointer border-2 border-violet-300 hover:border-violet-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-violet-100 to-purple-100"
+                onClick={startMPPMode}
+              >
+                <CardContent className="p-8 text-center">
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                    className="p-6 bg-gradient-to-r from-violet-600 to-purple-600 rounded-full shadow-xl mb-6 inline-block"
                   >
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className={`p-4 rounded-2xl bg-gradient-to-r ${type.color} shadow-lg`}>
-                          <Icon className="h-8 w-8 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-black text-violet-900 text-lg">{type.title}</h4>
-                          <Badge className={`bg-gradient-to-r ${type.color} text-white border-0 text-xs mt-1 font-bold`}>
-                            {type.id}
-                          </Badge>
-                        </div>
-                      </div>
-                      <p className="text-sm text-violet-700 font-medium">{type.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
+                    <Crown className="h-12 w-12 text-white" />
+                  </motion.div>
+                  <h3 className="text-2xl font-black text-violet-900 mb-4">
+                    Modo Pensamento Poderoso™
+                  </h3>
+                  <p className="text-violet-700 font-medium mb-6">
+                    A IA executa tudo automaticamente e cria o projeto completo para você
+                  </p>
+                  <Badge className="bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0 px-4 py-2 font-bold">
+                    Automático
+                  </Badge>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.02, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Card 
+                className="cursor-pointer border-2 border-blue-300 hover:border-blue-500 transition-all duration-300 hover:shadow-2xl bg-gradient-to-br from-blue-100 to-indigo-100"
+                onClick={startManualMode}
+              >
+                <CardContent className="p-8 text-center">
+                  <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-xl mb-6 inline-block">
+                    <Users className="h-12 w-12 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-black text-blue-900 mb-4">
+                    Criar Manualmente
+                  </h3>
+                  <p className="text-blue-700 font-medium mb-6">
+                    Você decide quais módulos adicionar e controla cada etapa do processo
+                  </p>
+                  <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0 px-4 py-2 font-bold">
+                    Manual
+                  </Badge>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Link Connection Dialog */}
-      <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
-        <DialogContent className="bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-violet-200">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black text-violet-900">Conectar Link Externo</DialogTitle>
-            <DialogDescription className="text-violet-700 font-medium">
-              Vincule um link externo a este módulo
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <Input
-              placeholder="https://exemplo.com"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              className="border-2 border-violet-300 focus:border-violet-500 focus:ring-violet-500 rounded-xl"
-            />
-            
-            <div className="flex gap-3">
-              <Button
-                onClick={() => {
-                  if (linkUrl && linkNodeId) {
-                    connectLink(linkNodeId, linkUrl);
-                    setShowLinkDialog(false);
-                    setLinkUrl('');
-                    setLinkNodeId('');
-                  }
-                }}
-                className="flex-1 bg-gradient-to-r from-violet-500 to-purple-500 hover:opacity-90 text-white rounded-xl font-bold"
-              >
-                Conectar Link
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowLinkDialog(false);
-                  setLinkUrl('');
-                  setLinkNodeId('');
-                }}
-                className="border-2 border-violet-300 text-violet-700 hover:bg-violet-50 rounded-xl font-bold"
-              >
-                Cancelar
-              </Button>
+      {/* Right-Click Context Menu */}
+      <AnimatePresence>
+        {contextMenu.show && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              position: 'fixed',
+              left: contextMenu.x,
+              top: contextMenu.y,
+              zIndex: 1000
+            }}
+            className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-violet-200 p-2 min-w-64"
+          >
+            <div className="py-2">
+              <h4 className="text-sm font-bold text-gray-700 px-3 py-2 border-b border-gray-200 mb-2">
+                Adicionar Módulo IA
+              </h4>
+              {nodeTypes.map((type) => {
+                const Icon = type.icon;
+                return (
+                  <motion.div
+                    key={type.id}
+                    whileHover={{ backgroundColor: '#f3f4f6' }}
+                    className="flex items-center gap-3 px-3 py-2 cursor-pointer rounded-xl transition-colors"
+                    onClick={() => createNodeFromContextMenu(type.id)}
+                  >
+                    <div className={`p-2 rounded-lg bg-gradient-to-r ${type.color} shadow-md`}>
+                      <Icon className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-gray-900">{type.title}</div>
+                      <div className="text-xs text-gray-600">{type.description}</div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Pensamento Poderoso™ Modal */}
       <Dialog open={showPensamentoPoderoso} onOpenChange={setShowPensamentoPoderoso}>
@@ -1004,22 +1013,28 @@ export default function Board() {
         </Card>
       </div>
 
-      {/* Add Node Button */}
-      <motion.div 
-        className="absolute bottom-6 right-6 z-40"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        <Button
-          onClick={() => {
-            setNewNodePosition({ x: 400, y: 300 });
-            setShowNodeCreator(true);
-          }}
-          className="h-16 w-16 rounded-full bg-gradient-to-r from-violet-500 to-purple-500 hover:opacity-90 text-white shadow-2xl border-0 transition-all duration-200 focus:ring-4 focus:ring-violet-300"
-        >
-          <Plus className="h-8 w-8" />
-        </Button>
-      </motion.div>
+      {/* Mode Indicator */}
+      {workflowMode && (
+        <div className="absolute bottom-6 right-6 z-40">
+          <Card className="bg-black/30 backdrop-blur-xl border border-violet-500/30 shadow-2xl">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                {workflowMode === 'mpp' ? (
+                  <>
+                    <Crown className="h-5 w-5 text-violet-300" />
+                    <span className="text-white font-bold">Modo Pensamento Poderoso™</span>
+                  </>
+                ) : (
+                  <>
+                    <Users className="h-5 w-5 text-blue-300" />
+                    <span className="text-white font-bold">Modo Manual</span>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

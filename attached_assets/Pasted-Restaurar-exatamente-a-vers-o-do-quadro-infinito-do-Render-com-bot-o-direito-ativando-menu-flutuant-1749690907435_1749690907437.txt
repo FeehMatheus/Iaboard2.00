@@ -1,0 +1,201 @@
+Restaurar exatamente a versão do quadro infinito do Render, com botão direito ativando menu flutuante para adicionar pop-ups.
+
+Corrigir todos os elementos visuais e funcionais falsos ou desconectados, que estão entregando arquivos vazios ou apenas aparência.
+
+Implementar uma decisão inicial clara para o usuário escolher entre o Modo Pensamento Poderoso (MPP) ou criar com sua própria ideia manualmente.
+
+Integrar tudo de verdade com execução funcional, CTAs reais e respostas visíveis com dados gerados por IA real (APIs integradas).
+
+Garantir que o sistema esteja coeso, limpo, bonito, moderno e sem falhas visuais, nem técnicas.
+
+
+
+---
+
+🧠⚙️ PROMPT SUPREMO V4.0 – IA BOARD BY FILIPPE™
+
+Versão Render Restaurada + Funcionalidade Real + Integrações Verdadeiras + Visual Premium
+
+Restaure, corrija, e reimplemente imediatamente o sistema IA BOARD BY FILIPPE™ com as seguintes instruções técnicas obrigatórias, detalhadas, funcionais e sem margem para falha:
+
+---
+
+✅ 1. RESTAURAR O QUADRO INFINITO EXATAMENTE COMO ESTAVA NA VERSÃO DO RENDER
+
+- Restaurar a **versão do quadro infinito exibida e funcional no Render**, com:
+  - Botão direito do mouse ativando um **menu rápido e flutuante de adição de blocos/pop-ups**
+  - Grid visível, com linhas e espaço para movimentação
+  - Suporte total a:
+    - **Drag & drop fluido**
+    - **Zoom com scroll**
+    - **Conexões animadas entre blocos**
+  - Blocos adicionados diretamente com um clique no menu contextual (botão direito)
+
+⚠️ A versão atual do quadro está **quebrada, sem o menu, e com funções visuais apenas.** Isso precisa ser revertido imediatamente.
+
+---
+
+✅ 2. CORRIGIR URGENTEMENTE A FALTA DE INTEGRAÇÃO COM GERAÇÃO DE CONTEÚDO REAL
+
+🛑 Nada atualmente está conectado à IA real.  
+🛑 As ações dos blocos estão entregando **arquivos vazios ou simulados**.  
+🛑 Os botões têm aparência, mas **não executam nada verdadeiro**.
+
+🔧 Correções obrigatórias:
+
+- **Integrar todas as funcionalidades aos blocos com chamadas reais de IA**, utilizando:
+  - OpenAI (GPT-4)
+  - Claude AI
+  - Gemini Pro
+
+📌 Exemplo de chamada real:
+```js
+const resposta = await fetch("https://api.openai.com/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${OPENAI_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "gpt-4",
+    messages: [{ role: "user", content: prompt }]
+  })
+});
+
+O retorno da IA deve ser exibido dentro do bloco do quadro infinito, de forma clara, com:
+
+Status (“Executando...”, “Concluído ✅”)
+
+Conteúdo gerado visível
+
+Opções: Exportar, Editar, Reexecutar
+
+
+
+
+---
+
+✅ 3. CRIAR DECISÃO INICIAL NO QUADRO INFINITO: MPP OU FLUXO PERSONALIZADO
+
+📌 Ao iniciar o IA Board, mostrar imediatamente um pop-up central no quadro infinito com:
+
+> "Como deseja começar sua criação?"
+
+🔮 Usar Modo Pensamento Poderoso™ (IA executa tudo sozinha)
+💡 Criar manualmente com minhas próprias ideias
+
+
+
+Cada escolha deve:
+
+Gerar a sequência de blocos automática (MPP) ou
+
+Liberar o botão direito para o usuário adicionar blocos por decisão própria
+
+
+Essas opções precisam:
+
+Ser visuais
+
+Ter execução real e não apenas animada
+
+Integrar automaticamente o fluxo com base na escolha
+
+
+
+---
+
+✅ 4. MELHORAR O VISUAL DE TODO O SISTEMA COM DESIGN MODERNO E PROFISSIONAL
+
+Aplicar um visual com:
+
+Cores vibrantes e tecnológicas (roxo, azul, preto, gradientes)
+
+Componentes modernos com Tailwind CSS:
+
+bg-gradient-to-r, rounded-xl, shadow-md, hover:opacity-90
+
+
+Tipografia profissional (font-sans, tracking-wide, text-lg)
+
+
+Tornar todo o sistema visualmente coeso, limpo, claro e acessível
+
+
+
+---
+
+✅ 5. NENHUMA FERRAMENTA DEVE SER REMOVIDA – TODAS DEVEM FUNCIONAR DENTRO DO QUADRO
+
+Módulos como:
+
+Gerador de Conteúdo IA
+
+Vídeo com IA
+
+Tráfego pago
+
+Produto Rápido
+
+Link externo devem ser transformados em blocos funcionais, com pop-ups integrados, CTAs reais e IA conectada
+
+
+
+
+---
+
+✅ 6. TODAS AS CTAs DEVEM FUNCIONAR DE VERDADE
+
+Cada botão deve:
+
+Executar uma função real com IA ou lógica interna
+
+Atualizar seu estado (carregando → sucesso)
+
+Gerar saída visível (PDF, texto, vídeo, página, dados)
+
+
+
+
+---
+
+✅ 7. ESTRUTURA BASE DO CÓDIGO RECOMENDADA:
+
+/js
+  - board.js             // quadro infinito (versão Render restaurada)
+  - popups.js            // todos os blocos e interações
+  - iaApi.js             // integração OpenAI, Claude, Gemini
+  - ações.js             // salvar, exportar, executar
+  - contexto.js          // MPP ou fluxo manual
+/css
+  - tailwind.css         // visual moderno e responsivo
+/components
+  - popupInicial.js
+  - menuDireito.js
+  - blocos/*.js
+/assets
+  - logos/
+  - respostas/
+
+
+---
+
+🎯 OBJETIVO FINAL:
+
+> O IA BOARD BY FILIPPE™ deve estar:
+
+
+
+✅ Com quadro infinito idêntico ao do Render, incluindo menu com botão direito
+✅ Com todas as ferramentas funcionando dentro do board, sem simulações
+✅ Com todas as CTAs conectadas a funções reais e APIs de IA reais
+✅ Com execução fluida, responsiva e visual moderno tecnológico
+✅ Com visual limpo, sem bugs, sem placeholders, sem cliques vazios
+✅ Pronto para uso real por qualquer usuário agora
+
+⚠️ Nenhum elemento pode estar quebrado.
+⚠️ Nenhuma ação pode retornar vazio.
+⚠️ Nenhum botão pode ser apenas visual.
+
+⚡ Essa é a versão real, restaurada, funcional e definitiva do IA BOARD BY FILIPPE™.
+👑 Agora sim, o sistema deve estar pronto para o mundo.
