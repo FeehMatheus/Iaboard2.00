@@ -428,6 +428,113 @@ export default function Board() {
     });
   };
 
+  // Video generation functions
+  const generateNodeVideo = async (node: Node) => {
+    if (videoGenerating) return;
+
+    setVideoGenerating(true);
+    setSelectedVideoNode(node.id);
+
+    try {
+      let videoResponse;
+      
+      if (node.type === 'vsl') {
+        videoResponse = await fetch('/api/video/generate-vsl', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productInfo: node.title + ' - ' + (node.content?.description || 'Produto digital inovador'),
+            duration: 120
+          })
+        });
+      } else {
+        videoResponse = await fetch('/api/video/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            script: `Apresentando ${node.title}: ${node.type === 'copywriting' ? 'Textos de alta conversão' : 
+                     node.type === 'funnel' ? 'Funis otimizados para vendas' :
+                     node.type === 'traffic' ? 'Campanhas de tráfego inteligentes' :
+                     'Solução completa com IA'}. Transforme seu negócio com tecnologia avançada.`,
+            style: node.type === 'vsl' ? 'vsl' : 'promotional',
+            duration: 90,
+            voiceGender: 'female'
+          })
+        });
+      }
+
+      if (videoResponse.ok) {
+        const result = await videoResponse.json();
+        
+        // Update node with video data
+        setCanvasState(prev => ({
+          ...prev,
+          nodes: prev.nodes.map(n => 
+            n.id === node.id 
+              ? { 
+                  ...n, 
+                  result: { ...n.result, video: result.video },
+                  content: { ...n.content, video: result.video }
+                }
+              : n
+          )
+        }));
+
+        toast({
+          title: "Vídeo gerado com sucesso",
+          description: "Vídeo real criado com IA e disponível para visualização.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro na geração do vídeo",
+        description: "Falha ao gerar vídeo com IA.",
+        variant: "destructive"
+      });
+    } finally {
+      setVideoGenerating(false);
+      setSelectedVideoNode(null);
+    }
+  };
+
+  const processExternalLink = async (nodeId: string, url: string) => {
+    try {
+      const response = await fetch('/api/video/process-external', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Update node with processed link data
+        setCanvasState(prev => ({
+          ...prev,
+          nodes: prev.nodes.map(n => 
+            n.id === nodeId 
+              ? { 
+                  ...n, 
+                  data: { ...n.data, externalLink: url, processedData: result.data }
+                }
+              : n
+          )
+        }));
+
+        toast({
+          title: "Link processado",
+          description: "Link externo analisado e integrado com IA.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro no processamento",
+        description: "Falha ao processar link externo.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const exportProject = async (format: 'pdf' | 'zip' | 'json') => {
     try {
       const response = await fetch('/api/export/project', {
@@ -610,7 +717,72 @@ export default function Board() {
                     ? node.result.substring(0, 100) + '...' 
                     : 'Conteúdo gerado com sucesso'}
                 </div>
+                
+                {/* Video Display */}
+                {node.result?.video && (
+                  <div className="bg-gray-100 rounded-lg p-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Video className="h-4 w-4 text-purple-600" />
+                      <span className="text-xs font-bold text-gray-800">Vídeo Gerado com IA</span>
+                    </div>
+                    <div className="aspect-video bg-black rounded-lg flex items-center justify-center mb-2 relative group cursor-pointer"
+                         onClick={() => window.open(node.result.video.videoUrl, '_blank')}>
+                      {node.result.video.thumbnailUrl ? (
+                        <img 
+                          src={node.result.video.thumbnailUrl} 
+                          alt="Video thumbnail" 
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="text-center text-white">
+                          <Play className="h-8 w-8 mx-auto mb-1" />
+                          <span className="text-xs">Clique para assistir</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/20 rounded-lg group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                        <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Play className="w-6 h-6 text-purple-600 ml-1" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-600 text-center">
+                      Duração: {node.result.video.scriptData?.totalDuration || 60}s | 
+                      Criado com {node.result.video.metadata?.style || 'IA'}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      generateNodeVideo(node);
+                    }}
+                    disabled={videoGenerating && selectedVideoNode === node.id}
+                    className="flex-1 text-xs bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 shadow-md font-medium"
+                  >
+                    {videoGenerating && selectedVideoNode === node.id ? (
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    ) : (
+                      <Video className="h-3 w-3 mr-1" />
+                    )}
+                    {videoGenerating && selectedVideoNode === node.id ? 'Gerando...' : 'Gerar Vídeo'}
+                  </Button>
+                  
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLinkNodeId(node.id);
+                      setShowLinkDialog(true);
+                    }}
+                    className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 shadow-md font-medium"
+                  >
+                    <Link className="h-3 w-3 mr-1" />
+                    Link
+                  </Button>
+                  
                   <Button
                     size="sm"
                     onClick={(e) => {
@@ -620,21 +792,26 @@ export default function Board() {
                     className="flex-1 text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 shadow-md font-medium"
                   >
                     <Download className="h-3 w-3 mr-1" />
-                    Baixar PDF
+                    PDF
                   </Button>
-                  
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigator.clipboard.writeText(JSON.stringify(node.result));
-                      toast({ title: "Copiado!", description: "Resultado copiado para a área de transferência." });
-                    }}
-                    className="flex-1 text-xs bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 rounded-xl hover:opacity-90 transition-all duration-200 shadow-md font-medium"
-                  >
-                    <Copy className="h-3 w-3 mr-1" />
-                    Copiar
-                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* External Link Display */}
+            {node.data?.externalLink && (
+              <div className="pt-2 border-t border-violet-100">
+                <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded-lg mb-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Globe className="h-3 w-3" />
+                    <span className="font-bold">Link Conectado</span>
+                  </div>
+                  <div className="truncate">{node.data.externalLink}</div>
+                  {node.data.processedData && (
+                    <div className="mt-1 text-xs text-gray-600">
+                      ✓ Processado com IA - Insights disponíveis
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -988,6 +1165,81 @@ export default function Board() {
                 animate={{ width: "100%" }}
                 transition={{ duration: 4, ease: "easeInOut" }}
               />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* External Link Processing Dialog */}
+      <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+        <DialogContent className="max-w-2xl bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-violet-200">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-violet-900 flex items-center gap-3">
+              <Globe className="h-6 w-6 text-violet-600" />
+              Processar Link Externo com IA
+            </DialogTitle>
+            <DialogDescription className="text-violet-700 font-medium">
+              Cole um link de vídeo ou conteúdo para análise e integração automática com IA
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-violet-900">URL do Conteúdo</label>
+              <Input
+                placeholder="https://youtube.com/watch?v=... ou qualquer link de vídeo/conteúdo"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                className="border-2 border-violet-300 focus:border-violet-500 focus:ring-violet-500 rounded-xl h-12 text-base"
+              />
+              <div className="text-xs text-violet-600 bg-violet-100 p-3 rounded-lg">
+                <strong>Suporte para:</strong> YouTube, Vimeo, Instagram, TikTok, links de landing pages, 
+                VSLs, páginas de vendas e qualquer conteúdo online
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
+              <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                <Brain className="h-4 w-4" />
+                O que a IA irá analisar:
+              </h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Estratégias de marketing utilizadas</li>
+                <li>• Elementos de conversão identificados</li>
+                <li>• Análise competitiva automática</li>
+                <li>• Sugestões de melhorias</li>
+                <li>• Extração de insights valiosos</li>
+              </ul>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                onClick={() => {
+                  if (linkUrl && linkNodeId) {
+                    processExternalLink(linkNodeId, linkUrl);
+                    setShowLinkDialog(false);
+                    setLinkUrl('');
+                    setLinkNodeId('');
+                  }
+                }}
+                disabled={!linkUrl}
+                className="flex-1 bg-gradient-to-r from-violet-500 to-purple-500 hover:opacity-90 text-white rounded-xl font-bold px-6 py-3 text-base shadow-lg transition-all duration-200"
+              >
+                <Brain className="h-5 w-5 mr-2" />
+                Processar com IA
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowLinkDialog(false);
+                  setLinkUrl('');
+                  setLinkNodeId('');
+                }}
+                className="border-2 border-violet-300 text-violet-700 hover:bg-violet-50 rounded-xl font-bold px-6 py-3"
+              >
+                Cancelar
+              </Button>
             </div>
           </div>
         </DialogContent>
