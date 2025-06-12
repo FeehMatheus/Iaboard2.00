@@ -687,6 +687,224 @@ Make the content professional, persuasive, and conversion-focused.`;
     }
   });
 
+  // AI Generation API
+  app.post('/api/ai/generate', async (req, res) => {
+    try {
+      const { type, prompt, audience, product, business, target, goals } = req.body;
+
+      let result;
+      
+      switch (type) {
+        case 'produto':
+          result = await aiContentGenerator.generateRealContent({
+            productType: product || 'digital-product',
+            targetAudience: audience || 'entrepreneurs',
+            marketData: { niche: product, audience },
+            stepId: 1,
+            context: { prompt }
+          });
+          break;
+
+        case 'copy':
+        case 'headline':
+        case 'anuncio':
+          result = await aiEngineSupreme.generateContent({
+            type: 'copy',
+            prompt,
+            parameters: { audience, tone: 'professional', goal: 'conversion' }
+          });
+          break;
+
+        case 'funnel':
+          result = await furionAI.processar({
+            tipo: 'funil',
+            prompt,
+            nicho: product,
+            avatarCliente: audience
+          });
+          break;
+
+        case 'video':
+        case 'vsl':
+          result = await aiEngineSupreme.generateContent({
+            type: 'video',
+            prompt,
+            parameters: { audience, length: 'medium' }
+          });
+          break;
+
+        case 'traffic':
+          result = await furionAI.processar({
+            tipo: 'anuncio',
+            prompt,
+            nicho: product,
+            avatarCliente: audience
+          });
+          break;
+
+        case 'avatar':
+          result = await aiContentGenerator.generateRealContent({
+            productType: 'avatar-analysis',
+            targetAudience: target || audience,
+            marketData: { business, target, goals },
+            stepId: 1,
+            context: { prompt, business, goals }
+          });
+          break;
+
+        case 'landing':
+          result = await furionAI.processar({
+            tipo: 'landing',
+            prompt,
+            nicho: product,
+            avatarCliente: audience
+          });
+          break;
+
+        default:
+          result = await aiEngineSupreme.generateContent({
+            type: 'copy',
+            prompt,
+            parameters: { audience: audience || 'general', tone: 'professional' }
+          });
+      }
+
+      res.json({
+        success: true,
+        project: {
+          title: result.content || `${type} Generated`,
+          description: result.metadata?.description || 'AI-generated content',
+          strategy: result.files?.map(f => f.name) || ['Strategic implementation'],
+          content: result.content
+        },
+        data: result
+      });
+
+    } catch (error) {
+      console.error('AI Generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to generate content',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Canvas state management
+  app.get('/api/canvas/state', async (req, res) => {
+    try {
+      // Return demo canvas state
+      const demoState = {
+        nodes: [
+          {
+            id: 'demo-1',
+            type: 'produto',
+            title: 'Criador de Produto',
+            content: {},
+            position: { x: 100, y: 100 },
+            size: { width: 300, height: 200 },
+            status: 'pending',
+            progress: 0,
+            connections: []
+          },
+          {
+            id: 'demo-2',
+            type: 'copywriting',
+            title: 'Copywriter IA',
+            content: {},
+            position: { x: 450, y: 100 },
+            size: { width: 300, height: 200 },
+            status: 'pending',
+            progress: 0,
+            connections: []
+          }
+        ],
+        zoom: 1,
+        pan: { x: 0, y: 0 }
+      };
+      
+      res.json(demoState);
+    } catch (error) {
+      console.error('Canvas state error:', error);
+      res.status(500).json({ error: 'Failed to load canvas state' });
+    }
+  });
+
+  app.post('/api/canvas/save', async (req, res) => {
+    try {
+      const canvasState = req.body;
+      // In a real app, save to database
+      res.json({ success: true, message: 'Canvas saved successfully' });
+    } catch (error) {
+      console.error('Canvas save error:', error);
+      res.status(500).json({ error: 'Failed to save canvas' });
+    }
+  });
+
+  app.post('/api/canvas/nodes', async (req, res) => {
+    try {
+      const nodeData = req.body;
+      const newNode = {
+        id: `node-${Date.now()}`,
+        ...nodeData,
+        status: 'pending',
+        progress: 0,
+        connections: []
+      };
+      
+      res.json(newNode);
+    } catch (error) {
+      console.error('Node creation error:', error);
+      res.status(500).json({ error: 'Failed to create node' });
+    }
+  });
+
+  // User stats and projects
+  app.get('/api/user/stats', async (req, res) => {
+    try {
+      const stats = {
+        totalProjects: 15,
+        completedProjects: 8,
+        creditsUsed: 420,
+        creditsRemaining: 580,
+        conversionRate: 12.5
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error('User stats error:', error);
+      res.status(500).json({ error: 'Failed to load user stats' });
+    }
+  });
+
+  app.get('/api/user/projects', async (req, res) => {
+    try {
+      const projects = [
+        {
+          id: 1,
+          name: 'Curso Marketing Digital',
+          type: 'produto',
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+          revenue: 15420
+        },
+        {
+          id: 2,
+          name: 'Campanha Facebook Ads',
+          type: 'traffic',
+          status: 'active',
+          createdAt: new Date().toISOString(),
+          revenue: 8750
+        }
+      ];
+      
+      res.json(projects);
+    } catch (error) {
+      console.error('Projects error:', error);
+      res.status(500).json({ error: 'Failed to load projects' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
