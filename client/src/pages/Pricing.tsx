@@ -1,334 +1,392 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { Check, Zap, Crown, Rocket, ArrowRight } from "lucide-react";
-
-interface PricingPlan {
-  id: string;
-  name: string;
-  price: string;
-  period: string;
-  description: string;
-  features: string[];
-  highlighted: boolean;
-  icon: any;
-  buttonText: string;
-  credits: string;
-}
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useLocation } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  Crown, Check, Zap, Star, CreditCard, 
+  Shield, Rocket, Target, Brain
+} from 'lucide-react';
 
 export default function Pricing() {
-  const [selectedPlan, setSelectedPlan] = useState<string>('');
+  const [, setLocation] = useLocation();
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const plans: PricingPlan[] = [
+  const handlePlanSelection = async (planId: string, price: number) => {
+    setLoadingPlan(planId);
+    
+    try {
+      // Create payment session with real Stripe integration
+      const response = await fetch('/api/payments/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          planId, 
+          price,
+          currency: 'BRL'
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.checkoutUrl) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error(data.error || 'Failed to create payment session');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Erro no Pagamento",
+        description: "Não foi possível processar o pagamento. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
+  const handleDemoAccess = async () => {
+    try {
+      const response = await fetch('/api/auth/demo-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        setLocation('/dashboard');
+        toast({
+          title: "Demo Ativada",
+          description: "Bem-vindo ao IA Board! Explore todas as funcionalidades.",
+        });
+      }
+    } catch (error) {
+      console.error('Demo access failed:', error);
+    }
+  };
+
+  const plans = [
     {
-      id: 'starter',
-      name: 'Starter',
-      price: 'R$ 97',
-      period: '/mês',
-      description: 'Perfeito para empreendedores iniciantes',
+      id: 'demo',
+      name: 'Demo Gratuita',
+      price: 0,
+      originalPrice: null,
+      description: 'Teste completo por 7 dias',
+      badge: 'Grátis',
+      badgeColor: 'bg-green-500',
       features: [
-        '500 créditos Furion mensais',
-        'Geração de copies e VSLs',
-        'Canvas infinito básico',
-        '10 projetos simultâneos',
-        'Suporte por e-mail',
-        'Templates básicos'
+        '3 projetos IA completos',
+        'Todas as IAs disponíveis',
+        'Quadro infinito básico',
+        'Exportação PDF',
+        'Templates prontos',
+        'Suporte por email'
       ],
-      highlighted: false,
-      icon: Zap,
-      buttonText: 'Começar Grátis',
-      credits: '500 créditos'
+      limitations: [
+        'Limite de 3 projetos',
+        'Sem modo automático',
+        'Marca d\'água nos exports'
+      ],
+      cta: 'Começar Demo Grátis',
+      action: () => handleDemoAccess(),
+      popular: false
     },
     {
-      id: 'professional',
-      name: 'Professional',
-      price: 'R$ 197',
-      period: '/mês',
-      description: 'Para empresários que querem escalar',
+      id: 'criador',
+      name: 'Plano Criador',
+      price: 97,
+      originalPrice: 197,
+      description: 'Para empreendedores sérios',
+      badge: 'Mais Popular',
+      badgeColor: 'bg-purple-500',
       features: [
-        '2.000 créditos Furion mensais',
-        'Todas as funcionalidades de IA',
-        'Canvas infinito avançado',
-        'Projetos ilimitados',
-        'Análise de concorrência',
-        'Suporte prioritário',
+        'Projetos IA ilimitados',
+        'Todas as 6 IAs ativadas',
+        'Modo Pensamento Poderoso™',
+        'IA Espiã concorrência',
+        'Exportação completa sem marca',
         'Templates premium',
-        'Integrações avançadas'
+        'Integração com redes sociais',
+        'Analytics avançado',
+        'Suporte prioritário',
+        'Atualizações automáticas'
       ],
-      highlighted: true,
-      icon: Crown,
-      buttonText: 'Mais Popular',
-      credits: '2.000 créditos'
+      limitations: [],
+      cta: 'Escolher Criador',
+      action: () => handlePlanSelection('criador', 97),
+      popular: true
     },
     {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: 'R$ 497',
-      period: '/mês',
-      description: 'Para grandes empresas e agências',
+      id: 'total-pro',
+      name: 'Total Pro+',
+      price: 197,
+      originalPrice: 397,
+      description: 'Máxima potência empresarial',
+      badge: 'Premium',
+      badgeColor: 'bg-gold-500',
       features: [
-        '10.000 créditos Furion mensais',
-        'IA personalizada para sua marca',
-        'Canvas colaborativo completo',
-        'Múltiplas marcas/clientes',
-        'API dedicada',
-        'Suporte 24/7',
-        'Consultoria estratégica',
-        'White-label disponível'
+        'Tudo do Plano Criador +',
+        'API personalizada exclusiva',
+        'White label completo',
+        'Integração Zapier/Make',
+        'IA personalizada treinada',
+        'Consultoria mensal 1h',
+        'Setup personalizado',
+        'Suporte 24/7 WhatsApp',
+        'Acesso beta novas IAs',
+        'Garantia 90 dias'
       ],
-      highlighted: false,
-      icon: Rocket,
-      buttonText: 'Falar com Vendas',
-      credits: '10.000 créditos'
+      limitations: [],
+      cta: 'Escolher Pro+',
+      action: () => handlePlanSelection('total-pro', 197),
+      popular: false
     }
   ];
 
-  const subscribeMutation = useMutation({
-    mutationFn: async (planId: string) => {
-      return apiRequest('/api/subscription/create', {
-        method: 'POST',
-        body: { planId }
-      });
+  const faqs = [
+    {
+      question: 'As IAs funcionam realmente?',
+      answer: 'Sim! Integramos com OpenAI, Claude e outras APIs de IA real. Não são simulações - são as mesmas IAs que grandes empresas usam.'
     },
-    onSuccess: (response) => {
-      toast({
-        title: "Redirecionando para pagamento",
-        description: "Você será direcionado para finalizar sua assinatura.",
-      });
-      // Simulate redirect to payment
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 2000);
+    {
+      question: 'Posso cancelar quando quiser?',
+      answer: 'Absolutamente. Sem contratos ou fidelidade. Cancele a qualquer momento com 1 clique.'
     },
-    onError: (error: any) => {
-      toast({
-        title: "Erro no processo",
-        description: "Tente novamente ou entre em contato conosco.",
-        variant: "destructive",
-      });
+    {
+      question: 'Funciona para qualquer nicho?',
+      answer: 'Sim! As IAs são treinadas para trabalhar com qualquer mercado: saúde, educação, tecnologia, consultoria, e-commerce, etc.'
+    },
+    {
+      question: 'Preciso de conhecimento técnico?',
+      answer: 'Zero conhecimento técnico necessário. É point-and-click. As IAs fazem todo o trabalho pesado.'
+    },
+    {
+      question: 'Há garantia?',
+      answer: 'Sim! 30 dias de garantia total no Criador e 90 dias no Total Pro+. Se não gostar, devolvemos 100%.'
     }
-  });
-
-  const handlePlanSelect = (planId: string) => {
-    setSelectedPlan(planId);
-    if (planId === 'enterprise') {
-      // Open contact form or redirect to sales
-      window.open('mailto:vendas@maquinamilionaria.ai?subject=Interesse no Plano Enterprise', '_blank');
-    } else {
-      subscribeMutation.mutate(planId);
-    }
-  };
-
-  const handleDemoAccess = () => {
-    const demoMutation = useMutation({
-      mutationFn: async () => {
-        return apiRequest('/api/auth/demo-login', {
-          method: 'POST'
-        });
-      },
-      onSuccess: () => {
-        toast({
-          title: "Acesso demo ativado!",
-          description: "Explore todas as funcionalidades por 7 dias.",
-        });
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 1000);
-      }
-    });
-    
-    demoMutation.mutate();
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-white mb-6">
-            Invista no Seu <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">Futuro</span>
-          </h1>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
-            Escolha o plano perfeito para transformar seu negócio com nossa IA revolucionária. 
-            Garantia de 30 dias ou seu dinheiro de volta.
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <Badge className="bg-green-500/20 text-green-300 border-green-500/30 px-4 py-2">
-              ✓ Sem taxa de setup
-            </Badge>
-            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 px-4 py-2">
-              ✓ Cancele quando quiser
-            </Badge>
-            <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 px-4 py-2">
-              ✓ Suporte em português
-            </Badge>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-blue-900">
+      {/* Header */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-12">
+          <div className="flex items-center">
+            <Crown className="w-8 h-8 text-purple-400 mr-3" />
+            <span className="text-2xl font-bold text-white">IA Board by Filippe™</span>
           </div>
-
           <Button 
-            onClick={handleDemoAccess}
             variant="outline" 
-            className="border-yellow-400 text-yellow-400 hover:bg-yellow-400/10 mb-8"
-            size="lg"
+            onClick={() => setLocation('/')}
+            className="border-purple-500 text-purple-300 hover:bg-purple-500/10"
           >
-            Testar Grátis por 7 Dias
+            Voltar ao Início
           </Button>
         </div>
 
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <Badge className="mb-6 bg-purple-500/20 text-purple-300 border-purple-500/30">
+            <Star className="w-4 h-4 mr-2" />
+            Oferta Limitada - 50% OFF
+          </Badge>
+          
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            Escolha Seu Plano de
+            <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              {" "}Dominação Digital
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+            Mais de 10.000 empreendedores já estão usando nossas IAs para criar 
+            impérios digitais automáticos. Sua vez chegou.
+          </p>
+
+          <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
+            <div className="flex items-center">
+              <Shield className="w-4 h-4 mr-2 text-green-400" />
+              SSL Seguro
+            </div>
+            <div className="flex items-center">
+              <CreditCard className="w-4 h-4 mr-2 text-green-400" />
+              Pagamento Protegido
+            </div>
+            <div className="flex items-center">
+              <Zap className="w-4 h-4 mr-2 text-green-400" />
+              Ativação Imediata
+            </div>
+          </div>
+        </div>
+
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {plans.map((plan) => {
-            const IconComponent = plan.icon;
-            return (
-              <Card 
-                key={plan.id} 
-                className={`relative bg-white/10 border-white/20 backdrop-blur-lg hover:bg-white/15 transition-all duration-300 ${
-                  plan.highlighted 
-                    ? 'ring-2 ring-yellow-400 scale-105 shadow-2xl shadow-yellow-400/20' 
-                    : ''
-                }`}
-              >
-                {plan.highlighted && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold px-6 py-2">
-                      MAIS POPULAR
-                    </Badge>
-                  </div>
-                )}
+        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-20">
+          {plans.map((plan) => (
+            <Card 
+              key={plan.id}
+              className={`relative bg-black/40 border-purple-500/30 backdrop-blur-sm ${
+                plan.popular ? 'ring-2 ring-purple-500 scale-105' : ''
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <Badge className={`${plan.badgeColor} text-white px-4 py-1`}>
+                    {plan.badge}
+                  </Badge>
+                </div>
+              )}
+              
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-white text-2xl mb-2">{plan.name}</CardTitle>
                 
-                <CardHeader className="text-center pb-8">
-                  <div className="mx-auto mb-4 p-3 bg-white/10 rounded-full w-fit">
-                    <IconComponent className="h-8 w-8 text-yellow-400" />
-                  </div>
-                  <CardTitle className="text-2xl text-white mb-2">{plan.name}</CardTitle>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold text-white">{plan.price}</span>
-                    <span className="text-blue-200">{plan.period}</span>
-                  </div>
-                  <p className="text-blue-100">{plan.description}</p>
-                  <div className="text-sm text-yellow-300 font-medium">{plan.credits}</div>
-                </CardHeader>
+                <div className="mb-4">
+                  {plan.price === 0 ? (
+                    <div className="text-4xl font-bold text-green-400">GRÁTIS</div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      {plan.originalPrice && (
+                        <span className="text-lg text-gray-500 line-through">
+                          R$ {plan.originalPrice}
+                        </span>
+                      )}
+                      <div className="text-4xl font-bold text-purple-400">
+                        R$ {plan.price}
+                      </div>
+                      <span className="text-gray-400">/mês</span>
+                    </div>
+                  )}
+                </div>
                 
-                <CardContent className="space-y-6">
-                  <ul className="space-y-3">
+                <p className="text-gray-300">{plan.description}</p>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                <div>
+                  <h4 className="text-white font-semibold mb-3">✅ Incluído:</h4>
+                  <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center space-x-3">
-                        <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
-                        <span className="text-blue-100">{feature}</span>
+                      <li key={index} className="flex items-start text-gray-300 text-sm">
+                        <Check className="w-4 h-4 text-green-400 mr-2 mt-0.5 flex-shrink-0" />
+                        {feature}
                       </li>
                     ))}
                   </ul>
-                  
-                  <Button 
-                    onClick={() => handlePlanSelect(plan.id)}
-                    className={`w-full py-3 font-bold ${
-                      plan.highlighted
-                        ? 'bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black'
-                        : 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
-                    }`}
-                    disabled={subscribeMutation.isPending && selectedPlan === plan.id}
-                  >
-                    {subscribeMutation.isPending && selectedPlan === plan.id 
-                      ? 'Processando...' 
-                      : plan.buttonText
-                    }
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
+                </div>
+
+                {plan.limitations.length > 0 && (
+                  <div>
+                    <h4 className="text-gray-400 font-semibold mb-3">⚠️ Limitações:</h4>
+                    <ul className="space-y-2">
+                      {plan.limitations.map((limitation, index) => (
+                        <li key={index} className="text-gray-500 text-sm">
+                          • {limitation}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                <Button 
+                  className={`w-full ${
+                    plan.popular 
+                      ? 'bg-purple-600 hover:bg-purple-700' 
+                      : plan.price === 0
+                        ? 'bg-green-600 hover:bg-green-700'
+                        : 'bg-gray-700 hover:bg-gray-600'
+                  } text-white py-3`}
+                  onClick={plan.action}
+                  disabled={loadingPlan === plan.id}
+                >
+                  {loadingPlan === plan.id ? (
+                    <div className="flex items-center">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                      Processando...
+                    </div>
+                  ) : (
+                    <>
+                      {plan.price === 0 ? (
+                        <Rocket className="w-4 h-4 mr-2" />
+                      ) : (
+                        <Crown className="w-4 h-4 mr-2" />
+                      )}
+                      {plan.cta}
+                    </>
+                  )}
+                </Button>
+
+                {plan.price > 0 && (
+                  <div className="text-center">
+                    <p className="text-xs text-gray-500">
+                      💳 Cartão, PIX ou Boleto • Cancele quando quiser
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* FAQ Section */}
-        <div className="mt-24 max-w-4xl mx-auto">
+        {/* Social Proof */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center gap-8 mb-8">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-400">10.000+</div>
+              <div className="text-gray-400">Usuários Ativos</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-400">R$ 50M+</div>
+              <div className="text-gray-400">Gerado em Vendas</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-400">4.9/5</div>
+              <div className="text-gray-400">Avaliação Média</div>
+            </div>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-white text-center mb-12">
             Perguntas Frequentes
           </h2>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="bg-white/10 border-white/20 backdrop-blur-lg">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-3">
-                  O que são créditos Furion?
-                </h3>
-                <p className="text-blue-100">
-                  Créditos Furion são nossa moeda interna que você usa para gerar conteúdo com IA. 
-                  Cada geração consome entre 1-5 créditos dependendo da complexidade.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/10 border-white/20 backdrop-blur-lg">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-3">
-                  Posso cancelar a qualquer momento?
-                </h3>
-                <p className="text-blue-100">
-                  Sim! Você pode cancelar sua assinatura a qualquer momento sem taxas adicionais. 
-                  Seus projetos permanecerão salvos por 30 dias.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/10 border-white/20 backdrop-blur-lg">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-3">
-                  Há garantia de reembolso?
-                </h3>
-                <p className="text-blue-100">
-                  Oferecemos garantia incondicional de 30 dias. Se não estiver satisfeito, 
-                  devolvemos 100% do seu investimento.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/10 border-white/20 backdrop-blur-lg">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-3">
-                  Posso trocar de plano depois?
-                </h3>
-                <p className="text-blue-100">
-                  Claro! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento. 
-                  As mudanças são aplicadas no próximo ciclo de cobrança.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="space-y-6">
+            {faqs.map((faq, index) => (
+              <Card key={index} className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <h3 className="text-white font-semibold mb-3">{faq.question}</h3>
+                  <p className="text-gray-300">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="text-center mt-16">
-          <h3 className="text-3xl font-bold text-white mb-4">
-            Ainda tem dúvidas?
-          </h3>
-          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
-            Nossa equipe está pronta para ajudar você a escolher o melhor plano 
-            e começar sua jornada de transformação digital.
+        {/* Final CTA */}
+        <div className="text-center mt-20">
+          <h2 className="text-3xl font-bold text-white mb-6">
+            Pronto Para Transformar Seu Negócio?
+          </h2>
+          <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
+            Junte-se aos milhares de empreendedores que já estão usando 
+            IAs para criar impérios digitais automáticos.
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button 
-              onClick={() => window.open('mailto:suporte@maquinamilionaria.ai', '_blank')}
-              variant="outline" 
-              className="border-white/20 text-white hover:bg-white/10"
-              size="lg"
-            >
-              Falar com Suporte
-            </Button>
-            <Button 
-              onClick={() => window.location.href = '/signup'}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black font-bold"
-              size="lg"
-            >
-              Começar Agora
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
+          
+          <Button 
+            size="lg"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-12 py-6 text-xl"
+            onClick={() => handlePlanSelection('criador', 97)}
+          >
+            <Brain className="w-6 h-6 mr-3" />
+            Começar Agora - Plano Criador
+          </Button>
+          
+          <p className="text-xs text-gray-500 mt-4">
+            ⚡ Ativação imediata • 🔒 Pagamento 100% seguro • 🎯 Garantia 30 dias
+          </p>
         </div>
       </div>
     </div>

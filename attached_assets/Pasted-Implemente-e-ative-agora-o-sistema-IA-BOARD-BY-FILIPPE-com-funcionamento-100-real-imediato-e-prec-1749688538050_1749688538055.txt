@@ -1,0 +1,91 @@
+Implemente e ative agora o sistema IA BOARD BY FILIPPE™ com funcionamento 100% real, imediato e preciso.
+
+⚠️ ATENÇÃO:  
+**Tudo — absolutamente tudo — DEVE funcionar de verdade.**  
+Não pode haver:
+- Elementos visuais falsos
+- Botões com animação mas sem função
+- CTAs sem execução real
+- APIs simuladas
+- Interações quebradas ou incompletas
+
+---
+
+✅ OBJETIVO: EXECUÇÃO TOTAL REAL
+
+1. **TODOS OS BOTÕES (CTAs) DEVEM FUNCIONAR PRECISAMENTE.**
+   - Cada botão deve estar conectado a uma função JavaScript **real**, com execução de ação concreta, visível e com retorno imediato.
+   - Use `addEventListener('click', async () => { ... })` para todos os botões
+   - Exemplo:
+     - “Gerar Produto” → `gerarProdutoIA()`
+     - “Criar Página de Vendas” → `criarPaginaDeVendas()`
+     - “Exportar PDF” → `baixarPDF()`
+     - “Ativar IA Espiã” → `ativarIAEspia()`
+
+2. **TODAS AS APIS DE IA DEVEM FUNCIONAR REALMENTE.**
+   - **Integrar e funcionar** com:
+     - OpenAI API → geração de texto, roteiro, copy
+     - Claude API → estruturação estratégica
+     - Gemini API → headlines, nomes, criatividade
+   - As requisições devem ser **funcionais e reais**, com:
+     - `fetch()` ou `axios`
+     - `Authorization: Bearer` com minhas futuras chaves
+     - `POST` com corpo JSON completo
+     - Resposta tratada e exibida em tela ou bloco
+
+---
+
+📈 O SISTEMA DEVE INICIAR FLUXOS REAIS:
+
+3. **AO CLICAR EM “COMEÇAR PRODUTO INTELIGENTE”**
+   - Se Modo Pensamento Poderoso™ for ativado:
+     - A IA deve **iniciar sozinha** a execução sequencial de todos os blocos do funil
+     - Os blocos devem ser exibidos no **quadro infinito**, conectados automaticamente com linhas animadas
+     - Cada bloco deve ter status visual: “Processando…”, “Concluído ✅”, ou “Erro ❌”
+   - Se o usuário escolher modo manual:
+     - Permitir que ele selecione manualmente os blocos
+     - Cada ação deve abrir um pop-up funcional, com campos reais, preenchidos com IA
+
+---
+
+🧩 TODOS OS POP-UPS E MÓDULOS DEVEM FUNCIONAR:
+
+4. **QUADRO INFINITO FUNCIONAL COM:**
+   - Drag & drop fluído
+   - Zoom com scroll
+   - Criação visual automática de blocos com lógica
+   - Pop-up inicial de escolha (IA faz tudo ou usuário manual)
+   - Módulo de link externo:
+     - Inserir link
+     - Nome
+     - Descrição
+     - Adicionar ao board como bloco conectável
+
+---
+
+💳 SISTEMA DE PLANO + PAGAMENTO REAL:
+
+5. **CRIAR INFRAESTRUTURA DE PAGAMENTO REAL INTEGRÁVEL:**
+   - Stripe / MercadoPago / PayPal prontos para funcionar
+   - Cada plano com permissões visíveis (Demo, Criador, Total Pro+)
+   - Sistema deve permitir que eu insira posteriormente minhas:
+     - Keys secretas
+     - Webhooks
+     - URLs de retorno
+
+---
+
+🎥 PÁGINA INICIAL COM CONTEÚDO REAL:
+
+6. **Tela inicial com conteúdo real, funcional e fluído:**
+   - Título: “IA Board by Filippe – Construa produtos e vendas com IAs reais”
+   - Botões: Login, Registro, Conta Demo
+   - Seleção de planos após login
+   - Embutir vídeos reais com:
+     - Avaliações
+     - Demonstrações do sistema
+   - VSL gerada por IA com roteiro, voz, visual e embed MP4
+
+---
+
+📂 ORGANIZAÇÃO E ARQUITETURA DE CÓDIGO:

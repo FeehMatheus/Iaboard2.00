@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { NodePopup } from '@/components/NodePopup';
 import { ActionButton, DownloadButton } from '@/components/ActionButton';
 import { InteractiveFeedback, FeedbackButton } from '@/components/InteractiveFeedback';
+import { ModoPensamentoPoderoso } from '@/components/ModoPensamentoPoderoso';
 import { 
   Plus, Move, ZoomIn, ZoomOut, Grid, Save, Download,
   FileText, Video, Mail, Target, TrendingUp, Brain,
@@ -61,6 +62,7 @@ export default function Board() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [showNodeCreator, setShowNodeCreator] = useState(false);
+  const [showPensamentoPoderoso, setShowPensamentoPoderoso] = useState(false);
   const [newNodePosition, setNewNodePosition] = useState({ x: 0, y: 0 });
   
   const [canvasState, setCanvasState] = useState<CanvasState>({
