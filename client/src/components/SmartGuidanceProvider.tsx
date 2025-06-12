@@ -63,7 +63,7 @@ export const SmartGuidanceProvider: React.FC<SmartGuidanceProviderProps> = ({
     // Save to localStorage (excluding sessionTime)
     const toSave = {
       ...state,
-      completedActions: [...state.completedActions]
+      completedActions: Array.from(state.completedActions)
     };
     localStorage.setItem('ia-board-guidance-state', JSON.stringify(toSave));
   }, [state.userLevel, state.currentContext, state.completedActions, state.guidanceEnabled]);
@@ -88,7 +88,7 @@ export const SmartGuidanceProvider: React.FC<SmartGuidanceProviderProps> = ({
   const markActionCompleted = (action: string) => {
     setState(prev => ({
       ...prev,
-      completedActions: new Set([...prev.completedActions, action])
+      completedActions: new Set(Array.from(prev.completedActions).concat([action]))
     }));
   };
 

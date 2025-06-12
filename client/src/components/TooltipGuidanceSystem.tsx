@@ -210,7 +210,7 @@ export const TooltipGuidanceSystem: React.FC<TooltipGuidanceProps> = ({
       
       if (tooltip && shouldShowTooltip(tooltip)) {
         setClickedElement(tooltip.id);
-        setActiveTooltips(prev => new Set([...prev, tooltip.id]));
+        setActiveTooltips(prev => new Set(Array.from(prev).concat([tooltip.id])));
       }
     };
 
@@ -243,8 +243,8 @@ export const TooltipGuidanceSystem: React.FC<TooltipGuidanceProps> = ({
 
   const handleTooltipComplete = (tooltipId: string) => {
     setCompletedTooltips(prev => {
-      const newSet = new Set([...prev, tooltipId]);
-      localStorage.setItem('tooltip-guidance-completed', JSON.stringify([...newSet]));
+      const newSet = new Set(Array.from(prev).concat([tooltipId]));
+      localStorage.setItem('tooltip-guidance-completed', JSON.stringify(Array.from(newSet)));
       return newSet;
     });
     

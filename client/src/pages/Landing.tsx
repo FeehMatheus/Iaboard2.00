@@ -232,7 +232,7 @@ Não perca esta oportunidade única de transformar seu negócio com a mais avan�
                       </div>
                     </div>
                   ) : (
-                    <div className="aspect-video bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-lg flex items-center justify-center group cursor-pointer relative overflow-hidden border-2 border-purple-500/30 hover:border-purple-400/50 transition-colors"
+                    <div className="video-generator-btn aspect-video bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-lg flex items-center justify-center group cursor-pointer relative overflow-hidden border-2 border-purple-500/30 hover:border-purple-400/50 transition-colors"
                          onClick={generatePromoVideo}>
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-blue-600/20"></div>
                       <div className="text-center text-white z-10">

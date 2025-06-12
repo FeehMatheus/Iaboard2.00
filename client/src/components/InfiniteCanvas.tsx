@@ -488,7 +488,7 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
         </div>
 
         <motion.div
-          className="w-full h-full relative cursor-grab active:cursor-grabbing"
+          className="infinite-canvas w-full h-full relative cursor-grab active:cursor-grabbing"
           style={{
             transform: `scale(${zoom}) translate(${panX}px, ${panY}px)`,
             transformOrigin: '0 0'
@@ -565,7 +565,7 @@ export default function InfiniteCanvas({ onExport, onSave, powerfulAIMode }: Inf
               } : {}}
               transition={{ duration: 2, repeat: node.status === 'active' ? Infinity : 0 }}
             >
-              <Card className={`w-full h-full border-2 transition-all duration-200 ${
+              <Card className={`ai-module-card w-full h-full border-2 transition-all duration-200 ${
                 node.status === 'completed' 
                   ? 'bg-green-50 border-green-500' 
                   : node.status === 'active'
