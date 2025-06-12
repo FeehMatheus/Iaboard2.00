@@ -1,0 +1,123 @@
+Corrija, reorganize, reconecte e implemente imediatamente o sistema completo do IA BOARD BY FILIPPE™ para que funcione como uma plataforma SaaS finalizada, funcional e profissional, com as seguintes exigências técnicas de execução obrigatória:
+
+---
+
+✅ 1. **TODAS AS FERRAMENTAS DEVEM FUNCIONAR 100% DENTRO DO QUADRO INFINITO**
+
+- Remova **qualquer ferramenta ou funcionalidade da pós-página que esteja fora do fluxo do quadro infinito**, como:
+  - “Gerador de Conteúdo com IA” ou qualquer widget lateral solto
+- Nenhuma ferramenta deve ser removida do sistema — apenas migrada para **blocos funcionais e conectáveis dentro do quadro infinito**
+- Cada ferramenta deve ter seu próprio **bloco interativo**, com botões reais, pop-up embutido e execução com IA real
+- O fluxo de todas as funcionalidades deve seguir o **sistema visual dinâmico e centralizado** do quadro infinito, com drag & drop, zoom e linhas de conexão animadas entre blocos
+
+---
+
+✅ 2. **CORREÇÃO COMPLETA DE BUGS VISUAIS**
+
+- Corrija todos os problemas de UI/UX, incluindo:
+  - Botões com fundo e texto branco (invisíveis)
+  - Elementos sobrepostos
+  - Componentes desalinhados ou mal responsivos
+  - Layout quebrado em resoluções menores
+- Utilize TailwindCSS e grid responsiva para um design limpo, organizado e moderno
+- Aplique `text-white`, `bg-indigo-600`, `hover:opacity-80`, `focus:ring`, `rounded-xl`, entre outras boas práticas
+- Padronize cores, fontes, espaçamentos e alinhamentos
+
+---
+
+✅ 3. **TODAS AS FUNÇÕES DEVEM SER REAIS E FUNCIONAIS**
+
+- Cada botão de ação (CTA) deve estar vinculado a uma função JavaScript funcional com `addEventListener` e `async/await`
+- Todos os CTAs devem:
+  - Executar processos reais
+  - Exibir **feedback visual**: “Executando...”, “Sucesso ✅”, “Erro ❌”
+  - Gerar **resultados visíveis** dentro do bloco correspondente
+
+📌 Exemplos:
+```js
+document.querySelector(`#executar-${id}`).addEventListener("click", async () => {
+  atualizarStatusBloco(id, "Executando...");
+  const resposta = await chamarAPIIAreal(conteudo);
+  atualizarStatusBloco(id, "Concluído ✅");
+  exibirResultado(id, resposta);
+});
+✅ 4. INTEGRAÇÃO OBRIGATÓRIA COM APIS DE IA REAIS
+
+Todas as ferramentas e blocos devem:
+
+Conectar-se às APIs reais de IA:
+
+OpenAI (copy, texto, pdf)
+
+Claude (organização, estratégia)
+
+Gemini (criatividade, headlines)
+
+Realizar chamadas fetch() com autenticação Bearer, cabeçalhos válidos e JSON correto
+
+Retornar dados para o bloco visual correspondente
+
+Exemplo:
+
+js
+Copiar
+Editar
+const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${OPENAI_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ model: "gpt-4", messages: [{ role: "user", content: prompt }] })
+});
+✅ 5. IMPLEMENTAÇÃO DE NOVAS FUNÇÕES REAIS NO SISTEMA
+
+Todas as ferramentas devem ser enriquecidas com funções reais e ampliadas:
+
+Exportar: exportarBlocoComoPDF(id)
+
+Salvar fluxo atual: salvarFunilNaNuvem()
+
+Importar projeto anterior: importarFunilUsuario()
+
+Executar IA total: ativarModoPensamentoPoderoso()
+
+Conectar link externo: vincularLinkAoBloco(link, id)
+
+✅ 6. PADRÃO DE ORGANIZAÇÃO DO CÓDIGO:
+
+markdown
+Copiar
+Editar
+/js
+  - auth.js             // login, registro, conta demo
+  - board.js            // quadro infinito, blocos, conexões
+  - blocos.js           // lógica dos blocos (executar, gerar, exportar)
+  - iaApi.js            // integração com APIs de IA reais
+  - ferramentas.js      // cada ferramenta transformada em módulo real
+  - popups.js           // popups editáveis dinâmicos
+/css
+  - tailwind.css        // visual moderno e responsivo
+/components
+  - popupPensamento.js
+  - popupLink.js
+  - blocoGerador.js
+  - blocoVideoIA.js
+  - blocoPagina.js
+🎯 OBJETIVO FINAL:
+
+O IA BOARD BY FILIPPE™ deve:
+
+✅ Ter todas as ferramentas operando como blocos reais dentro do quadro infinito
+✅ Ter todas as CTAs funcionando de verdade com ações reais e feedback visual
+✅ Ter APIs de IA integradas e retornando dados reais
+✅ Ter visual totalmente corrigido, limpo e acessível
+✅ Ter novas funções como exportação, salvamento, conexão de links, execução IA total
+✅ Estar 100% pronto para o usuário usar agora, sem bugs, sem placeholders, sem aparência falsa
+
+🚫 Nenhuma ferramenta pode ser perdida
+🚫 Nenhum botão pode estar sem ação real
+🚫 Nenhum bloco pode ser decorativo
+
+⚡ Tudo deve funcionar com precisão total.
+👑 Essa é a plataforma IA BOARD BY FILIPPE™ – versão final, real, poderosa e pronta para o mundo.
