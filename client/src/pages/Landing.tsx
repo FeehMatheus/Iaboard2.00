@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
+import { useGuidance } from '@/components/SmartGuidanceProvider';
 import { 
   Brain, Crown, Zap, Target, TrendingUp, Video, 
   FileText, Mail, Star, Check, Play, ArrowRight
@@ -14,6 +15,12 @@ export default function Landing() {
   const [videoLoading, setVideoLoading] = useState(false);
   const [generatedVideo, setGeneratedVideo] = useState<any>(null);
   const [showPromoVideo, setShowPromoVideo] = useState(false);
+  const { updateContext, markActionCompleted } = useGuidance();
+
+  // Update guidance context when entering landing page
+  useEffect(() => {
+    updateContext('landing');
+  }, [updateContext]);
 
   const generatePromoVideo = async () => {
     try {
