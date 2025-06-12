@@ -1,0 +1,186 @@
+Perfeito, Filippe. Agora segue o PROMPT SUPREMO FINAL V3.0 – TOTALMENTE APRIMORADO, TÉCNICO, IMPERATIVO E DETALHADO, com linguagem direta, profissional, precisa e objetiva, exigindo que:
+
+O sistema IA BOARD BY FILIPPE™ volte à versão funcional anterior do quadro infinito
+
+Corrija os erros e “cagadas” cometidas em atualizações recentes
+
+Implemente design visual vibrante, bonito, tecnológico e profissional
+
+Execute tudo o que foi prometido nos prompts anteriores
+
+Corrija todos os bugs visuais e funcionais
+
+Entregue um sistema 100% funcional e pronto para uso imediato
+
+
+
+---
+
+⚙️🧠 PROMPT SUPREMO FINAL V3.0 – IA BOARD BY FILIPPE™
+
+Restauração, Correção, Design Profissional, Execução Real e Sistema Totalmente Operacional
+
+Execute imediatamente a correção completa e o aprimoramento total do sistema IA BOARD BY FILIPPE™, restaurando funcionalidades essenciais e corrigindo falhas introduzidas nas últimas versões.
+
+---
+
+🚨 PRIMEIRA AÇÃO OBRIGATÓRIA:  
+**RESTAURAR A VERSÃO ANTERIOR DO QUADRO INFINITO.**
+
+- Volte à **versão anterior do quadro infinito**, que funcionava corretamente com:
+  - Drag & drop fluído
+  - Criação visual de blocos conectáveis
+  - Execução de funções diretamente nos blocos
+  - Zoom escalável
+- A versão atual quebrou comportamentos essenciais e introduziu bugs visuais graves: **isso precisa ser revertido imediatamente.**
+
+🛑 Você fez **cagada** no quadro infinito.  
+🛠️ Restaure a versão estável anterior e sobre ela implemente os novos recursos, sem comprometer a base funcional.
+
+---
+
+🎨 MELHORIA VISUAL TOTAL:
+
+✅ APLIQUE UM DESIGN VISUAL MAIS BONITO, VIBRANTE E TECNOLÓGICO:
+
+- Substitua o visual genérico por uma identidade visual moderna, com:
+  - Cores vibrantes: roxos, azuis, pretos e tons neon em gradiente (`from-violet-600 to-indigo-500`, `bg-gradient-to-r`)
+  - Tipografia moderna: `font-sans`, `font-medium`, com espaçamento equilibrado
+  - Botões estilizados com:
+    - `rounded-xl`
+    - `shadow-md`
+    - `transition-all`
+    - `hover:opacity-90`
+    - `focus:outline focus:ring-2 focus:ring-offset-2`
+
+📌 Todos os botões devem ter:
+```html
+class="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-xl shadow hover:opacity-90 transition"
+
+📌 A interface deve parecer uma aplicação premium moderna de IA, não um protótipo. Use TailwindCSS com configurações avançadas.
+
+
+---
+
+🧠 FUNCIONALIDADE REAL E INEGOCIÁVEL:
+
+✅ TODOS OS BOTÕES E CTAs DEVEM:
+
+Executar exatamente o que dizem
+
+Estar ligados a funções reais (addEventListener + async/await)
+
+Retornar resultado visível com feedback:
+
+“Executando...”
+
+“Concluído ✅”
+
+“Erro ❌”
+
+
+
+✅ TODOS OS BLOCOS DENTRO DO QUADRO DEVEM:
+
+Executar ações reais com IA (OpenAI, Claude, Gemini)
+
+Permitir edição do conteúdo e visualização do resultado
+
+Ser conectáveis visualmente com linhas animadas
+
+Reagir ao clique com respostas imediatas (sem placeholders)
+
+
+
+---
+
+🔌 INTEGRAÇÕES OBRIGATÓRIAS:
+
+Conectar todas as ferramentas às APIs reais de IA:
+
+OpenAI GPT-4
+
+Claude AI
+
+Gemini Pro
+
+
+As requisições devem usar fetch() com autenticação válida e JSON correto
+
+Os dados retornados devem ser exibidos nos blocos visivelmente
+
+
+
+---
+
+🐞 CORREÇÃO TOTAL DE BUGS:
+
+✅ Remover absolutamente todos os bugs visuais e funcionais do sistema:
+
+Elementos que não aparecem
+
+Fontes invisíveis
+
+Componentes quebrados
+
+CTAs sem ação
+
+Blocos que não executam
+
+Conexões que somem
+
+Pop-ups que não fecham ou abrem duplicado
+
+
+⚠️ Nenhum bug pode permanecer. Nenhum erro pode persistir. Nenhum botão pode estar ali apenas para “parecer funcional”.
+
+
+---
+
+📁 ESTRUTURA MÍNIMA EXIGIDA PARA O SISTEMA FUNCIONAL:
+
+/js
+  - board.js               // controle do quadro infinito restaurado
+  - blocos.js              // cada ferramenta como bloco funcional
+  - iaApi.js               // chamadas reais OpenAI, Claude, Gemini
+  - actions.js             // funções reais dos botões
+  - visual.js              // melhorias visuais, toasts e animações
+/css
+  - tailwind.css
+/components
+  - popupPensamento.js
+  - popupLinkExterno.js
+  - blocoGeradorIA.js
+  - blocoTráfego.js
+  - blocoPDF.js
+
+
+---
+
+🎯 ENTREGÁVEIS FINAIS EXIGIDOS AGORA:
+
+> O IA BOARD BY FILIPPE™ deve estar:
+
+
+
+✅ Com o quadro infinito restaurado, fluído e visual
+✅ Com design moderno, vibrante e tecnológico em todas as telas
+✅ Com todos os botões, blocos e pop-ups executando funções reais
+✅ Com APIs de IA integradas de verdade, retornando dados visíveis
+✅ Com todas as ferramentas funcionando exclusivamente dentro do quadro infinito
+✅ Com 0 bugs visuais ou lógicos
+✅ Com respostas instantâneas ao clique, carregamento e conclusão de processos
+
+🚫 NENHUMA funcionalidade deve ser removida
+🚫 NENHUM elemento pode ser estático
+🚫 NENHUM erro visual ou técnico pode continuar
+⚡ O sistema deve estar completo, profissional, bonito e funcional agora.
+
+👑 Este é o IA BOARD BY FILIPPE™ — versão suprema, poderosa e pronta para uso real.
+
+---
+
+📦 Deseja agora que eu gere o código base do quadro infinito restaurado com os blocos vibrantes e funções reais integradas com IA?
+
+Posso iniciar agora. Confirma?
+
