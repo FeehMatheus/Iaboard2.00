@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface GuidanceState {
   userLevel: 'beginner' | 'intermediate' | 'advanced';
@@ -62,8 +62,10 @@ export const SmartGuidanceProvider: React.FC<SmartGuidanceProviderProps> = ({
   useEffect(() => {
     // Save to localStorage (excluding sessionTime)
     const toSave = {
-      ...state,
-      completedActions: Array.from(state.completedActions)
+      userLevel: state.userLevel,
+      currentContext: state.currentContext,
+      completedActions: Array.from(state.completedActions),
+      guidanceEnabled: state.guidanceEnabled
     };
     localStorage.setItem('ia-board-guidance-state', JSON.stringify(toSave));
   }, [state.userLevel, state.currentContext, state.completedActions, state.guidanceEnabled]);
@@ -77,9 +79,12 @@ export const SmartGuidanceProvider: React.FC<SmartGuidanceProviderProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  const updateContext = (context: string) => {
-    setState(prev => ({ ...prev, currentContext: context }));
-  };
+  const updateContext = useCallback((context: string) => {
+    setState(prev => {
+      if (prev.currentContext === context) return prev;
+      return { ...prev, currentContext: context };
+    });
+  }, []);
 
   const setUserLevel = (level: 'beginner' | 'intermediate' | 'advanced') => {
     setState(prev => ({ ...prev, userLevel: level }));

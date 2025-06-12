@@ -1,9 +1,8 @@
-import { Switch, Route } from 'wouter';
+import { Switch, Route, useLocation } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ui/theme-provider';
-import SmartGuidanceProvider from '@/components/SmartGuidanceProvider';
-import TooltipGuidanceSystem from '@/components/TooltipGuidanceSystem';
+import SmartGuidance from '@/components/SmartGuidance';
 import Landing from '@/pages/Landing';
 import Dashboard from '@/pages/Dashboard';
 import Board from '@/pages/Board';
@@ -23,26 +22,32 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
+  const [location] = useLocation();
+  
+  const getCurrentContext = () => {
+    if (location === '/board') return 'board';
+    if (location === '/dashboard') return 'dashboard';
+    return 'landing';
+  };
+
   return (
     <ThemeProvider defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
-        <SmartGuidanceProvider>
-          <div className="min-h-screen bg-gray-900">
-            <Switch>
-              <Route path="/" component={Landing} />
-              <Route path="/dashboard" component={Dashboard} />
-              <Route path="/board" component={Board} />
-              <Route>
-                <Landing />
-              </Route>
-            </Switch>
-            <TooltipGuidanceSystem 
-              context="global" 
-              userLevel="beginner" 
-            />
-            <Toaster />
-          </div>
-        </SmartGuidanceProvider>
+        <div className="min-h-screen bg-gray-900">
+          <Switch>
+            <Route path="/" component={Landing} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/board" component={Board} />
+            <Route>
+              <Landing />
+            </Route>
+          </Switch>
+          <SmartGuidance 
+            currentContext={getCurrentContext()}
+            userLevel="beginner"
+          />
+          <Toaster />
+        </div>
       </QueryClientProvider>
     </ThemeProvider>
   );
