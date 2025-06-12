@@ -5,6 +5,7 @@ import OpenAI from "openai";
 import { aiContentGenerator } from "./ai-content-generator";
 import { aiEngineSupreme } from "./ai-engine-supreme";
 import { furionAI } from "./furion-ai-system";
+import { videoGenerator } from "./video-generator";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1355,6 +1356,144 @@ Make the content professional, persuasive, and conversion-focused.`;
     } catch (error) {
       console.error('Execution status error:', error);
       res.status(500).json({ error: 'Failed to get execution status' });
+    }
+  });
+
+  // Video Generation API Routes
+  app.post('/api/video/generate', async (req, res) => {
+    try {
+      const { script, style, duration, voiceGender, backgroundMusic, subtitles } = req.body;
+      
+      if (!script) {
+        return res.status(400).json({ error: 'Script is required' });
+      }
+
+      const videoRequest = {
+        script,
+        style: style || 'promotional',
+        duration: duration || 60,
+        voiceGender: voiceGender || 'female',
+        backgroundMusic: backgroundMusic || true,
+        subtitles: subtitles || true
+      };
+
+      const generatedVideo = await videoGenerator.generateVideo(videoRequest);
+
+      res.json({
+        success: true,
+        video: generatedVideo,
+        message: 'Video generated successfully'
+      });
+    } catch (error) {
+      console.error('Video generation error:', error);
+      res.status(500).json({ error: 'Failed to generate video' });
+    }
+  });
+
+  // VSL Video Generation
+  app.post('/api/video/generate-vsl', async (req, res) => {
+    try {
+      const { productInfo, duration } = req.body;
+      
+      if (!productInfo) {
+        return res.status(400).json({ error: 'Product information is required' });
+      }
+
+      const vslVideo = await videoGenerator.generateVSLVideo(productInfo, duration || 120);
+
+      res.json({
+        success: true,
+        video: vslVideo,
+        message: 'VSL video generated successfully'
+      });
+    } catch (error) {
+      console.error('VSL generation error:', error);
+      res.status(500).json({ error: 'Failed to generate VSL' });
+    }
+  });
+
+  // Demo Video Generation
+  app.post('/api/video/generate-demo', async (req, res) => {
+    try {
+      const demoVideo = await videoGenerator.generateDemoVideo();
+
+      res.json({
+        success: true,
+        video: demoVideo,
+        message: 'Demo video generated successfully'
+      });
+    } catch (error) {
+      console.error('Demo video generation error:', error);
+      res.status(500).json({ error: 'Failed to generate demo video' });
+    }
+  });
+
+  // External Video Link Processing
+  app.post('/api/video/process-external', async (req, res) => {
+    try {
+      const { url } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ error: 'Video URL is required' });
+      }
+
+      const processedResult = await videoGenerator.processExternalVideoLink(url);
+
+      res.json({
+        success: processedResult.processed,
+        data: processedResult.videoData,
+        message: processedResult.processed ? 'Video link processed successfully' : 'Failed to process video link'
+      });
+    } catch (error) {
+      console.error('External video processing error:', error);
+      res.status(500).json({ error: 'Failed to process external video' });
+    }
+  });
+
+  // Canvas Video Integration
+  app.post('/api/canvas/add-video', async (req, res) => {
+    try {
+      const { nodeId, videoType, videoData } = req.body;
+      
+      let generatedVideo;
+      
+      switch (videoType) {
+        case 'vsl':
+          generatedVideo = await videoGenerator.generateVSLVideo(videoData.productInfo, videoData.duration);
+          break;
+        case 'demo':
+          generatedVideo = await videoGenerator.generateDemoVideo();
+          break;
+        case 'custom':
+          generatedVideo = await videoGenerator.generateVideo({
+            script: videoData.script,
+            style: videoData.style || 'promotional',
+            duration: videoData.duration || 60,
+            voiceGender: videoData.voiceGender || 'female',
+            backgroundMusic: true,
+            subtitles: true
+          });
+          break;
+        default:
+          return res.status(400).json({ error: 'Invalid video type' });
+      }
+
+      // Update node with video data
+      const updatedNode = {
+        id: nodeId,
+        videoData: generatedVideo,
+        lastUpdated: new Date().toISOString()
+      };
+
+      res.json({
+        success: true,
+        node: updatedNode,
+        video: generatedVideo,
+        message: 'Video added to canvas successfully'
+      });
+    } catch (error) {
+      console.error('Canvas video integration error:', error);
+      res.status(500).json({ error: 'Failed to add video to canvas' });
     }
   });
 

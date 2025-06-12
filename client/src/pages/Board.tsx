@@ -56,6 +56,12 @@ export default function Board() {
   const [showInitialDecision, setShowInitialDecision] = useState(true);
   const [workflowMode, setWorkflowMode] = useState<'mpp' | 'manual' | null>(null);
   const [showPensamentoPoderoso, setShowPensamentoPoderoso] = useState(false);
+  const [showVideoDialog, setShowVideoDialog] = useState(false);
+  const [selectedVideoNode, setSelectedVideoNode] = useState<string | null>(null);
+  const [videoGenerating, setVideoGenerating] = useState(false);
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkNodeId, setLinkNodeId] = useState('');
   
   const [contextMenu, setContextMenu] = useState<ContextMenu>({
     x: 0,
