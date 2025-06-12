@@ -2,6 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
+import { aiContentGenerator } from "./ai-content-generator";
+import { aiEngineSupreme } from "./ai-engine-supreme";
+import { furionAI } from "./furion-ai-system";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

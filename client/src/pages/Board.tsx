@@ -25,7 +25,11 @@ import {
   gerarVideoIA,
   iniciarCampanhaAds,
   gerarFunilCompleto,
-  baixarPDF
+  baixarPDF,
+  gerarCopy,
+  gerarAvatarIA,
+  ativarIAEspia,
+  criarPaginaVendas
 } from '@/lib/aiActions';
 
 interface Node {
@@ -72,8 +76,8 @@ export default function Board() {
 
   // Initialize canvas state when data loads
   React.useEffect(() => {
-    if (canvasData) {
-      setCanvasState(canvasData);
+    if (canvasData && typeof canvasData === 'object') {
+      setCanvasState(canvasData as CanvasState);
     }
   }, [canvasData]);
 
@@ -255,66 +259,103 @@ export default function Board() {
             </div>
 
             <div className="flex gap-2">
-              <ActionButton
-                label="Executar"
-                loadingLabel="Processando"
-                successLabel="Concluído"
-                size="sm"
-                className="flex-1 text-xs"
-                action={async () => {
-                  // Execute based on node type
+              <FeedbackButton
+                nodeId={node.id}
+                nodeType={node.type}
+                actionName={`Executar ${nodeType?.title || node.type}`}
+                className="flex-1 text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                onClick={async () => {
+                  // Execute based on node type with real functions
                   switch (node.type) {
                     case 'produto':
-                      return gerarProdutoIA({
+                      const productResult = await gerarProdutoIA({
                         niche: 'marketing-digital',
                         audience: 'empreendedores',
                         priceRange: 'R$ 297 - R$ 497'
                       });
+                      handleNodeUpdate(node.id, { 
+                        progress: 100, 
+                        status: 'completed',
+                        content: productResult.data 
+                      });
+                      return productResult;
                     case 'copywriting':
-                      return { success: true, data: { copy: 'Copy gerada com sucesso!' } };
+                      const copyResult = await gerarCopy({
+                        tipo: 'headline',
+                        produto: 'Produto Digital',
+                        audience: 'empreendedores',
+                        objetivo: 'conversão'
+                      });
+                      handleNodeUpdate(node.id, { 
+                        progress: 100, 
+                        status: 'completed',
+                        content: copyResult.data 
+                      });
+                      return copyResult;
                     case 'vsl':
-                      return gerarVideoIA({
+                      const vslResult = await gerarVideoIA({
                         produto: 'Curso Digital',
                         duracao: '10-15 minutos',
                         audience: 'empreendedores'
                       });
+                      handleNodeUpdate(node.id, { 
+                        progress: 100, 
+                        status: 'completed',
+                        content: vslResult.data 
+                      });
+                      return vslResult;
                     case 'funnel':
-                      return gerarFunilCompleto({
+                      const funnelResult = await gerarFunilCompleto({
                         produto: 'Produto Digital',
                         audience: 'empreendedores',
                         objetivo: 'vendas'
                       });
+                      handleNodeUpdate(node.id, { 
+                        progress: 100, 
+                        status: 'completed',
+                        content: funnelResult.data 
+                      });
+                      return funnelResult;
                     case 'traffic':
-                      return iniciarCampanhaAds({
+                      const trafficResult = await iniciarCampanhaAds({
                         produto: 'Produto Digital',
                         budget: 100,
                         platform: 'Facebook',
                         audience: 'empreendedores'
                       });
+                      handleNodeUpdate(node.id, { 
+                        progress: 100, 
+                        status: 'completed',
+                        content: trafficResult.data 
+                      });
+                      return trafficResult;
                     default:
-                      return { success: true, data: { message: 'Ação executada' } };
+                      const defaultResult = { success: true, data: { message: 'Ação executada com sucesso' } };
+                      handleNodeUpdate(node.id, { 
+                        progress: 100, 
+                        status: 'completed',
+                        content: defaultResult.data 
+                      });
+                      return defaultResult;
                   }
                 }}
-                onSuccess={(result) => {
-                  handleNodeUpdate(node.id, { 
-                    progress: 100, 
-                    status: 'completed',
-                    content: result.data 
-                  });
-                }}
-              />
+              >
+                <Play className="h-3 w-3 mr-1" />
+                Executar
+              </FeedbackButton>
               
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs"
-                onClick={(e) => {
-                  e.stopPropagation();
+              <FeedbackButton
+                nodeId={node.id}
+                nodeType={node.type}
+                actionName="Abrir configurações"
+                className="text-xs px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                onClick={async () => {
                   handleNodeClick(node);
+                  return { success: true, data: { message: 'Configurações abertas' } };
                 }}
               >
                 <Eye className="h-3 w-3" />
-              </Button>
+              </FeedbackButton>
             </div>
 
             {node.content && Object.keys(node.content).length > 0 && (
@@ -527,6 +568,15 @@ export default function Board() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Interactive Feedback System */}
+      <InteractiveFeedback 
+        nodeId="board-main"
+        nodeType="canvas"
+        onFeedback={(feedback) => {
+          console.log('Board feedback:', feedback);
+        }}
+      />
     </div>
   );
 }
