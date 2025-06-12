@@ -11,6 +11,46 @@ import {
 export default function Landing() {
   const [, setLocation] = useLocation();
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(false);
+  const [generatedVideo, setGeneratedVideo] = useState<any>(null);
+  const [showPromoVideo, setShowPromoVideo] = useState(false);
+
+  const generatePromoVideo = async () => {
+    try {
+      setVideoLoading(true);
+      
+      const response = await fetch('/api/video/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          script: `Revolucione seu negócio com o IA BOARD BY FILIPPE - a plataforma mais avançada de inteligência artificial para empreendedores digitais. 
+
+Imagine ter acesso a 10 IAs especializadas trabalhando simultaneamente para criar produtos digitais completos, campanhas de marketing de alta conversão e estratégias de crescimento automático.
+
+Com nossa tecnologia exclusiva de Pensamento Poderoso, você obtém resultados extraordinários em tempo record. Milhares de empreendedores já estão dominando seus mercados com nossa plataforma.
+
+Crie VSLs cinematográficos, copies persuasivas, funis otimizados e campanhas de tráfego inteligentes - tudo com poucos cliques no nosso quadro infinito revolucionário.
+
+Não perca esta oportunidade única de transformar seu negócio com a mais avançada tecnologia de IA do mercado. Comece agora mesmo sua demo gratuita e descubra o poder da automação inteligente!`,
+          style: 'promotional',
+          duration: 120,
+          voiceGender: 'female',
+          backgroundMusic: true,
+          subtitles: true
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setGeneratedVideo(result.video);
+        setShowPromoVideo(true);
+      }
+    } catch (error) {
+      console.error('Video generation failed:', error);
+    } finally {
+      setVideoLoading(false);
+    }
+  };
 
   const handleDemoLogin = async () => {
     try {
@@ -146,21 +186,66 @@ export default function Landing() {
             <div className="relative max-w-4xl mx-auto">
               <Card className="bg-black/40 border-purple-500/30 backdrop-blur-sm">
                 <CardContent className="p-8">
-                  {!isVideoPlaying ? (
-                    <div 
-                      className="relative cursor-pointer group"
-                      onClick={() => setIsVideoPlaying(true)}
-                    >
-                      <div className="aspect-video bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-lg flex items-center justify-center">
-                        <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Play className="w-8 h-8 text-white ml-1" />
+                  {generatedVideo ? (
+                    <div className="aspect-video bg-black rounded-lg flex items-center justify-center relative group cursor-pointer overflow-hidden"
+                         onClick={() => window.open(generatedVideo.videoUrl, '_blank')}>
+                      {generatedVideo.thumbnailUrl ? (
+                        <img 
+                          src={generatedVideo.thumbnailUrl} 
+                          alt="IA Board Promotional Video" 
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+                          <div className="text-center text-white">
+                            <Video className="w-16 h-16 mx-auto mb-4 text-purple-300" />
+                            <h3 className="text-xl font-bold mb-2">Vídeo Promocional IA</h3>
+                            <p className="text-sm text-purple-200">Criado com IA cinematográfica</p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/30 rounded-lg group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                        <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
+                          <Play className="w-10 h-10 text-purple-600 ml-1" />
                         </div>
                       </div>
-                      <div className="absolute inset-0 bg-black/20 rounded-lg group-hover:bg-black/10 transition-colors"></div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <div className="bg-black/70 backdrop-blur-sm rounded-lg p-3">
+                          <h4 className="text-white font-bold text-sm">IA BOARD BY FILIPPE™</h4>
+                          <p className="text-purple-200 text-xs">Vídeo promocional gerado com IA real</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            <span className="text-xs text-white">Duração: {generatedVideo.scriptData?.totalDuration || 120}s</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : videoLoading ? (
+                    <div className="aspect-video bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-lg flex items-center justify-center">
+                      <div className="text-center text-white">
+                        <div className="w-16 h-16 border-4 border-purple-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <h3 className="text-xl font-bold mb-2">Gerando Vídeo Promocional...</h3>
+                        <p className="text-sm text-purple-200">IA criando conteúdo cinematográfico</p>
+                        <div className="mt-4 w-64 bg-purple-800/30 rounded-full h-2 mx-auto">
+                          <div className="bg-gradient-to-r from-purple-400 to-blue-400 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+                        </div>
+                      </div>
                     </div>
                   ) : (
-                    <div className="aspect-video bg-black rounded-lg flex items-center justify-center">
-                      <p className="text-white">Demonstração do IA Board em ação...</p>
+                    <div className="aspect-video bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-lg flex items-center justify-center group cursor-pointer relative overflow-hidden border-2 border-purple-500/30 hover:border-purple-400/50 transition-colors"
+                         onClick={generatePromoVideo}>
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-blue-600/20"></div>
+                      <div className="text-center text-white z-10">
+                        <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl mb-4 mx-auto">
+                          <Video className="w-10 h-10 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2">Gerar Vídeo Promocional</h3>
+                        <p className="text-purple-200 mb-4">Clique para criar um vídeo cinematográfico com IA</p>
+                        <div className="bg-black/30 backdrop-blur-sm rounded-lg p-3 inline-block">
+                          <p className="text-xs text-purple-300">✨ Narração profissional • 🎬 Visuais cinematográficos • 🎵 Trilha sonora</p>
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors"></div>
                     </div>
                   )}
                 </CardContent>
