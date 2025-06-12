@@ -4,17 +4,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { NodePopup } from '@/components/NodePopup';
+import { ActionButton, DownloadButton } from '@/components/ActionButton';
 import { 
   Plus, Move, ZoomIn, ZoomOut, Grid, Save, Download,
   FileText, Video, Mail, Target, TrendingUp, Brain,
   Crown, Settings, Home, Trash2, Edit3, Maximize2,
-  Play, Pause, RefreshCw, Copy, Share2
+  Play, Pause, RefreshCw, Copy, Share2, Eye
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import {
+  gerarProdutoIA,
+  gerarPaginaVendas,
+  gerarVideoIA,
+  iniciarCampanhaAds,
+  gerarFunilCompleto,
+  baixarPDF
+} from '@/lib/aiActions';
 
 interface Node {
   id: string;
@@ -26,6 +37,7 @@ interface Node {
   status: string;
   progress: number;
   connections: string[];
+  data?: any;
 }
 
 interface CanvasState {
@@ -39,6 +51,8 @@ export default function Board() {
   const { toast } = useToast();
   const canvasRef = useRef<HTMLDivElement>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [selectedNodeData, setSelectedNodeData] = useState<Node | null>(null);
+  const [showNodePopup, setShowNodePopup] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [showNodeCreator, setShowNodeCreator] = useState(false);
@@ -51,107 +65,87 @@ export default function Board() {
   });
 
   // Load canvas state
-  const { data: savedState } = useQuery({
+  const { data: canvasData } = useQuery({
     queryKey: ['/api/canvas/state'],
-    retry: 1,
+    onSuccess: (data) => {
+      if (data) {
+        setCanvasState(data);
+      }
+    }
   });
 
-  // Save canvas state mutation
-  const saveStateMutation = useMutation({
+  // Save canvas state
+  const saveCanvasMutation = useMutation({
     mutationFn: async (state: CanvasState) => {
-      return await apiRequest('POST', '/api/canvas/save', state);
+      return apiRequest('/api/canvas/save', {
+        method: 'POST',
+        body: state
+      });
     },
     onSuccess: () => {
       toast({
-        title: "Canvas Salvo",
-        description: "Seu trabalho foi salvo automaticamente.",
+        title: "Canvas salvo",
+        description: "Seu progresso foi salvo automaticamente.",
       });
-    },
+    }
   });
 
-  // Create node mutation
+  // Create new node
   const createNodeMutation = useMutation({
-    mutationFn: async (nodeData: any) => {
-      return await apiRequest('POST', '/api/canvas/nodes', nodeData);
+    mutationFn: async (nodeData: Partial<Node>) => {
+      return apiRequest('/api/canvas/nodes', {
+        method: 'POST',
+        body: nodeData
+      });
     },
     onSuccess: (newNode) => {
       setCanvasState(prev => ({
         ...prev,
-        nodes: [...prev.nodes, newNode]
+        nodes: [...prev.nodes, newNode as Node]
       }));
       setShowNodeCreator(false);
       toast({
-        title: "Nó Criado",
-        description: "Novo nó adicionado ao canvas.",
+        title: "Novo módulo criado",
+        description: "Módulo adicionado ao seu canvas.",
       });
-    },
+    }
   });
 
-  useEffect(() => {
-    if (savedState) {
-      setCanvasState(savedState);
-    }
-  }, [savedState]);
-
   const nodeTypes = [
-    { id: 'copywriting', name: 'Copy de Vendas', icon: FileText, color: 'bg-blue-500' },
-    { id: 'vsl', name: 'VSL', icon: Video, color: 'bg-red-500' },
-    { id: 'email', name: 'Email Marketing', icon: Mail, color: 'bg-green-500' },
-    { id: 'ads', name: 'Anúncios', icon: Target, color: 'bg-yellow-500' },
-    { id: 'funnel', name: 'Funil', icon: TrendingUp, color: 'bg-purple-500' },
-    { id: 'strategy', name: 'Estratégia', icon: Brain, color: 'bg-pink-500' },
+    { id: 'produto', title: 'Criador de Produto', icon: Brain, color: 'bg-purple-500', description: 'Gere produtos digitais completos com IA' },
+    { id: 'copywriting', title: 'Copywriter IA', icon: FileText, color: 'bg-blue-500', description: 'Crie copies persuasivas e headlines' },
+    { id: 'vsl', title: 'Gerador de VSL', icon: Video, color: 'bg-red-500', description: 'Roteiros de vídeo de alta conversão' },
+    { id: 'funnel', title: 'Construtor de Funil', icon: Target, color: 'bg-green-500', description: 'Funis completos otimizados' },
+    { id: 'traffic', title: 'Máquina de Tráfego', icon: TrendingUp, color: 'bg-yellow-500', description: 'Campanhas de tráfego inteligentes' },
+    { id: 'email', title: 'Sequências de Email', icon: Mail, color: 'bg-indigo-500', description: 'Automações de email marketing' },
+    { id: 'strategy', title: 'Estrategista IA', icon: Crown, color: 'bg-orange-500', description: 'Planejamento estratégico completo' }
   ];
 
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (rect) {
-        const x = (e.clientX - rect.left - canvasState.pan.x) / canvasState.zoom;
-        const y = (e.clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
-        setNewNodePosition({ x, y });
-        setShowNodeCreator(true);
-      }
+    if (e.target === canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const x = (e.clientX - rect.left - canvasState.pan.x) / canvasState.zoom;
+      const y = (e.clientY - rect.top - canvasState.pan.y) / canvasState.zoom;
+      
+      setNewNodePosition({ x, y });
+      setShowNodeCreator(true);
     }
   }, [canvasState.pan, canvasState.zoom]);
 
-  const handleNodeDragStart = useCallback((e: React.MouseEvent, nodeId: string) => {
-    e.stopPropagation();
-    setSelectedNode(nodeId);
-    setIsDragging(true);
-    
-    const rect = canvasRef.current?.getBoundingClientRect();
-    const node = canvasState.nodes.find(n => n.id === nodeId);
-    if (rect && node) {
-      const offsetX = e.clientX - rect.left - (node.position.x * canvasState.zoom + canvasState.pan.x);
-      const offsetY = e.clientY - rect.top - (node.position.y * canvasState.zoom + canvasState.pan.y);
-      setDragOffset({ x: offsetX, y: offsetY });
-    }
-  }, [canvasState]);
+  const handleNodeClick = (node: Node) => {
+    setSelectedNode(node.id);
+    setSelectedNodeData(node);
+    setShowNodePopup(true);
+  };
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (isDragging && selectedNode) {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (rect) {
-        const x = (e.clientX - rect.left - canvasState.pan.x - dragOffset.x) / canvasState.zoom;
-        const y = (e.clientY - rect.top - canvasState.pan.y - dragOffset.y) / canvasState.zoom;
-        
-        setCanvasState(prev => ({
-          ...prev,
-          nodes: prev.nodes.map(node =>
-            node.id === selectedNode
-              ? { ...node, position: { x, y } }
-              : node
-          )
-        }));
-      }
-    }
-  }, [isDragging, selectedNode, canvasState.pan, canvasState.zoom, dragOffset]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-    setSelectedNode(null);
-    setDragOffset({ x: 0, y: 0 });
-  }, []);
+  const handleNodeUpdate = (nodeId: string, updates: Partial<Node>) => {
+    setCanvasState(prev => ({
+      ...prev,
+      nodes: prev.nodes.map(node => 
+        node.id === nodeId ? { ...node, ...updates } : node
+      )
+    }));
+  };
 
   const createNode = (type: string) => {
     const nodeType = nodeTypes.find(t => t.id === type);
@@ -159,252 +153,370 @@ export default function Board() {
 
     const newNode = {
       type,
-      title: `Novo ${nodeType.name}`,
+      title: nodeType.title,
       position: newNodePosition,
-      size: { width: 280, height: 200 },
-      content: {},
+      size: { width: 300, height: 200 },
       status: 'pending',
       progress: 0,
+      connections: [],
+      content: {}
     };
 
     createNodeMutation.mutate(newNode);
   };
 
-  const handleZoom = (direction: 'in' | 'out') => {
-    setCanvasState(prev => ({
-      ...prev,
-      zoom: direction === 'in' 
-        ? Math.min(prev.zoom * 1.2, 3)
-        : Math.max(prev.zoom / 1.2, 0.1)
-    }));
-  };
-
-  const handleSave = () => {
-    saveStateMutation.mutate(canvasState);
-  };
-
   const renderNode = (node: Node) => {
     const nodeType = nodeTypes.find(t => t.id === node.type);
-    if (!nodeType) return null;
+    const Icon = nodeType?.icon || Settings;
+    const isSelected = selectedNode === node.id;
 
     return (
       <motion.div
         key={node.id}
-        className={`absolute cursor-move ${selectedNode === node.id ? 'z-50' : 'z-10'}`}
-        style={{
-          left: node.position.x * canvasState.zoom + canvasState.pan.x,
-          top: node.position.y * canvasState.zoom + canvasState.pan.y,
-          width: node.size.width * canvasState.zoom,
-          height: node.size.height * canvasState.zoom,
+        drag
+        dragMomentum={false}
+        onDragEnd={(_, info) => {
+          const newPosition = {
+            x: node.position.x + info.offset.x / canvasState.zoom,
+            y: node.position.y + info.offset.y / canvasState.zoom
+          };
+          handleNodeUpdate(node.id, { position: newPosition });
         }}
-        onMouseDown={(e) => handleNodeDragStart(e, node.id)}
+        style={{
+          position: 'absolute',
+          left: node.position.x,
+          top: node.position.y,
+          width: node.size.width,
+          height: node.size.height,
+          zIndex: isSelected ? 10 : 1
+        }}
+        className="cursor-move"
         whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileDrag={{ scale: 1.05, zIndex: 20 }}
       >
-        <Card className={`h-full bg-gray-800/90 backdrop-blur-sm border-gray-700 shadow-2xl ${
-          selectedNode === node.id ? 'ring-2 ring-blue-500' : ''
-        }`}>
-          <CardHeader className="pb-3">
+        <Card 
+          className={`h-full border-2 transition-all duration-200 ${
+            isSelected 
+              ? 'border-yellow-400 shadow-lg shadow-yellow-400/20' 
+              : 'border-gray-200 hover:border-gray-300'
+          } bg-white/95 backdrop-blur-sm`}
+          onClick={() => handleNodeClick(node)}
+        >
+          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${nodeType.color}`} />
-                <CardTitle className="text-sm text-white truncate">{node.title}</CardTitle>
+              <div className="flex items-center gap-2">
+                <div className={`p-2 rounded-lg ${nodeType?.color || 'bg-gray-500'}`}>
+                  <Icon className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-sm font-medium">{node.title}</CardTitle>
+                  <Badge variant="outline" className="text-xs">
+                    {node.type}
+                  </Badge>
+                </div>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center gap-1">
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+                  className="h-6 w-6 p-0"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Edit node
+                    handleNodeClick(node);
                   }}
                 >
-                  <Edit3 className="w-3 h-3" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0 text-gray-400 hover:text-red-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCanvasState(prev => ({
-                      ...prev,
-                      nodes: prev.nodes.filter(n => n.id !== node.id)
-                    }));
-                  }}
-                >
-                  <Trash2 className="w-3 h-3" />
+                  <Settings className="h-3 w-3" />
                 </Button>
               </div>
             </div>
-            <Badge variant="outline" className="text-xs w-fit">
-              {node.status}
-            </Badge>
           </CardHeader>
-          <CardContent className="pt-0">
+          
+          <CardContent className="space-y-3">
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <nodeType.icon className="w-4 h-4 text-gray-400" />
-                <span className="text-xs text-gray-400">{nodeType.name}</span>
+              <div className="flex justify-between text-xs text-gray-600">
+                <span>Progresso</span>
+                <span>{node.progress}%</span>
               </div>
-              
-              <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${node.progress}%` }}
                 />
               </div>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">{node.progress}% completo</span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-6 text-xs px-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Execute node action
-                  }}
-                >
-                  <Play className="w-3 h-3" />
-                </Button>
-              </div>
             </div>
+
+            <div className="flex gap-2">
+              <ActionButton
+                label="Executar"
+                loadingLabel="Processando"
+                successLabel="Concluído"
+                size="sm"
+                className="flex-1 text-xs"
+                action={async () => {
+                  // Execute based on node type
+                  switch (node.type) {
+                    case 'produto':
+                      return gerarProdutoIA({
+                        niche: 'marketing-digital',
+                        audience: 'empreendedores',
+                        priceRange: 'R$ 297 - R$ 497'
+                      });
+                    case 'copywriting':
+                      return { success: true, data: { copy: 'Copy gerada com sucesso!' } };
+                    case 'vsl':
+                      return gerarVideoIA({
+                        produto: 'Curso Digital',
+                        duracao: '10-15 minutos',
+                        audience: 'empreendedores'
+                      });
+                    case 'funnel':
+                      return gerarFunilCompleto({
+                        produto: 'Produto Digital',
+                        audience: 'empreendedores',
+                        objetivo: 'vendas'
+                      });
+                    case 'traffic':
+                      return iniciarCampanhaAds({
+                        produto: 'Produto Digital',
+                        budget: 100,
+                        platform: 'Facebook',
+                        audience: 'empreendedores'
+                      });
+                    default:
+                      return { success: true, data: { message: 'Ação executada' } };
+                  }
+                }}
+                onSuccess={(result) => {
+                  handleNodeUpdate(node.id, { 
+                    progress: 100, 
+                    status: 'completed',
+                    content: result.data 
+                  });
+                }}
+              />
+              
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNodeClick(node);
+                }}
+              >
+                <Eye className="h-3 w-3" />
+              </Button>
+            </div>
+
+            {node.content && Object.keys(node.content).length > 0 && (
+              <div className="pt-2 border-t">
+                <DownloadButton
+                  label="PDF"
+                  downloadAction={() => baixarPDF({
+                    nome: node.title,
+                    tipo: node.type,
+                    conteudo: node.content
+                  })}
+                  className="w-full text-xs"
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
     );
   };
 
+  // Auto-save canvas state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (canvasState.nodes.length > 0) {
+        saveCanvasMutation.mutate(canvasState);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [canvasState]);
+
   return (
-    <div className="h-screen bg-gray-950 text-white overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 relative overflow-hidden">
       {/* Header */}
-      <div className="h-16 border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm flex items-center justify-between px-6">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation('/dashboard')}
-          >
-            <Home className="w-4 h-4 mr-2" />
-            Dashboard
-          </Button>
-          <div className="h-6 w-px bg-gray-700" />
-          <div className="flex items-center space-x-2">
-            <Crown className="w-5 h-5 text-blue-400" />
-            <span className="font-semibold">Canvas Infinito</span>
+      <div className="absolute top-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation('/')}
+              className="flex items-center gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Button>
+            <div className="flex items-center gap-2">
+              <Brain className="h-6 w-6 text-purple-600" />
+              <h1 className="text-xl font-bold text-gray-900">Canvas IA Supremo</h1>
+            </div>
           </div>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleZoom('out')}
-          >
-            <ZoomOut className="w-4 h-4" />
-          </Button>
-          <span className="text-sm text-gray-400 min-w-12 text-center">
-            {Math.round(canvasState.zoom * 100)}%
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleZoom('in')}
-          >
-            <ZoomIn className="w-4 h-4" />
-          </Button>
           
-          <div className="h-6 w-px bg-gray-700" />
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSave}
-            disabled={saveStateMutation.isPending}
-          >
-            {saveStateMutation.isPending ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-          >
-            <Download className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCanvasState(prev => ({ ...prev, zoom: Math.max(0.5, prev.zoom - 0.1) }))}
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+            <span className="text-sm text-gray-600 min-w-[60px] text-center">
+              {Math.round(canvasState.zoom * 100)}%
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCanvasState(prev => ({ ...prev, zoom: Math.min(2, prev.zoom + 0.1) }))}
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            
+            <ActionButton
+              label="Salvar"
+              loadingLabel="Salvando"
+              successLabel="Salvo!"
+              size="sm"
+              action={async () => {
+                await saveCanvasMutation.mutateAsync(canvasState);
+                return { success: true, data: { message: 'Canvas salvo' } };
+              }}
+            />
+            
+            <DownloadButton
+              label="Exportar"
+              downloadAction={() => baixarPDF({
+                nome: 'Canvas_Completo',
+                tipo: 'canvas',
+                conteudo: canvasState
+              })}
+              size="sm"
+            />
+          </div>
         </div>
       </div>
 
       {/* Canvas */}
       <div
         ref={canvasRef}
-        className="h-full bg-gray-950 relative overflow-hidden cursor-crosshair"
+        className="absolute inset-0 pt-20"
         onClick={handleCanvasClick}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
         style={{
-          backgroundImage: `
-            radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0)
-          `,
-          backgroundSize: `${20 * canvasState.zoom}px ${20 * canvasState.zoom}px`,
-          backgroundPosition: `${canvasState.pan.x}px ${canvasState.pan.y}px`,
+          transform: `scale(${canvasState.zoom}) translate(${canvasState.pan.x}px, ${canvasState.pan.y}px)`,
+          transformOrigin: '0 0'
         }}
       >
-        {canvasState.nodes.map(renderNode)}
-        
-        {/* Node Creator Modal */}
+        {/* Grid background */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
+
+        {/* Nodes */}
         <AnimatePresence>
-          {showNodeCreator && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="absolute z-50 bg-gray-800 border border-gray-700 rounded-lg p-4 shadow-2xl"
-              style={{
-                left: newNodePosition.x * canvasState.zoom + canvasState.pan.x,
-                top: newNodePosition.y * canvasState.zoom + canvasState.pan.y,
-              }}
-            >
-              <h3 className="text-sm font-semibold mb-3 text-white">Criar Novo Nó</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {nodeTypes.map((type) => (
-                  <Button
-                    key={type.id}
-                    variant="outline"
-                    className="h-auto p-3 flex flex-col items-center space-y-1"
-                    onClick={() => createNode(type.id)}
-                  >
-                    <type.icon className="w-4 h-4" />
-                    <span className="text-xs">{type.name}</span>
-                  </Button>
-                ))}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full mt-2"
-                onClick={() => setShowNodeCreator(false)}
-              >
-                Cancelar
-              </Button>
-            </motion.div>
-          )}
+          {canvasState.nodes.map(renderNode)}
         </AnimatePresence>
+
+        {/* Welcome message when empty */}
+        {canvasState.nodes.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Card className="p-8 bg-white/90 backdrop-blur-sm border-dashed border-2 border-gray-300">
+              <div className="text-center space-y-4">
+                <Brain className="h-12 w-12 text-purple-600 mx-auto" />
+                <h2 className="text-2xl font-bold text-gray-900">Canvas IA Vazio</h2>
+                <p className="text-gray-600">Clique em qualquer lugar para adicionar seu primeiro módulo IA</p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {nodeTypes.slice(0, 4).map(type => (
+                    <Badge key={type.id} variant="outline" className="cursor-pointer hover:bg-gray-100">
+                      {type.title}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
 
-      {/* Status Bar */}
-      <div className="h-8 border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm flex items-center justify-between px-6 text-xs text-gray-400">
-        <div>
-          {canvasState.nodes.length} nós • Zoom: {Math.round(canvasState.zoom * 100)}%
-        </div>
-        <div>
-          Clique no canvas para criar um novo nó
-        </div>
+      {/* Node Creator Dialog */}
+      <Dialog open={showNodeCreator} onOpenChange={setShowNodeCreator}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Adicionar Módulo IA</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            {nodeTypes.map(type => {
+              const Icon = type.icon;
+              return (
+                <Card 
+                  key={type.id}
+                  className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105"
+                  onClick={() => createNode(type.id)}
+                >
+                  <CardContent className="p-6 text-center space-y-3">
+                    <div className={`p-4 rounded-lg ${type.color} mx-auto w-fit`}>
+                      <Icon className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="font-semibold">{type.title}</h3>
+                    <p className="text-sm text-gray-600">{type.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Node Configuration Popup */}
+      <NodePopup
+        node={selectedNodeData}
+        isOpen={showNodePopup}
+        onClose={() => {
+          setShowNodePopup(false);
+          setSelectedNode(null);
+          setSelectedNodeData(null);
+        }}
+        onUpdate={handleNodeUpdate}
+      />
+
+      {/* Floating Action Button */}
+      <div className="absolute bottom-6 right-6 z-40">
+        <Button
+          size="lg"
+          className="rounded-full w-14 h-14 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg"
+          onClick={() => setShowNodeCreator(true)}
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      </div>
+
+      {/* Quick Stats */}
+      <div className="absolute bottom-6 left-6 z-40">
+        <Card className="bg-white/90 backdrop-blur-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span>{canvasState.nodes.length} módulos</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>{canvasState.nodes.filter(n => n.progress === 100).length} completos</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
