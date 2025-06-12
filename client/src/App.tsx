@@ -2,13 +2,9 @@ import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ui/theme-provider';
-import Landing from '@/pages/Landing';
-import Dashboard from '@/pages/Dashboard';
+import Landing from '@/pages/landing';
+import Dashboard from '@/pages/dashboard';
 import Board from '@/pages/Board';
-import CaseStudies from '@/pages/CaseStudies';
-import Signup from '@/pages/Signup';
-import Pricing from '@/pages/Pricing';
-import Features from '@/pages/Features';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,10 +29,6 @@ export default function App() {
             <Route path="/" component={Landing} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/board" component={Board} />
-            <Route path="/case-studies" component={CaseStudies} />
-            <Route path="/signup" component={Signup} />
-            <Route path="/pricing" component={Pricing} />
-            <Route path="/features" component={Features} />
             <Route>
               <Landing />
             </Route>
