@@ -58,7 +58,6 @@ export default function Board() {
   const [workflowMode, setWorkflowMode] = useState<'mpp' | 'manual' | null>(null);
   const [showPensamentoPoderoso, setShowPensamentoPoderoso] = useState(false);
   const [showVideoDialog, setShowVideoDialog] = useState(false);
-  const { updateContext, markActionCompleted, state } = useGuidance();
   const [selectedVideoNode, setSelectedVideoNode] = useState<string | null>(null);
   const [videoGenerating, setVideoGenerating] = useState(false);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
@@ -88,11 +87,6 @@ export default function Board() {
       setCanvasState(canvasData as CanvasState);
     }
   }, [canvasData]);
-
-  // Update guidance context when entering board
-  useEffect(() => {
-    updateContext('board');
-  }, [updateContext]);
 
   // Real AI Integration
   const executeRealAI = async (prompt: string, type: string): Promise<any> => {
