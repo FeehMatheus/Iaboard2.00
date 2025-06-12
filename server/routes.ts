@@ -908,7 +908,7 @@ Make the content professional, persuasive, and conversion-focused.`;
           result = await aiEngineSupreme.generateContent({
             type: 'traffic',
             prompt: prompt + ' - Crie uma estratégia de tráfego',
-            parameters: { audience: context?.audience || 'general', budget: context?.budget || 'medium' }
+            parameters: { audience: context?.audience || 'general', tone: 'professional' }
           });
           break;
           
@@ -943,7 +943,7 @@ Make the content professional, persuasive, and conversion-focused.`;
           result = await aiEngineSupreme.generateContent({
             type: 'analytics',
             prompt: prompt + ' - Analise e otimize dados',
-            parameters: { audience: context?.audience || 'general', metrics: 'conversion' }
+            parameters: { audience: context?.audience || 'general', tone: 'analytical' }
           });
           break;
           

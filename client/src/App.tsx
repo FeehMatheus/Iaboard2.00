@@ -2,8 +2,8 @@ import { Switch, Route } from 'wouter';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ui/theme-provider';
-import Landing from '@/pages/landing';
-import Dashboard from '@/pages/dashboard';
+import Landing from '@/pages/Landing';
+import Dashboard from '@/pages/Dashboard';
 import Board from '@/pages/Board';
 
 const queryClient = new QueryClient({
