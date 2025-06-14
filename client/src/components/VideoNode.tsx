@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, memo } from 'react';
+import { useCallback, useState, useEffect, useRef, memo } from 'react';
 import { Handle, Position, NodeProps, useReactFlow, NodeResizer } from 'reactflow';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
