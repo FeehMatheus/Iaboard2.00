@@ -11,6 +11,12 @@ import { tokenManager } from "./token-manager";
 import { realAIServices } from "./real-ai-services";
 import { freePublicAPIs } from "./free-public-apis";
 import { ultimateAISystem } from "./ultimate-ai-system";
+import { aiMultiProvider } from './ai-multi-provider';
+import { stabilityVideoService } from './stability-video-service';
+import { heyGenAvatarService } from './heygen-avatar-service';
+import { googleTTSService } from './google-tts-service';
+import { typeformService } from './typeform-service';
+import { aiHealthCheck } from './ai-health-check';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -175,6 +181,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
       status: 'completed',
       message: 'Free AI video generation uses direct processing'
     });
+  });
+
+  // Multi-Provider LLM API
+  app.post('/api/llm/generate', async (req, res) => {
+    try {
+      const { prompt, model = 'gpt-4o', maxTokens = 500, temperature = 0.7 } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
+      }
+
+      const result = await aiMultiProvider.generateLLM({
+        prompt,
+        model,
+        maxTokens,
+        temperature
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `LLM generation failed: ${error.message}`
+      });
+    }
+  });
+
+  // Stability AI Video Generation
+  app.post('/api/stability/video', async (req, res) => {
+    try {
+      const { prompt, seed, aspectRatio = '16:9' } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
+      }
+
+      const result = await stabilityVideoService.generateVideo({
+        prompt,
+        seed,
+        aspectRatio
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `Stability video generation failed: ${error.message}`
+      });
+    }
+  });
+
+  // HeyGen Avatar Generation
+  app.post('/api/heygen/avatar', async (req, res) => {
+    try {
+      const { text, voice = 'pt-BR-FranciscaNeural', avatar = 'default' } = req.body;
+
+      if (!text) {
+        return res.status(400).json({ success: false, error: 'Texto é obrigatório' });
+      }
+
+      const result = await heyGenAvatarService.generateAvatar({
+        text,
+        voice,
+        avatar
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `HeyGen avatar generation failed: ${error.message}`
+      });
+    }
+  });
+
+  // Google Text-to-Speech
+  app.post('/api/tts/synthesize', async (req, res) => {
+    try {
+      const { text, languageCode = 'pt-BR', voiceName = 'pt-BR-Wavenet-A', ssmlGender = 'FEMALE' } = req.body;
+
+      if (!text) {
+        return res.status(400).json({ success: false, error: 'Texto é obrigatório' });
+      }
+
+      const result = await googleTTSService.synthesizeSpeech({
+        text,
+        languageCode,
+        voiceName,
+        ssmlGender
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `TTS synthesis failed: ${error.message}`
+      });
+    }
+  });
+
+  // Typeform Creation
+  app.post('/api/typeform/create', async (req, res) => {
+    try {
+      const { title, fields } = req.body;
+
+      if (!title || !fields || !Array.isArray(fields)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Título e campos são obrigatórios' 
+        });
+      }
+
+      const result = await typeformService.createForm({
+        title,
+        fields
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `Typeform creation failed: ${error.message}`
+      });
+    }
+  });
+
+  // Comprehensive Health Check
+  app.get('/api/health', async (req, res) => {
+    try {
+      const result = await aiHealthCheck.runFullHealthCheck();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `Health check failed: ${error.message}`
+      });
+    }
+  });
+
+  // Quick Health Check
+  app.get('/api/health/quick', async (req, res) => {
+    try {
+      const result = await aiHealthCheck.quickCheck();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `Quick health check failed: ${error.message}`
+      });
+    }
   });
 
   // AI Module Execution
