@@ -117,7 +117,7 @@ export class AdvancedAIService {
       content: request.prompt
     });
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.openai!.chat.completions.create({
       model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages,
       temperature: request.temperature || 0.7,
@@ -139,7 +139,7 @@ export class AdvancedAIService {
       content: request.prompt
     });
 
-    const response = await this.anthropic.messages.create({
+    const response = await this.anthropic!.messages.create({
       model: 'claude-3-sonnet-20240229',
       max_tokens: request.maxTokens || 1000,
       temperature: request.temperature || 0.7,

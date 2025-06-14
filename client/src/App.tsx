@@ -6,6 +6,7 @@ import SmartGuidance from '@/components/SmartGuidance';
 import Landing from '@/pages/Landing';
 import Dashboard from '@/pages/Dashboard';
 import Board from '@/pages/Board';
+import AdvancedBoard from '@/pages/AdvancedBoard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/" component={Landing} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/board" component={Board} />
+            <Route path="/advanced-board" component={AdvancedBoard} />
             <Route>
               <Landing />
             </Route>

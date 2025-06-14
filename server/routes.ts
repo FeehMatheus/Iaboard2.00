@@ -1498,6 +1498,103 @@ Make the content professional, persuasive, and conversion-focused.`;
     }
   });
 
+  // Advanced AI Execution for Canvas Nodes
+  app.post('/api/ai/execute', async (req, res) => {
+    try {
+      const { model, prompt, systemPrompt, temperature, maxTokens, context } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required' });
+      }
+
+      const result = await advancedAIService.executeAI({
+        model: model || 'gpt-4o',
+        prompt,
+        systemPrompt,
+        temperature,
+        maxTokens,
+        context
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('AI execution error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to execute AI request' 
+      });
+    }
+  });
+
+  // AI Node Suggestions
+  app.post('/api/ai/suggestions', async (req, res) => {
+    try {
+      const { context } = req.body;
+      const suggestions = await advancedAIService.generateNodeSuggestions(context || '');
+      
+      res.json({
+        success: true,
+        suggestions
+      });
+    } catch (error) {
+      console.error('AI suggestions error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to generate suggestions' 
+      });
+    }
+  });
+
+  // Prompt Optimization
+  app.post('/api/ai/optimize-prompt', async (req, res) => {
+    try {
+      const { prompt } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ error: 'Prompt is required' });
+      }
+
+      const optimizedPrompt = await advancedAIService.optimizePrompt(prompt);
+      
+      res.json({
+        success: true,
+        originalPrompt: prompt,
+        optimizedPrompt
+      });
+    } catch (error) {
+      console.error('Prompt optimization error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to optimize prompt' 
+      });
+    }
+  });
+
+  // Workflow Generation
+  app.post('/api/ai/generate-workflow', async (req, res) => {
+    try {
+      const { nodes } = req.body;
+      
+      if (!nodes || !Array.isArray(nodes)) {
+        return res.status(400).json({ error: 'Nodes array is required' });
+      }
+
+      const workflowDescription = await advancedAIService.generateWorkflowFromNodes(nodes);
+      
+      res.json({
+        success: true,
+        workflow: workflowDescription,
+        nodeCount: nodes.length
+      });
+    } catch (error) {
+      console.error('Workflow generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to generate workflow' 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

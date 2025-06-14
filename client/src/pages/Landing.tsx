@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useLocation } from 'wouter';
 import { 
   Brain, Crown, Zap, Target, TrendingUp, Video, 
-  FileText, Mail, Star, Check, Play, ArrowRight
+  FileText, Mail, Star, Check, Play, ArrowRight, Sparkles
 } from 'lucide-react';
 
 export default function Landing() {
