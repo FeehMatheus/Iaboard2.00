@@ -21,6 +21,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Settings, Download, FileText, Share2, Trash2, Grid3X3, Eye, EyeOff } from 'lucide-react';
 import { CurisoChatNode } from '@/components/CurisoChatNode';
+import { VideoNode } from '@/components/VideoNode';
 import { nanoid } from 'nanoid';
 import { useDebouncedCallback } from 'use-debounce';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +31,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const nodeTypes = {
   chat: CurisoChatNode,
+  video: VideoNode,
 };
 
 const defaultEdgeOptions = {

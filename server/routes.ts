@@ -7,6 +7,7 @@ import { aiEngineSupreme } from "./ai-engine-supreme";
 import { furionAI } from "./furion-ai-system";
 import { videoGenerator } from "./video-generator";
 import { advancedAIService } from "./advanced-ai-service";
+import { videoGenerationService } from "./video-generation-service";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1591,6 +1592,60 @@ Make the content professional, persuasive, and conversion-focused.`;
       res.status(500).json({ 
         success: false, 
         error: 'Failed to generate workflow' 
+      });
+    }
+  });
+
+  // Video generation routes
+  app.post('/api/video/generate', async (req, res) => {
+    try {
+      const { text, voice, avatar, type } = req.body;
+      
+      if (!text || !type) {
+        return res.status(400).json({
+          success: false,
+          error: 'Text and type are required'
+        });
+      }
+
+      const result = await videoGenerationService.generateVideo({
+        text,
+        voice,
+        avatar,
+        type
+      });
+
+      res.json(result);
+      
+    } catch (error) {
+      console.error('Video generation error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Video generation failed'
+      });
+    }
+  });
+
+  app.get('/api/video/voices', async (req, res) => {
+    try {
+      const voices = await videoGenerationService.getAvailableVoices();
+      res.json({ success: true, voices });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get voices'
+      });
+    }
+  });
+
+  app.get('/api/video/avatars', async (req, res) => {
+    try {
+      const avatars = await videoGenerationService.getAvailableAvatars();
+      res.json({ success: true, avatars });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get avatars'
       });
     }
   });

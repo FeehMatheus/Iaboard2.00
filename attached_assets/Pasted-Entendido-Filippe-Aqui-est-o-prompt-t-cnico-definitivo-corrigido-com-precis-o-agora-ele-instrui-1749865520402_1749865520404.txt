@@ -1,0 +1,108 @@
+Entendido, Filippe. Aqui está o prompt técnico definitivo, corrigido com precisão: agora ele instrui a IA a replicar exatamente o projeto do repositório Curiso (e não o curso), com identidade visual personalizada, IA real funcionando, e vídeo gerado com APIs verdadeiras (como D-ID, RunwayML e Pika Labs). A IA deve recriar do zero se necessário, mas sempre garantindo que o sistema seja igual ou superior ao Curiso original.
+
+
+---
+
+# 📌 INSTRUÇÃO TÉCNICA – IA BOARD IGUAL AO CURISO
+
+Você deve entregar um sistema **exatamente igual** ao projeto Curiso (https://github.com/metaspartan/curiso), mantendo TODAS as funcionalidades e estrutura visual.
+
+⚠️ Se for necessário RECRIA-LO do zero para garantir fidelidade completa, **então faça isso**.  
+Não crie algo “parecido”. **Quero algo idêntico ao Curiso**, alterando apenas a identidade visual.
+
+---
+
+## ✅ OBJETIVO FINAL
+
+✔️ Clonar ou reconstruir o Curiso com fidelidade total  
+✔️ Alterar apenas o branding para: `IA Board by Filippe`  
+✔️ Integrar APIs REAIS de vídeo (D-ID, RunwayML, Pika Labs)  
+✔️ Executar localmente e gerar .exe para distribuição  
+✔️ Todas as funcionalidades devem funcionar de verdade
+
+---
+
+## 🧱 FUNCIONALIDADES QUE DEVEM SER MANTIDAS (OBRIGATÓRIAS)
+
+- Quadro infinito (canvas arrastável, zoom, grid)
+- Blocos IA interconectáveis (drag & drop, links visuais)
+- Execução real via OpenAI / Claude / Gemini
+- Chat interno de cada nó com resposta em tempo real
+- Minimapa lateral
+- Exportação funcional (JSON, PDF, Markdown)
+- Salvamento automático de fluxo
+
+---
+
+## 🎨 ALTERAÇÕES DE IDENTIDADE
+
+- Nome do sistema: `IA Board by Filippe`  
+- Cor principal: `#00d9ff`  
+- Substituir logo, título e favicon  
+- Incluir botão no topo: `Baixar IA Board Desktop (.exe)`
+
+---
+
+## 🎥 INTEGRAÇÃO DE VÍDEO COM IA (OBRIGATÓRIO)
+
+### Opção 1 – D-ID (voz + avatar real)
+- Usar API oficial: `https://api.d-id.com/talks`
+- Enviar texto, escolher voz e avatar
+- Mostrar vídeo `.mp4` e botão de download
+
+### Opção 2 – RunwayML Gen-2
+- Criar botão com link para prompt pré-preenchido
+- Explicação sobre uso da plataforma
+
+### Opção 3 – Pika Labs
+- Mostrar botão “Gerar com Pika (via Discord)”
+- Exibir instruções reais para acesso gratuito
+
+---
+
+## 🔐 VARIÁVEIS .ENV EXIGIDAS
+
+OPENAI_API_KEY=sk-... ANTHROPIC_API_KEY=sk-ant-... GOOGLE_API_KEY=AIza... D_ID_API_KEY=did_prod_...
+
+---
+
+## 💻 EXECUÇÃO E EMPACOTAMENTO
+
+- Deve rodar localmente com:
+  ```bash
+  bun run dev || npm run dev
+
+Empacotar como .exe funcional com:
+
+npm run desktop
+
+Geração automática do .zip com o instalador
+
+
+
+---
+
+✅ VERIFICAÇÃO FINAL ANTES DE ENTREGAR
+
+[ ] É visualmente idêntico ao projeto Curiso?
+
+[ ] Todos os blocos e IA estão funcionando com retorno real?
+
+[ ] As opções de vídeo funcionam com APIs reais?
+
+[ ] O empacotamento para .exe está funcional?
+
+[ ] O nome e as cores foram personalizados corretamente?
+
+
+
+---
+
+Se a resposta for não a qualquer item acima, refaça.
+A entrega final deve ser uma réplica funcional do Curiso, com IA e vídeo reais, personalizada como IA Board by Filippe, empacotada em .exe.
+
+---
+
+Esse prompt está pronto para colar em qualquer agente IA (Replit, GPT-Engineer, AutoGPT, etc.).  
+Deseja agora que eu gere o `.env.example`, estrutura de pastas e handlers reais para a D-ID?
+
