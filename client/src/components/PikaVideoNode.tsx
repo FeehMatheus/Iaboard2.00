@@ -106,9 +106,10 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
       }
     } catch (error) {
       console.error('Erro na geração do thumbnail:', error);
+      const errorMessage = error instanceof Error ? error.message : "Erro na comunicação com o servidor";
       toast({
         title: "Erro no Preview",
-        description: error instanceof Error ? error.message : "Erro desconhecido",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -159,14 +160,15 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
       }
     } catch (error) {
       console.error('Erro na geração do vídeo:', error);
+      const errorMessage = error instanceof Error ? error.message : "Erro na comunicação com o servidor";
       toast({
         title: "Erro na Geração",
-        description: error instanceof Error ? error.message : "Erro desconhecido",
+        description: errorMessage,
         variant: "destructive"
       });
+      updateNodeData({ isGenerating: false });
     } finally {
       setIsGenerating(false);
-      updateNodeData({ isGenerating: false });
     }
   };
 

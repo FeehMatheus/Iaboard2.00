@@ -122,6 +122,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Thumbnail generation endpoint
+  app.post('/api/pika/thumbnail', async (req, res) => {
+    try {
+      const { prompt, aspectRatio = '16:9', style = 'cinematic' } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({
+          success: false,
+          error: 'Prompt é obrigatório para gerar thumbnail'
+        });
+      }
+
+      console.log('🖼️ Generating thumbnail for:', prompt);
+
+      // Generate thumbnail using the Ultimate AI System
+      const result = await ultimateAISystem.generate({
+        type: 'image',
+        prompt: `Create a video thumbnail preview for: ${prompt}. Style: ${style}, Aspect ratio: ${aspectRatio}`,
+        parameters: {
+          width: aspectRatio === '16:9' ? 1280 : aspectRatio === '9:16' ? 720 : 1024,
+          height: aspectRatio === '16:9' ? 720 : aspectRatio === '9:16' ? 1280 : 1024,
+          style
+        }
+      });
+
+      if (result.success && result.url) {
+        res.json({
+          success: true,
+          thumbnailUrl: result.url,
+          provider: result.provider || 'Ultimate AI Thumbnail Generator',
+          metadata: result.metadata
+        });
+      } else {
+        throw new Error(result.error || 'Falha na geração do thumbnail');
+      }
+    } catch (error) {
+      console.error('Thumbnail generation error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro na geração do thumbnail'
+      });
+    }
+  });
+
   // Video generation status check
   app.get('/api/pika/status/:taskId', async (req, res) => {
     res.json({
