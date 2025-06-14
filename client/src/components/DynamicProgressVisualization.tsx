@@ -40,39 +40,39 @@ const moduleIcons = {
 
 const defaultSteps = {
   'ia-copy': [
-    { id: 'analyze', label: 'Analisando prompt', duration: 1000 },
-    { id: 'research', label: 'Pesquisando mercado', duration: 2000 },
-    { id: 'generate', label: 'Gerando headlines', duration: 3000 },
-    { id: 'optimize', label: 'Otimizando persuasão', duration: 2000 },
-    { id: 'finalize', label: 'Finalizando copy', duration: 1000 }
+    { id: 'analyze', label: 'Analisando prompt', duration: 1000, status: 'pending' as const },
+    { id: 'research', label: 'Pesquisando mercado', duration: 2000, status: 'pending' as const },
+    { id: 'generate', label: 'Gerando headlines', duration: 3000, status: 'pending' as const },
+    { id: 'optimize', label: 'Otimizando persuasão', duration: 2000, status: 'pending' as const },
+    { id: 'finalize', label: 'Finalizando copy', duration: 1000, status: 'pending' as const }
   ],
   'ia-video': [
-    { id: 'script', label: 'Criando roteiro', duration: 2000 },
-    { id: 'scenes', label: 'Definindo cenas', duration: 2500 },
-    { id: 'generate', label: 'Gerando vídeo IA', duration: 4000 },
-    { id: 'effects', label: 'Aplicando efeitos', duration: 2000 },
-    { id: 'render', label: 'Renderizando final', duration: 3000 }
+    { id: 'script', label: 'Criando roteiro', duration: 2000, status: 'pending' as const },
+    { id: 'scenes', label: 'Definindo cenas', duration: 2500, status: 'pending' as const },
+    { id: 'generate', label: 'Gerando vídeo IA', duration: 4000, status: 'pending' as const },
+    { id: 'effects', label: 'Aplicando efeitos', duration: 2000, status: 'pending' as const },
+    { id: 'render', label: 'Renderizando final', duration: 3000, status: 'pending' as const }
   ],
   'ia-produto': [
-    { id: 'market', label: 'Análise de mercado', duration: 2000 },
-    { id: 'strategy', label: 'Estratégia de produto', duration: 2500 },
-    { id: 'pricing', label: 'Definindo preços', duration: 1500 },
-    { id: 'launch', label: 'Plano de lançamento', duration: 2000 },
-    { id: 'forecast', label: 'Projeções de vendas', duration: 1500 }
+    { id: 'market', label: 'Análise de mercado', duration: 2000, status: 'pending' as const },
+    { id: 'strategy', label: 'Estratégia de produto', duration: 2500, status: 'pending' as const },
+    { id: 'pricing', label: 'Definindo preços', duration: 1500, status: 'pending' as const },
+    { id: 'launch', label: 'Plano de lançamento', duration: 2000, status: 'pending' as const },
+    { id: 'forecast', label: 'Projeções de vendas', duration: 1500, status: 'pending' as const }
   ],
   'ia-trafego': [
-    { id: 'audience', label: 'Segmentando público', duration: 1500 },
-    { id: 'platforms', label: 'Selecionando canais', duration: 1000 },
-    { id: 'campaigns', label: 'Criando campanhas', duration: 3000 },
-    { id: 'budget', label: 'Otimizando budget', duration: 2000 },
-    { id: 'tracking', label: 'Configurando tracking', duration: 1500 }
+    { id: 'audience', label: 'Segmentando público', duration: 1500, status: 'pending' as const },
+    { id: 'platforms', label: 'Selecionando canais', duration: 1000, status: 'pending' as const },
+    { id: 'campaigns', label: 'Criando campanhas', duration: 3000, status: 'pending' as const },
+    { id: 'budget', label: 'Otimizando budget', duration: 2000, status: 'pending' as const },
+    { id: 'tracking', label: 'Configurando tracking', duration: 1500, status: 'pending' as const }
   ],
   'ia-analytics': [
-    { id: 'metrics', label: 'Definindo KPIs', duration: 1500 },
-    { id: 'dashboard', label: 'Criando dashboard', duration: 2500 },
-    { id: 'reports', label: 'Gerando relatórios', duration: 2000 },
-    { id: 'insights', label: 'Extraindo insights', duration: 2500 },
-    { id: 'recommendations', label: 'Sugestões de melhoria', duration: 1500 }
+    { id: 'metrics', label: 'Definindo KPIs', duration: 1500, status: 'pending' as const },
+    { id: 'dashboard', label: 'Criando dashboard', duration: 2500, status: 'pending' as const },
+    { id: 'reports', label: 'Gerando relatórios', duration: 2000, status: 'pending' as const },
+    { id: 'insights', label: 'Extraindo insights', duration: 2500, status: 'pending' as const },
+    { id: 'recommendations', label: 'Sugestões de melhoria', duration: 1500, status: 'pending' as const }
   ]
 };
 

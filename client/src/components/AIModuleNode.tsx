@@ -285,6 +285,8 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
     });
   }, [prompt, workflowTemplate, startProgress, executeStep, nextStep, generatedContent, toast]);
 
+  const [showProgressVisualization, setShowProgressVisualization] = useState(false);
+
   const executeModule = async () => {
     if (progressMode) {
       await startProgressWorkflow();
@@ -301,6 +303,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
     }
 
     setIsExecuting(true);
+    setShowProgressVisualization(true);
     setResult('');
 
     try {
@@ -340,6 +343,8 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
       });
     } finally {
       setIsExecuting(false);
+      // Keep progress visualization visible for 2 seconds after completion
+      setTimeout(() => setShowProgressVisualization(false), 2000);
     }
   };
 
@@ -576,6 +581,17 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
           onCancel={cancelProgress}
           onRetry={(stepId) => retryStep(stepId)}
         />
+      )}
+
+      {/* Dynamic Progress Visualization (Standard Mode) */}
+      {!progressMode && showProgressVisualization && (
+        <div className="absolute top-full left-0 mt-2 z-50">
+          <DynamicProgressVisualization
+            moduleType={moduleType}
+            isActive={isExecuting}
+            onComplete={() => setShowProgressVisualization(false)}
+          />
+        </div>
       )}
 
       {/* Connection Handles */}
