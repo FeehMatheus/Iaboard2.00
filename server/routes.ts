@@ -9,6 +9,7 @@ import { videoGenerator } from "./video-generator";
 import { advancedAIService } from "./advanced-ai-service";
 import { videoGenerationService } from "./video-generation-service";
 import { pikaLabsService } from "./pika-labs-service";
+import { internalVideoGenerator } from "./internal-video-generator";
 import { aiModuleExecutor } from "./ai-module-executor";
 
 const openai = new OpenAI({
@@ -1661,20 +1662,27 @@ Make the content professional, persuasive, and conversion-focused.`;
         return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
       }
 
-      // Always return manual instructions since we don't have direct Pika Labs API
-      const instructions = pikaLabsService.generateManualInstructions(prompt);
-      
-      res.json({
-        success: true,
-        requiresManualStep: true,
-        instructions: instructions,
-        metadata: {
-          prompt,
-          aspectRatio,
-          style,
-          provider: 'Pika Labs (Manual)'
-        }
+      // Generate video directly using internal generator
+      const result = await internalVideoGenerator.generateVideo({
+        prompt,
+        aspectRatio: aspectRatio as '16:9' | '9:16' | '1:1',
+        duration: 5,
+        style
       });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          videoUrl: result.videoUrl,
+          downloadUrl: result.downloadUrl,
+          metadata: result.metadata
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.error
+        });
+      }
     } catch (error) {
       console.error('Pika Labs error:', error);
       res.status(500).json({
