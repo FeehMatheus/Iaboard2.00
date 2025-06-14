@@ -161,7 +161,7 @@ Não perca esta oportunidade única de transformar seu negócio com a mais avan�
               páginas de vendas e campanhas de tráfego automaticamente.
             </p>
 
-            <div className="flex flex-col md:flex-row gap-4 justify-center mb-16">
+            <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
               <Button 
                 size="lg"
                 className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 text-lg"
@@ -179,6 +179,28 @@ Não perca esta oportunidade única de transformar seu negócio com a mais avan�
               >
                 <Video className="w-5 h-5 mr-2" />
                 Ver Demonstração
+              </Button>
+            </div>
+
+            {/* Board Access Options */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <Button 
+                size="lg" 
+                onClick={() => setLocation('/board')}
+                className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg group"
+              >
+                <Brain className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                IA Board Clássico
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button 
+                size="lg" 
+                onClick={() => setLocation('/advanced-board')}
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 shadow-lg group border-2 border-cyan-400/50"
+              >
+                <Crown className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                IA Board Supremo
+                <Sparkles className="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" />
               </Button>
             </div>
 
