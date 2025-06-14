@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/ui/theme-provider';
 import SmartGuidance from '@/components/SmartGuidance';
 import IABoard from '@/pages/CurisoOriginal';
 import ProgressDemo from '@/pages/ProgressDemo';
+import { IABoardProductionDashboard } from '@/components/IABoardProductionDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,7 @@ export default function App() {
           <Switch>
             <Route path="/" component={IABoard} />
             <Route path="/progress" component={ProgressDemo} />
+            <Route path="/production" component={IABoardProductionDashboard} />
             <Route>
               <IABoard />
             </Route>
