@@ -1,0 +1,107 @@
+# PROMPT TÉCNICO PARA EXECUÇÃO COMPLETA — IA REPLIT / AUTOGPT / GPT ENGINEER
+
+Crie uma réplica exata, linha por linha, do sistema Curiso disponível em:
+→ https://github.com/metaspartan/curiso
+
+**Atenção:**
+Não quero algo parecido, inspirado, adaptado ou resumido.  
+Quero a **mesma estrutura**, os **mesmos fluxos funcionais**, o **mesmo canvas infinito**, o **mesmo sistema de nós conectados à IA real**, e os **mesmos recursos de exportação** — tudo **idêntico** ao projeto original.
+
+---
+
+## 1. CLONE O REPOSITÓRIO OFICIAL:
+```bash
+git clone https://github.com/metaspartan/curiso.git ia-board
+cd ia-board
+
+2. INSTALE AS DEPENDÊNCIAS:
+
+bun install || npm install
+
+3. CRIE O ARQUIVO .env NA RAIZ DO PROJETO:
+
+As variáveis devem conter chaves reais de APIs funcionais:
+
+OPENAI_API_KEY=sk-SUA_CHAVE_REAL
+ANTHROPIC_API_KEY=sk-ant-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
+GOOGLE_API_KEY=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
+
+PUBLIC_APP_NAME="IA Board by Filippe"
+PUBLIC_DEFAULT_MODEL="gpt-4o"
+PUBLIC_ALLOWED_MODELS="gpt-4o,claude-3-sonnet-20240229,gemini-1.5-pro"
+PUBLIC_BRANDING_COLOR="#00d9ff"
+
+
+---
+
+4. ALTERAÇÕES PERMITIDAS (APENAS IDENTIDADE VISUAL):
+
+A única modificação que desejo é a troca de:
+
+Nome do projeto → "IA Board by Filippe"
+
+Cores e fonte visual (branding)
+
+Ícone (caso esteja presente)
+
+
+Essas alterações devem ser aplicadas em todos os locais visuais do projeto:
+
+Título do app (src/meta/config.ts)
+
+Estilos visuais principais (tailwind.config.ts ou arquivos Svelte/TSX)
+
+Logotipo, ícones e CTAs visuais
+
+
+
+---
+
+5. FUNCIONALIDADES QUE DEVEM PERMANECER INALTERADAS:
+
+✅ Quadro infinito igual e funcional com arrasto, zoom e posicionamento
+✅ Blocos (nós) arrastáveis e interconectáveis
+✅ Cada bloco deve usar modelos reais de IA:
+
+OpenAI GPT-4o
+
+Claude 3 (Anthropic)
+
+Gemini 1.5 (Google) ✅ Streaming real de resposta (não simulado)
+✅ Menu de exportação funcional (JSON, Markdown, PDF)
+✅ Salvamento local, persistência de estado, navegação fluida
+✅ Execução via bun run dev ou npm run dev
+✅ Empacotamento .exe via Tauri (bun run desktop ou npm run desktop.
+7. RESULTADO ESPERADO:
+
+Sistema funcionalmente idêntico ao Curiso
+
+Interface com identidade visual própria (IA Board by Filippe)
+
+Nenhuma funcionalidade omitida ou simulada
+
+Nenhum bug visual ou erro estrutural
+
+Código limpo, comentado e pronto para deploy em Replit, Vercel ou Render
+
+
+
+---
+
+8. IMPORTANTE:
+
+> Se, para atingir esse resultado, for necessário refatorar completamente o projeto, reescrever partes, ou recriar do zero mantendo a mesma arquitetura e fluxo, FAÇA.
+
+
+
+Não aceito substituições visuais que comprometam as funções originais.
+Não aceito cortes de função ou simplificações.
+Quero o projeto real, executável, 100% replicado, apenas com identidade visual personalizada.
+
+
+---
+
+FIM
+
+Execute agora todos os passos acima automaticamente.
+Entregue o projeto funcionando com blocos IA reais, exportações, identidade visual alterada e 100% das funcionalidades preservadas.

@@ -14,24 +14,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Message, ChatNodeData } from '@/lib/store';
-import { useStore } from '@/lib/store';
 import { SUPPORTED_MODELS, MODEL_PROVIDERS, BRAND_CONFIG } from '@/lib/constants';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
-export const CurisoChatNode = memo(({ id, data: initialData }: NodeProps<ChatNodeData>) => {
+export const CurisoChatNode = memo(({ id, data }: NodeProps<ChatNodeData>) => {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>(initialData?.messages || []);
-  const [model, setModel] = useState(initialData?.model || 'gpt-4o');
   const [isLoading, setIsLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>({});
   const [isExpanded, setIsExpanded] = useState(false);
   
-  const { settings, setSettings } = useStore();
-  const { getNode, setNodes } = useReactFlow();
+  // Use data directly from props to avoid state sync issues
+  const messages = data?.messages || [];
+  const model = data?.model || 'gpt-4o';
+  
+  const { setNodes } = useReactFlow();
   const { toast } = useToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -43,28 +43,22 @@ export const CurisoChatNode = memo(({ id, data: initialData }: NodeProps<ChatNod
     }
   }, [input]);
 
-  // Update node data when messages change
-  useEffect(() => {
-    const currentBoard = settings.boards.find(b => b.id === settings.currentBoardId);
-    if (!currentBoard) return;
-
-    const newSettings = {
-      ...settings,
-      boards: settings.boards.map(board =>
-        board.id === settings.currentBoardId
+  const updateNodeData = useCallback((newMessages: Message[], newModel?: string) => {
+    setNodes((nodes) =>
+      nodes.map((node) =>
+        node.id === id
           ? {
-              ...board,
-              nodes: board.nodes.map(node =>
-                node.id === id
-                  ? { ...node, data: { ...node.data, messages, model } }
-                  : node
-              ),
+              ...node,
+              data: {
+                ...node.data,
+                messages: newMessages,
+                model: newModel || model,
+              },
             }
-          : board
-      ),
-    };
-    setSettings(newSettings);
-  }, [messages, model, id, settings, setSettings]);
+          : node
+      )
+    );
+  }, [id, setNodes, model]);
 
   const copyToClipboard = async (text: string, messageId: string) => {
     try {
@@ -97,7 +91,8 @@ export const CurisoChatNode = memo(({ id, data: initialData }: NodeProps<ChatNod
       timestamp: Date.now(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    updateNodeData(newMessages);
     setInput('');
     setIsLoading(true);
 
@@ -126,7 +121,8 @@ export const CurisoChatNode = memo(({ id, data: initialData }: NodeProps<ChatNod
           timestamp: Date.now(),
         };
 
-        setMessages(prev => [...prev, assistantMessage]);
+        const finalMessages = [...newMessages, assistantMessage];
+        updateNodeData(finalMessages);
         
         toast({
           title: "Sucesso!",
@@ -152,7 +148,7 @@ export const CurisoChatNode = memo(({ id, data: initialData }: NodeProps<ChatNod
   };
 
   const clearMessages = () => {
-    setMessages([]);
+    updateNodeData([]);
     toast({
       title: "Limpo!",
       description: "Todas as mensagens foram removidas.",
@@ -164,6 +160,10 @@ export const CurisoChatNode = memo(({ id, data: initialData }: NodeProps<ChatNod
       e.preventDefault();
       sendMessage();
     }
+  };
+
+  const handleModelChange = (newModel: string) => {
+    updateNodeData(messages, newModel);
   };
 
   const currentProvider = MODEL_PROVIDERS[model as keyof typeof MODEL_PROVIDERS] || 'unknown';
@@ -213,7 +213,7 @@ export const CurisoChatNode = memo(({ id, data: initialData }: NodeProps<ChatNod
             </div>
           </div>
 
-          <Select value={model} onValueChange={setModel}>
+          <Select value={model} onValueChange={handleModelChange}>
             <SelectTrigger className="h-8 bg-gray-800 border-gray-600">
               <SelectValue />
             </SelectTrigger>

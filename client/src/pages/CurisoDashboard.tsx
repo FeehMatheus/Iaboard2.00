@@ -53,21 +53,29 @@ function Flow() {
 
   const debouncedSetSettings = useDebouncedCallback((newSettings) => {
     setSettings(newSettings);
-  }, 500);
+  }, 300);
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
+    // Filter out remove changes to prevent unwanted deletions
     const filteredChanges = changes.filter(change => change.type !== 'remove');
+    
+    if (filteredChanges.length === 0) return;
+    
+    const currentBoard = settings.boards.find(b => b.id === settings.currentBoardId);
+    if (!currentBoard) return;
+    
+    const updatedNodes = applyNodeChanges(filteredChanges, currentBoard.nodes);
     
     const newSettings = {
       ...settings,
       boards: settings.boards.map(board =>
         board.id === settings.currentBoardId
-          ? { ...board, nodes: applyNodeChanges(filteredChanges, board.nodes) }
+          ? { ...board, nodes: updatedNodes }
           : board
       ),
     };
     debouncedSetSettings(newSettings);
-  }, [settings, debouncedSetSettings]);
+  }, [settings.currentBoardId, settings.boards, debouncedSetSettings]);
 
   const onEdgesChange = useCallback((changes: EdgeChange[]) => {
     const newSettings = {
