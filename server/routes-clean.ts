@@ -336,16 +336,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // IA Board Module Execution - Main endpoint for all modules
   app.post('/api/ai/module/execute', async (req, res) => {
     try {
-      console.log('🔍 Received request body:', JSON.stringify(req.body, null, 2));
+      console.log('🔍 Module execution endpoint hit with body:', JSON.stringify(req.body, null, 2));
+      console.log('🔍 Request headers:', JSON.stringify(req.headers, null, 2));
+      
       const { moduleType, prompt, parameters = {} } = req.body;
 
-      console.log('📋 Extracted values:', { moduleType, prompt: prompt?.length, parameters });
-
-      if (!moduleType || !prompt) {
-        console.log('❌ Validation failed:', { moduleType: !!moduleType, prompt: !!prompt });
+      if (!moduleType || !prompt || moduleType.trim() === '' || prompt.trim() === '') {
+        console.log('❌ Validation failed - missing required fields');
         return res.status(400).json({ 
           success: false, 
-          error: `Module type and prompt are required. Got moduleType: ${moduleType}, prompt: ${prompt}` 
+          error: 'Module type and prompt are required' 
         });
       }
 
@@ -637,10 +637,9 @@ async function executeIAVideoModule(prompt: string, parameters: any) {
     });
 
     // Generate script with AI
-    const scriptResult = await aiMultiProvider.generateContent({
+    const scriptResult = await aiMultiProvider.generateLLM({
       model: 'gpt-4o',
-      prompt: `Crie um roteiro detalhado para vídeo baseado na seguinte descrição: ${prompt}`,
-      systemPrompt: 'Você é um roteirista especializado em criar scripts para vídeos de marketing, tutoriais e conteúdo digital.',
+      prompt: `Você é um roteirista especializado em criar scripts para vídeos de marketing, tutoriais e conteúdo digital. Crie um roteiro detalhado para vídeo baseado na seguinte descrição: ${prompt}`,
       temperature: 0.6
     });
 
@@ -683,10 +682,9 @@ async function executeIAProdutoModule(prompt: string, parameters: any) {
   const startTime = performance.now();
   
   try {
-    const result = await aiMultiProvider.generateContent({
+    const result = await aiMultiProvider.generateLLM({
       model: 'gpt-4o',
-      prompt: `Como especialista em desenvolvimento de produtos digitais, analise e desenvolva uma estratégia completa para: ${prompt}`,
-      systemPrompt: 'Você é um especialista em desenvolvimento de produtos digitais que cria estratégias de lançamento, análise de mercado e posicionamento de produtos.',
+      prompt: `Você é um especialista em desenvolvimento de produtos digitais que cria estratégias de lançamento, análise de mercado e posicionamento de produtos. Como especialista em desenvolvimento de produtos digitais, analise e desenvolva uma estratégia completa para: ${prompt}`,
       temperature: 0.7,
       maxTokens: 2500
     });
@@ -731,10 +729,9 @@ async function executeIATrafegoModule(prompt: string, parameters: any) {
   const startTime = performance.now();
   
   try {
-    const result = await aiMultiProvider.generateContent({
+    const result = await aiMultiProvider.generateLLM({
       model: 'gpt-4o',
-      prompt: `Como especialista em tráfego pago e marketing digital, desenvolva uma estratégia completa de tráfego para: ${prompt}`,
-      systemPrompt: 'Você é um especialista em tráfego pago, SEO e marketing digital que cria campanhas otimizadas para diferentes plataformas.',
+      prompt: `Você é um especialista em tráfego pago, SEO e marketing digital que cria campanhas otimizadas para diferentes plataformas. Como especialista em tráfego pago e marketing digital, desenvolva uma estratégia completa de tráfego para: ${prompt}`,
       temperature: 0.6,
       maxTokens: 2200
     });
@@ -779,10 +776,9 @@ async function executeIAAnalyticsModule(prompt: string, parameters: any) {
   const startTime = performance.now();
   
   try {
-    const result = await aiMultiProvider.generateContent({
+    const result = await aiMultiProvider.generateLLM({
       model: 'gpt-4o',
-      prompt: `Como especialista em analytics e business intelligence, analise e forneça insights detalhados sobre: ${prompt}`,
-      systemPrompt: 'Você é um especialista em analytics que interpreta dados, cria relatórios e fornece insights acionáveis para otimização de negócios.',
+      prompt: `Você é um especialista em analytics que interpreta dados, cria relatórios e fornece insights acionáveis para otimização de negócios. Como especialista em analytics e business intelligence, analise e forneça insights detalhados sobre: ${prompt}`,
       temperature: 0.5,
       maxTokens: 2000
     });
