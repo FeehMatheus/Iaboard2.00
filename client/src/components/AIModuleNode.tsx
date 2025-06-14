@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProgressVisualization } from './ProgressVisualization';
+import { DynamicProgressVisualization } from './DynamicProgressVisualization';
 import { useProgressTracking } from '../hooks/useProgressTracking';
 import {
   Select,
