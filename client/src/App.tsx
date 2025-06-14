@@ -3,11 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import SmartGuidance from '@/components/SmartGuidance';
-import Landing from '@/pages/Landing';
-import Dashboard from '@/pages/Dashboard';
-import Board from '@/pages/Board';
-import AdvancedBoard from '@/pages/AdvancedBoard';
-import CurisoDashboard from '@/pages/CurisoDashboard';
+import CurisoOriginal from '@/pages/CurisoOriginal';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,14 +33,9 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-gray-900">
           <Switch>
-            <Route path="/" component={CurisoDashboard} />
-            <Route path="/landing" component={Landing} />
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/board" component={Board} />
-            <Route path="/advanced-board" component={AdvancedBoard} />
-            <Route path="/curiso" component={CurisoDashboard} />
+            <Route path="/" component={CurisoOriginal} />
             <Route>
-              <CurisoDashboard />
+              <CurisoOriginal />
             </Route>
           </Switch>
           <SmartGuidance 
