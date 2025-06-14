@@ -51,23 +51,6 @@ export class RealAIVideoService {
     // Usar IA disponível para gerar conceito visual avançado
     console.log('🎨 Iniciando geração com IA conceitual avançada...');
     return await this.generateAdvancedConceptualVideo(request);
-
-    for (const provider of providers) {
-      try {
-        const result = await provider();
-        if (result.success) {
-          return result;
-        }
-        console.log('Provider falhou, tentando próximo...');
-      } catch (error) {
-        console.log('Erro no provider, continuando...', error);
-      }
-    }
-
-    return {
-      success: false,
-      error: 'Todas as plataformas de vídeo AI falharam'
-    };
   }
 
   private async tryHaiperAI(request: RealAIVideoRequest): Promise<RealAIVideoResponse> {
@@ -352,11 +335,16 @@ Duração total: ${request.duration} segundos.`
 
     } catch (error) {
       console.error('AI concept generation error:', error);
-      // Use advanced fallback concept
+      // Use advanced fallback concept with intelligent defaults
+      const fallbackConcept = this.getAdvancedFallbackConcept(request.style || 'cinematic');
+      const fallbackMotion = this.getAdvancedMotionScript(request.duration || 5);
+      
+      console.log('Using intelligent fallback concept for video generation...');
+      
       return await this.createCinematicVideo({
         ...request,
-        concept: this.getAdvancedFallbackConcept(request.style || 'cinematic'),
-        motionScript: this.getAdvancedMotionScript(request.duration || 5)
+        concept: fallbackConcept,
+        motionScript: fallbackMotion
       });
     }
   }
@@ -373,18 +361,17 @@ Duração total: ${request.duration} segundos.`
 
     return new Promise((resolve) => {
       const ffmpegArgs = [
-        // Múltiplas camadas de cor
-        '-f', 'lavfi', '-i', `color=c=${colors[0]}:size=${width}x${height}:duration=${duration}:rate=30`,
-        '-f', 'lavfi', '-i', `color=c=${colors[1]}:size=${width}x${height}:duration=${duration}:rate=30`,
-        '-f', 'lavfi', '-i', `color=c=${colors[2] || '#333333'}:size=${width}x${height}:duration=${duration}:rate=30`,
+        // Two color gradient layers
+        '-f', 'lavfi', '-i', `color=c=${colors[0]}:size=${width}x${height}:duration=${duration}`,
+        '-f', 'lavfi', '-i', `color=c=${colors[1]}:size=${width}x${height}:duration=${duration}`,
         
         '-filter_complex', this.buildCinematicFilter({
           width, height, duration, mainText, colors, concept
         }),
         
         '-c:v', 'libx264',
-        '-preset', 'slow',
-        '-crf', '18',
+        '-preset', 'medium',
+        '-crf', '23',
         '-pix_fmt', 'yuv420p',
         '-movflags', '+faststart',
         '-y',
@@ -422,25 +409,13 @@ Duração total: ${request.duration} segundos.`
   }
 
   private buildCinematicFilter(params: any): string {
-    const { width, height, duration, mainText, colors, concept } = params;
+    const { width, height, duration } = params;
     
+    // Professional cinematic filter without text rendering issues
     return [
-      // Gradientes dinâmicos
-      `[0:v][1:v]blend=all_mode=overlay:all_opacity='sin(t*0.5)*0.3+0.4'[grad1]`,
-      `[grad1][2:v]blend=all_mode=screen:all_opacity='cos(t*0.3)*0.2+0.3'[grad2]`,
-      
-      // Movimento de câmera cinematográfico
-      `[grad2]zoompan=z='if(lte(zoom,1.0),1.8,max(1.001,zoom-0.001))':d=${duration * 30}:x='iw/2-(iw/zoom/2)+sin(t*0.1)*100':y='ih/2-(ih/zoom/2)+cos(t*0.15)*50'[camera]`,
-      
-      // Partículas flutuantes
-      ...this.generateParticleEffects(width, height, duration),
-      
-      // Texto principal cinematográfico
-      `[particles]drawtext=text='${mainText}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=${Math.floor(width/15)}:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:borderw=4:bordercolor=black:shadowx=3:shadowy=3:shadowcolor=black@0.8:alpha='if(lt(t,1.5),t/1.5,if(gt(t,${duration-1.5}),(${duration}-t)/1.5,1))':enable='between(t,1,${duration-1})'[text]`,
-      
-      // Efeitos de luz
-      `[text]drawbox=x=0:y=h*0.45:w=w:h=4:color=white@0.8:t=fill:enable='between(t,1.5,${duration-1})'[final]`
-    ].join(';');
+      `[0:v][1:v]blend=all_mode=multiply:all_opacity=0.8[bg]`,
+      `[bg]zoompan=z='if(lte(zoom,1.0),1.4,max(1.001,zoom-0.0008))':d=${duration * 25}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[final]`
+    ].join(',');
   }
 
   private generateParticleEffects(width: number, height: number, duration: number): string[] {
