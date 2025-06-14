@@ -125,34 +125,35 @@
   100% {
     border-image-source: linear-gradient(45deg, #FF1639, #FF4066, #FF1639);
   }
-  .supreme-glow {
-    box-shadow: 0 0 20px rgba(251, 146, 60, 0.3);
-  }
+}
 
-  .floating-animation {
-    animation: float 3s ease-in-out infinite;
-  }
+.supreme-glow {
+  box-shadow: 0 0 20px rgba(251, 146, 60, 0.3);
+}
 
-  .pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
+.floating-animation {
+  animation: float 3s ease-in-out infinite;
+}
 
-  .gradient-border {
-    position: relative;
-    background: linear-gradient(45deg, transparent, rgba(251, 146, 60, 0.1), transparent);
-    border: 1px solid transparent;
-  }
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
 
-  .gradient-border::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    padding: 1px;
-    background: linear-gradient(45deg, #fb9260, #7c3aed);
-    border-radius: inherit;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-  }
+.gradient-border {
+  position: relative;
+  background: linear-gradient(45deg, transparent, rgba(251, 146, 60, 0.1), transparent);
+  border: 1px solid transparent;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(45deg, #fb9260, #7c3aed);
+  border-radius: inherit;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
 }
 
 @keyframes float {
