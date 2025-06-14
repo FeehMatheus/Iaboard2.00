@@ -86,47 +86,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.use('/ai-content', express.static(path.join(process.cwd(), 'public', 'ai-content')));
 
-  // AI Module Execution
-  app.post('/api/ai/module/execute', async (req, res) => {
-    try {
-      const { module, prompt } = req.body;
-      
-      if (!module || !prompt) {
-        return res.status(400).json({ success: false, error: 'Module and prompt are required' });
-      }
-
-      console.log('🤖 Executing AI module:', { module, prompt });
-
-      // Use ultimate AI system for execution
-      const result = await ultimateAISystem.generate({
-        type: 'text',
-        prompt: `Como assistente de IA especializado em marketing digital: ${prompt}`,
-        parameters: {
-          maxTokens: 2000,
-          temperature: 0.7
-        }
-      });
-
-      if (result.success) {
-        res.json({
-          success: true,
-          content: result.content,
-          metadata: result.metadata
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          error: result.error || 'Execution failed'
-        });
-      }
-    } catch (error) {
-      console.error('AI module execution error:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Module execution failed'
-      });
-    }
-  });
+  // Removed duplicate route - using organized API structure below
 
   // FREE AI Video Generation
   app.post('/api/pika/generate', async (req, res) => {
@@ -342,17 +302,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // IA Board Module Execution - Main endpoint for all modules
   app.post('/api/ai/module/execute', async (req, res) => {
     try {
-      const body = req.body || {};
-      const moduleType = body.moduleType;
-      const prompt = body.prompt;
-      const parameters = body.parameters || {};
+      console.log('Request received:', {
+        hasBody: !!req.body,
+        bodyType: typeof req.body,
+        body: req.body,
+        contentType: req.headers['content-type']
+      });
 
-      console.log('Module execution:', { moduleType, promptLength: prompt?.length });
+      const { moduleType, prompt, parameters = {} } = req.body || {};
 
-      if (!moduleType || !prompt || typeof moduleType !== 'string' || typeof prompt !== 'string') {
+      console.log('Extracted values:', { moduleType, prompt: prompt?.substring(0, 50) });
+
+      if (!moduleType || !prompt) {
+        console.log('Validation failed - missing required fields');
         return res.status(400).json({ 
           success: false, 
-          error: 'Module type and prompt are required'
+          error: 'Module type and prompt are required',
+          debug: { moduleType, promptExists: !!prompt }
         });
       }
 
