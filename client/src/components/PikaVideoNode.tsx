@@ -141,17 +141,22 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
     }
 
     try {
-      const response = await apiRequest('/api/pika/upload', {
+      const response = await fetch('/api/pika/upload', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           videoUrl: manualVideoUrl,
           originalPrompt: prompt
         })
       });
 
-      if (response.success) {
-        setVideoUrl(response.videoUrl);
-        updateNodeData({ videoUrl: response.videoUrl });
+      const data = await response.json();
+
+      if (data.success) {
+        setVideoUrl(data.videoUrl);
+        updateNodeData({ videoUrl: data.videoUrl });
         setShowManualUpload(false);
         setManualVideoUrl('');
         toast({
@@ -159,7 +164,7 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
           description: "Vídeo foi adicionado com sucesso"
         });
       } else {
-        throw new Error(response.error || 'Falha no upload do vídeo');
+        throw new Error(data.error || 'Falha no upload do vídeo');
       }
     } catch (error) {
       toast({
@@ -233,7 +238,7 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
               <div className="space-y-4">
                 <div>
                   <Label>Proporção</Label>
-                  <Select value={aspectRatio} onValueChange={setAspectRatio}>
+                  <Select value={aspectRatio} onValueChange={(value) => setAspectRatio(value as '16:9' | '9:16' | '1:1')}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

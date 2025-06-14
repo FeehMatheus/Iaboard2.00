@@ -21,14 +21,14 @@ import { Button } from '@/components/ui/button';
 import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart } from 'lucide-react';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
-import { VideoNode } from '@/components/VideoNode';
+import { PikaVideoNode } from '@/components/PikaVideoNode';
 import { nanoid } from 'nanoid';
 import { useDebouncedCallback } from 'use-debounce';
 
 const nodeTypes = {
   chat: CurisoChatNodeOriginal,
   aiModule: AIModuleNode,
-  video: VideoNode,
+  video: PikaVideoNode,
 };
 
 function Flow() {
@@ -203,10 +203,9 @@ function Flow() {
       position,
       resizable: true,
       data: {
-        text: '',
-        voice: 'pt-BR-FranciscaNeural',
-        avatar: 'amy-jcwCkr1grs',
-        type: 'did',
+        prompt: '',
+        aspectRatio: '16:9' as '16:9' | '9:16' | '1:1',
+        style: 'cinematic',
         videoUrl: '',
         isGenerating: false,
       },
