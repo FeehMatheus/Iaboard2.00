@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { storage } from "./storage";
 import OpenAI from "openai";
-import { simpleVideoGenerator } from "./simple-video-generator";
+import { realFreeAIVideo } from "./real-free-ai-video";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -23,9 +23,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
       }
 
-      console.log('🎬 Generating FREE AI video:', { prompt, aspectRatio, style });
+      console.log('🎬 Starting REAL AI video generation with public APIs:', { prompt, aspectRatio, style });
 
-      const result = await simpleVideoGenerator.generateVideo({
+      const result = await realFreeAIVideo.generateRealAIVideo({
         prompt,
         aspectRatio,
         style,
