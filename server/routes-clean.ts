@@ -6,6 +6,8 @@ import path from "path";
 import { storage } from "./storage";
 import OpenAI from "openai";
 import { freeRealVideoAPIs } from "./free-real-video-apis";
+import { tokenManager } from "./token-manager";
+import { realAIServices } from "./real-ai-services";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -129,6 +131,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/canvas/nodes/:id', async (req, res) => {
     res.json({ success: true });
+  });
+
+  // Token status endpoint
+  app.get('/api/tokens/status', (req, res) => {
+    try {
+      const status = tokenManager.getAllServiceStatus();
+      res.json({
+        success: true,
+        services: status,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Token status error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get token status'
+      });
+    }
+  });
+
+  // Universal AI generation endpoint for all modules
+  app.post('/api/ai/generate', async (req, res) => {
+    try {
+      const { type, prompt, parameters } = req.body;
+
+      if (!type || !prompt) {
+        return res.status(400).json({
+          success: false,
+          error: 'Type and prompt are required'
+        });
+      }
+
+      console.log(`🤖 Generating ${type} content with real AI services:`, prompt);
+
+      const result = await realAIServices.generate({
+        type,
+        prompt,
+        parameters
+      });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          content: result.content,
+          url: result.url,
+          provider: result.provider,
+          metadata: result.metadata
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.error || 'AI generation failed'
+        });
+      }
+    } catch (error) {
+      console.error('AI generation error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate AI content'
+      });
+    }
+  });
+
+  // Enhanced IA Copy module with real AI
+  app.post('/api/ia-copy/generate', async (req, res) => {
+    try {
+      const { prompt, copyType, parameters } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({
+          success: false,
+          error: 'Prompt is required'
+        });
+      }
+
+      console.log('✍️ Generating copy with real AI services:', prompt);
+
+      const copyPrompt = `Create ${copyType || 'professional'} copy for: ${prompt}. Make it compelling, persuasive, and action-oriented.`;
+
+      const result = await realAIServices.generate({
+        type: 'text',
+        prompt: copyPrompt,
+        parameters: {
+          ...parameters,
+          temperature: 0.8,
+          maxTokens: 1500
+        }
+      });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          copy: result.content,
+          provider: result.provider,
+          metadata: {
+            ...result.metadata,
+            copyType: copyType || 'professional',
+            module: 'IA Copy'
+          }
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.error || 'Copy generation failed'
+        });
+      }
+    } catch (error) {
+      console.error('IA Copy generation error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate copy'
+      });
+    }
   });
 
   // Health check

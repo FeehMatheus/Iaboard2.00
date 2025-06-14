@@ -15,6 +15,26 @@ export class TokenManager {
   }
 
   private initializeServices() {
+    // OpenAI service with API key
+    this.tokens.set('openai', {
+      service: 'OpenAI',
+      tokensPerHour: process.env.OPENAI_API_KEY ? 10000 : 0,
+      tokensUsed: 0,
+      lastReset: Date.now(),
+      apiKey: process.env.OPENAI_API_KEY,
+      freeEndpoint: 'https://api.openai.com'
+    });
+
+    // Anthropic service with API key
+    this.tokens.set('anthropic', {
+      service: 'Anthropic',
+      tokensPerHour: process.env.ANTHROPIC_API_KEY ? 10000 : 0,
+      tokensUsed: 0,
+      lastReset: Date.now(),
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      freeEndpoint: 'https://api.anthropic.com'
+    });
+
     // Free tier limits for various services
     this.tokens.set('huggingface', {
       service: 'Hugging Face',
