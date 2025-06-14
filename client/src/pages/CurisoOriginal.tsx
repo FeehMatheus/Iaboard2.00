@@ -302,27 +302,60 @@ function Flow() {
         </div>
       </Panel>
       <Panel position="top-right" className="space-x-2">
-        <div className="flex gap-2 bg-background/80 backdrop-blur-sm rounded-lg p-2 border">
-          <Button onClick={addNode} size="sm" className="bg-primary hover:bg-primary/90">
-            <MessageCirclePlus className="h-4 w-4 mr-1" />
-            Chat
-          </Button>
-          <Button onClick={() => addAIModule('ia-total')} size="sm" className="bg-purple-600 hover:bg-purple-700">
-            <Brain className="h-4 w-4 mr-1" />
-            IA Total™
-          </Button>
-          <Button onClick={() => addAIModule('pensamento-poderoso')} size="sm" className="bg-yellow-600 hover:bg-yellow-700">
-            <Zap className="h-4 w-4 mr-1" />
-            Pensamento Poderoso™
-          </Button>
-          <Button onClick={addVideoNode} size="sm" className="bg-pink-600 hover:bg-pink-700">
-            <Video className="h-4 w-4 mr-1" />
-            Vídeo IA
-          </Button>
+        <div className="grid grid-cols-1 gap-1 bg-background/90 backdrop-blur-sm rounded-lg p-3 border shadow-lg max-w-xs">
+          <div className="text-xs font-semibold text-muted-foreground mb-2 text-center">CURISO AI MODULES</div>
+          
+          <div className="grid grid-cols-2 gap-1">
+            <Button onClick={addNode} size="sm" className="bg-primary hover:bg-primary/90 text-xs">
+              <MessageCirclePlus className="h-3 w-3 mr-1" />
+              Chat
+            </Button>
+            <Button onClick={addVideoNode} size="sm" className="bg-pink-600 hover:bg-pink-700 text-xs">
+              <Video className="h-3 w-3 mr-1" />
+              Vídeo
+            </Button>
+          </div>
+
+          <div className="text-xs font-medium text-muted-foreground mt-2 mb-1">ADVANCED AI:</div>
+          <div className="grid grid-cols-1 gap-1">
+            <Button onClick={() => addAIModule('ia-total')} size="sm" className="bg-purple-600 hover:bg-purple-700 text-xs justify-start">
+              <Brain className="h-3 w-3 mr-1" />
+              IA Total™
+            </Button>
+            <Button onClick={() => addAIModule('pensamento-poderoso')} size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-xs justify-start">
+              <Zap className="h-3 w-3 mr-1" />
+              Pensamento Poderoso™
+            </Button>
+            <Button onClick={() => addAIModule('ia-espia')} size="sm" className="bg-red-600 hover:bg-red-700 text-xs justify-start">
+              <Search className="h-3 w-3 mr-1" />
+              IA Espiã
+            </Button>
+            <Button onClick={() => addAIModule('ia-produto')} size="sm" className="bg-green-600 hover:bg-green-700 text-xs justify-start">
+              <Package className="h-3 w-3 mr-1" />
+              IA Produto Rápido™
+            </Button>
+            <Button onClick={() => addAIModule('ia-copy')} size="sm" className="bg-blue-600 hover:bg-blue-700 text-xs justify-start">
+              <PenTool className="h-3 w-3 mr-1" />
+              IA Copy
+            </Button>
+            <Button onClick={() => addAIModule('ia-trafego')} size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-xs justify-start">
+              <Target className="h-3 w-3 mr-1" />
+              IA Tráfego Pago
+            </Button>
+            <Button onClick={() => addAIModule('ia-video')} size="sm" className="bg-rose-600 hover:bg-rose-700 text-xs justify-start">
+              <Video className="h-3 w-3 mr-1" />
+              IA Vídeo Avançado
+            </Button>
+            <Button onClick={() => addAIModule('ia-analytics')} size="sm" className="bg-teal-600 hover:bg-teal-700 text-xs justify-start">
+              <BarChart className="h-3 w-3 mr-1" />
+              IA Analytics Plus
+            </Button>
+          </div>
+
           {selectedNodes.length > 0 && (
-            <Button onClick={delNode} size="sm" variant="destructive">
-              <Trash2 className="h-4 w-4 mr-1" />
-              Delete
+            <Button onClick={delNode} size="sm" variant="destructive" className="mt-2 text-xs">
+              <Trash2 className="h-3 w-3 mr-1" />
+              Delete ({selectedNodes.length})
             </Button>
           )}
         </div>
