@@ -18,6 +18,48 @@ const openai = new OpenAI({
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
+  // AI Module Execution
+  app.post('/api/ai/module/execute', async (req, res) => {
+    try {
+      const { module, prompt } = req.body;
+      
+      if (!module || !prompt) {
+        return res.status(400).json({ success: false, error: 'Module and prompt are required' });
+      }
+
+      console.log('🤖 Executing AI module:', { module, prompt });
+
+      // Use ultimate AI system for execution
+      const result = await ultimateAISystem.generate({
+        type: 'text',
+        prompt: `Como assistente de IA especializado em marketing digital: ${prompt}`,
+        parameters: {
+          maxTokens: 2000,
+          temperature: 0.7
+        }
+      });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          content: result.content,
+          metadata: result.metadata
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.error || 'Execution failed'
+        });
+      }
+    } catch (error) {
+      console.error('AI module execution error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Module execution failed'
+      });
+    }
+  });
+
   // FREE AI Video Generation
   app.post('/api/pika/generate', async (req, res) => {
     try {
@@ -171,7 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`🤖 Generating ${type} content with real AI services:`, prompt);
 
-      const result = await definitiveAISystem.generate({
+      const result = await ultimateAISystem.generate({
         type,
         prompt,
         parameters
@@ -216,7 +258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const copyPrompt = `Create ${copyType || 'professional'} copy for: ${prompt}. Make it compelling, persuasive, and action-oriented.`;
 
-      const result = await definitiveAISystem.generate({
+      const result = await ultimateAISystem.generate({
         type: 'text',
         prompt: copyPrompt,
         parameters: {
