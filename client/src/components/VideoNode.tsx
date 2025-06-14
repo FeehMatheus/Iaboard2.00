@@ -77,9 +77,9 @@ export const VideoNode = memo(({ id, data }: NodeProps<VideoNodeData>) => {
     }
   }, []);
 
-  useState(() => {
+  useEffect(() => {
     loadOptions();
-  });
+  }, [loadOptions]);
 
   const generateVideo = async () => {
     if (!text.trim()) {

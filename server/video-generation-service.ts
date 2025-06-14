@@ -19,6 +19,7 @@ interface VideoGenerationResponse {
     size: string;
     format: string;
     provider: string;
+    instructions?: string;
   };
 }
 

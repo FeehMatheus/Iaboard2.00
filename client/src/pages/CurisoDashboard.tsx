@@ -19,7 +19,7 @@ import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, Download, FileText, Share2, Trash2, Grid3X3, Eye, EyeOff } from 'lucide-react';
+import { Plus, Settings, Download, FileText, Share2, Trash2, Grid3X3, Eye, EyeOff, Video } from 'lucide-react';
 import { CurisoChatNode } from '@/components/CurisoChatNode';
 import { VideoNode } from '@/components/VideoNode';
 import { nanoid } from 'nanoid';
@@ -133,6 +133,43 @@ function Flow() {
     toast({
       title: "Nó Criado",
       description: "Novo nó de chat adicionado ao canvas.",
+    });
+  }, [getViewport, screenToFlowPosition, settings, setSettings, toast]);
+
+  const addVideoNode = useCallback(() => {
+    const viewport = getViewport();
+    const position = screenToFlowPosition({
+      x: window.innerWidth / 2 - 160,
+      y: window.innerHeight / 2 - 150,
+    });
+
+    const newNode: Node = {
+      id: nanoid(),
+      type: 'video',
+      position,
+      data: {
+        text: '',
+        voice: 'pt-BR-FranciscaNeural',
+        avatar: 'amy-jcwCkr1grs',
+        type: 'did',
+        videoUrl: '',
+        isGenerating: false,
+      },
+    };
+
+    const newSettings = {
+      ...settings,
+      boards: settings.boards.map(board =>
+        board.id === settings.currentBoardId
+          ? { ...board, nodes: [...board.nodes, newNode] }
+          : board
+      ),
+    };
+    setSettings(newSettings);
+    
+    toast({
+      title: "Nó de Vídeo Criado",
+      description: "Novo nó de geração de vídeo com D-ID adicionado ao canvas.",
     });
   }, [getViewport, screenToFlowPosition, settings, setSettings, toast]);
 
@@ -339,7 +376,16 @@ function Flow() {
                   className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Novo Nó
+                  Chat IA
+                </Button>
+                
+                <Button
+                  onClick={addVideoNode}
+                  size="sm"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                >
+                  <Video className="w-4 h-4 mr-2" />
+                  Vídeo IA
                 </Button>
                 
                 <Button
