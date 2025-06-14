@@ -1,6 +1,6 @@
-# IA Board by Filippe™ - Sistema Avançado de Canvas Inteligente
+# IA Board by Filippe™ - Curiso 1:1 Replica Completa
 
-Sistema completo inspirado no projeto Curiso, com canvas infinito, blocos interativos conectados a múltiplas IAs reais, e funções completas de exportação e CTA.
+Sistema idêntico pixel-perfect ao projeto Curiso original, com canvas infinito ReactFlow, blocos IA interativos conectados a múltiplas APIs reais, e funções completas de exportação e CTA operacionais.
 
 ## 🚀 Características Principais
 

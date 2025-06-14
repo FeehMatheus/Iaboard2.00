@@ -292,7 +292,6 @@ function Flow() {
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
         className="bg-gray-900"
-        colorMode="dark"
       >
         <Background 
           color={showGrid ? "#374151" : "transparent"} 
@@ -302,7 +301,6 @@ function Flow() {
         />
         <Controls 
           className="bg-gray-800 border-gray-700"
-          style={{ button: { backgroundColor: '#374151', borderColor: '#4b5563' } }}
         />
         
         {/* Header Panel */}

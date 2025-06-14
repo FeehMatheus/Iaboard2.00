@@ -37,12 +37,14 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-gray-900">
           <Switch>
-            <Route path="/" component={Landing} />
+            <Route path="/" component={CurisoDashboard} />
+            <Route path="/landing" component={Landing} />
             <Route path="/dashboard" component={Dashboard} />
             <Route path="/board" component={Board} />
             <Route path="/advanced-board" component={AdvancedBoard} />
+            <Route path="/curiso" component={CurisoDashboard} />
             <Route>
-              <Landing />
+              <CurisoDashboard />
             </Route>
           </Switch>
           <SmartGuidance 
