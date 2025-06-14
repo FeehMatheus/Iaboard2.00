@@ -361,14 +361,12 @@ Duração total: ${request.duration} segundos.`
 
     return new Promise((resolve) => {
       const ffmpegArgs = [
-        // Two color gradient layers
-        '-f', 'lavfi', '-i', `color=c=${colors[0]}:size=${width}x${height}:duration=${duration}`,
-        '-f', 'lavfi', '-i', `color=c=${colors[1]}:size=${width}x${height}:duration=${duration}`,
-        
-        '-filter_complex', this.buildCinematicFilter({
-          width, height, duration, mainText, colors, concept
-        }),
-        
+        '-f', 'lavfi',
+        '-i', `color=c=${colors[0]}:size=${width}x${height}:duration=${duration}:rate=25`,
+        '-f', 'lavfi', 
+        '-i', `color=c=${colors[1]}:size=${width}x${height}:duration=${duration}:rate=25`,
+        '-filter_complex', 
+        `[0:v][1:v]blend=all_mode=multiply:all_opacity=0.7[bg];[bg]zoompan=z='if(lte(zoom,1.0),1.3,max(1.001,zoom-0.0006))':d=${duration * 25}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`,
         '-c:v', 'libx264',
         '-preset', 'medium',
         '-crf', '23',

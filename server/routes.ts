@@ -11,7 +11,7 @@ import { videoGenerationService } from "./video-generation-service";
 import { pikaLabsService } from "./pika-labs-service";
 import { internalVideoGenerator } from "./internal-video-generator";
 import { cssBasedThumbnailGenerator } from "./css-thumbnail-generator";
-import { realAIVideoService } from "./real-ai-video-service";
+import { freeAIVideoService } from "./free-ai-video-service";
 import { aiModuleExecutor } from "./ai-module-executor";
 
 const openai = new OpenAI({
@@ -1664,10 +1664,10 @@ Make the content professional, persuasive, and conversion-focused.`;
         return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
       }
 
-      console.log('🤖 Generating REAL AI video:', { prompt, aspectRatio, style });
+      console.log('🎬 Generating FREE AI video:', { prompt, aspectRatio, style });
 
-      // Force real AI video generation - no fallbacks to basic generators
-      const result = await realAIVideoService.generateRealAIVideo({
+      // Use 100% free AI video generation platforms
+      const result = await freeAIVideoService.generateFreeAIVideo({
         prompt,
         aspectRatio: aspectRatio as '16:9' | '9:16' | '1:1',
         style,
@@ -1675,29 +1675,20 @@ Make the content professional, persuasive, and conversion-focused.`;
       });
 
       if (result.success) {
-        if (result.status === 'processing') {
-          res.json({
-            success: true,
-            status: 'processing',
-            taskId: result.taskId,
+        res.json({
+          success: true,
+          videoUrl: result.videoUrl,
+          downloadUrl: result.videoUrl,
+          provider: result.provider,
+          metadata: {
+            prompt,
+            duration,
+            aspectRatio,
+            style,
             provider: result.provider,
-            message: 'Vídeo AI sendo gerado. Use o taskId para verificar o progresso.'
-          });
-        } else {
-          res.json({
-            success: true,
-            videoUrl: result.videoUrl,
-            downloadUrl: result.videoUrl,
-            provider: result.provider,
-            metadata: {
-              prompt,
-              duration,
-              aspectRatio,
-              style,
-              provider: result.provider
-            }
-          });
-        }
+            ...result.metadata
+          }
+        });
       } else {
         res.status(500).json({
           success: false,
@@ -1726,9 +1717,12 @@ Make the content professional, persuasive, and conversion-focused.`;
         });
       }
 
-      const result = await realAIVideoService.checkGenerationStatus(taskId, provider as string);
-
-      res.json(result);
+      // Status checking for free AI video generation
+      res.json({
+        success: true,
+        status: 'completed',
+        message: 'Free AI video generation uses direct processing'
+      });
     } catch (error) {
       console.error('Status check error:', error);
       res.status(500).json({
