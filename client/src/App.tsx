@@ -31,7 +31,7 @@ export default function App() {
   return (
     <ThemeProvider defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-gray-900">
+        <div className="min-h-screen bg-background">
           <Switch>
             <Route path="/" component={CurisoOriginal} />
             <Route>
