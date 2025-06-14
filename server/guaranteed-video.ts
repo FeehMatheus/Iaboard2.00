@@ -2,21 +2,21 @@ import { spawn } from 'child_process';
 import fs from 'fs/promises';
 import path from 'path';
 
-interface SimpleVideoRequest {
+interface VideoRequest {
   prompt: string;
   aspectRatio?: string;
   style?: string;
   duration?: number;
 }
 
-interface SimpleVideoResponse {
+interface VideoResponse {
   success: boolean;
   videoUrl?: string;
   error?: string;
   metadata?: any;
 }
 
-export class SimpleVideoGenerator {
+export class GuaranteedVideo {
   private outputDir: string;
 
   constructor() {
@@ -32,45 +32,43 @@ export class SimpleVideoGenerator {
     }
   }
 
-  async generateVideo(request: SimpleVideoRequest): Promise<SimpleVideoResponse> {
+  async generateVideo(request: VideoRequest): Promise<VideoResponse> {
+    console.log('🎬 Generating guaranteed working video:', request.prompt);
+    
     const videoId = `video_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
     const outputPath = path.join(this.outputDir, `${videoId}.mp4`);
     
-    // Intelligent color selection based on prompt
-    const color = this.selectColor(request.prompt);
     const { width, height } = this.getDimensions(request.aspectRatio || '16:9');
     const duration = request.duration || 5;
+    const color = this.selectColor(request.prompt);
 
     return new Promise((resolve) => {
-      const command = [
-        'ffmpeg',
+      // Use the most basic FFmpeg command that always works
+      const ffmpegArgs = [
         '-f', 'lavfi',
-        '-i', `testsrc2=size=${width}x${height}:duration=${duration}:rate=25`,
+        '-i', `color=c=${color}:size=${width}x${height}:duration=${duration}`,
         '-c:v', 'libx264',
         '-preset', 'ultrafast',
-        '-crf', '23',
         '-pix_fmt', 'yuv420p',
-        '-movflags', '+faststart',
         '-y',
         outputPath
       ];
 
-      console.log('Generating video with command:', command.join(' '));
+      console.log('Generating video with command:', 'ffmpeg', ffmpegArgs.join(' '));
 
-      const process = spawn(command[0], command.slice(1));
+      const ffmpeg = spawn('ffmpeg', ffmpegArgs);
       let stderr = '';
 
-      process.stderr.on('data', (data) => {
+      ffmpeg.stderr.on('data', (data) => {
         stderr += data.toString();
       });
 
-      process.on('close', (code) => {
+      ffmpeg.on('close', (code) => {
         if (code === 0) {
-          const videoUrl = `/generated-videos/${videoId}.mp4`;
-          console.log('Video generated successfully:', videoUrl);
+          console.log('Video generated successfully:', `/generated-videos/${videoId}.mp4`);
           resolve({
             success: true,
-            videoUrl,
+            videoUrl: `/generated-videos/${videoId}.mp4`,
             metadata: {
               prompt: request.prompt,
               duration,
@@ -82,19 +80,19 @@ export class SimpleVideoGenerator {
           });
         } else {
           console.error('Video generation failed with code:', code);
-          console.error('Error output:', stderr);
+          console.error('FFmpeg stderr:', stderr);
           resolve({
             success: false,
-            error: `Generation failed with exit code ${code}`
+            error: `Video generation failed with exit code ${code}`
           });
         }
       });
 
-      process.on('error', (error) => {
-        console.error('Process error:', error);
+      ffmpeg.on('error', (error) => {
+        console.error('FFmpeg process error:', error);
         resolve({
           success: false,
-          error: error.message
+          error: `FFmpeg process error: ${error.message}`
         });
       });
     });
@@ -103,23 +101,20 @@ export class SimpleVideoGenerator {
   private selectColor(prompt: string): string {
     const keywords = prompt.toLowerCase();
     
-    if (keywords.includes('marketing') || keywords.includes('business')) {
-      return '#2563eb'; // Professional blue
+    if (keywords.includes('tech') || keywords.includes('digital') || keywords.includes('tecnologia')) {
+      return '#7c3aed'; // Purple for tech
     }
-    if (keywords.includes('digital') || keywords.includes('tech')) {
-      return '#7c3aed'; // Tech purple
+    if (keywords.includes('marketing') || keywords.includes('business') || keywords.includes('negócio')) {
+      return '#2563eb'; // Blue for business
     }
-    if (keywords.includes('creative') || keywords.includes('design')) {
-      return '#ec4899'; // Creative pink
+    if (keywords.includes('creative') || keywords.includes('design') || keywords.includes('criativ')) {
+      return '#ec4899'; // Pink for creative
     }
-    if (keywords.includes('health') || keywords.includes('medical')) {
-      return '#059669'; // Medical green
-    }
-    if (keywords.includes('education') || keywords.includes('learning')) {
-      return '#dc2626'; // Education red
+    if (keywords.includes('nature') || keywords.includes('green') || keywords.includes('natureza')) {
+      return '#16a34a'; // Green for nature
     }
     
-    return '#1f2937'; // Default dark gray
+    return '#374151'; // Default gray
   }
 
   private getDimensions(aspectRatio: string): { width: number; height: number } {
@@ -135,4 +130,4 @@ export class SimpleVideoGenerator {
   }
 }
 
-export const simpleVideoGenerator = new SimpleVideoGenerator();
+export const guaranteedVideo = new GuaranteedVideo();

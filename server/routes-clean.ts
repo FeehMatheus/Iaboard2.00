@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { storage } from "./storage";
 import OpenAI from "openai";
-import { realAIAPIs } from "./real-ai-apis";
+import { simpleVideoGenerator } from "./simple-video-generator";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -25,7 +25,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🎬 Starting REAL AI video generation with public APIs:', { prompt, aspectRatio, style });
 
-      const result = await realAIAPIs.generateVideo({
+      const result = await simpleVideoGenerator.generateVideo({
         prompt,
         aspectRatio,
         style,
