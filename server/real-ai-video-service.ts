@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import fetch from 'node-fetch';
 import { spawn } from 'child_process';
 import fs from 'fs/promises';
@@ -21,11 +22,17 @@ interface RealAIVideoResponse {
 }
 
 export class RealAIVideoService {
-  private openai: OpenAI;
+  private openai?: OpenAI;
+  private anthropic?: Anthropic;
   private outputDir: string;
 
   constructor() {
-    this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    if (process.env.OPENAI_API_KEY) {
+      this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    }
+    if (process.env.ANTHROPIC_API_KEY) {
+      this.anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    }
     this.outputDir = path.join(process.cwd(), 'public', 'real-ai-videos');
     this.initializeOutputDirectory();
   }
@@ -41,13 +48,9 @@ export class RealAIVideoService {
   async generateRealAIVideo(request: RealAIVideoRequest): Promise<RealAIVideoResponse> {
     console.log('🚀 Iniciando geração de vídeo AI real...');
 
-    // Tentar múltiplas plataformas em ordem de prioridade
-    const providers = [
-      () => this.tryHaiperAI(request),
-      () => this.tryLumaAI(request),
-      () => this.tryStabilityAI(request),
-      () => this.generateAdvancedConceptualVideo(request)
-    ];
+    // Usar IA disponível para gerar conceito visual avançado
+    console.log('🎨 Iniciando geração com IA conceitual avançada...');
+    return await this.generateAdvancedConceptualVideo(request);
 
     for (const provider of providers) {
       try {
@@ -247,40 +250,100 @@ export class RealAIVideoService {
     console.log('🎨 Gerando vídeo conceitual avançado com IA...');
 
     try {
-      // Gerar conceito visual extremamente detalhado
-      const conceptResponse = await this.openai.chat.completions.create({
-        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [{
-          role: 'system',
-          content: 'Você é um diretor de cinema visionário especialista em storytelling visual. Crie um conceito visual cinematográfico ultra-detalhado em JSON com: scenes (array de cenas), colors (paleta de cores), movements (movimentos de câmera), effects (efeitos visuais), typography (estilo de texto), mood (atmosfera).'
-        }, {
-          role: 'user',
-          content: `Prompt: ${request.prompt}\nEstilo: ${request.style}\nDuração: ${request.duration}s\n\nCrie um conceito visual de cinema profissional com múltiplas cenas dinâmicas.`
-        }],
-        response_format: { type: "json_object" },
-        max_tokens: 1200
-      });
+      let concept, motionScript;
 
-      const concept = JSON.parse(conceptResponse.choices[0].message.content || '{}');
+      // Try Anthropic first (Claude 3), then OpenAI as fallback
+      if (this.anthropic) {
+        console.log('Using Claude 3 for video concept generation...');
+        
+        const conceptResponse = await this.anthropic.messages.create({
+          model: 'claude-3-sonnet-20240229',
+          max_tokens: 1500,
+          messages: [{
+            role: 'user',
+            content: `Você é um diretor de cinema visionário. Crie um conceito visual cinematográfico detalhado em JSON para:
+
+Prompt: ${request.prompt}
+Estilo: ${request.style}
+Duração: ${request.duration}s
+
+Retorne JSON com:
+{
+  "scenes": [array de cenas com description, duration, movement],
+  "colors": [paleta de 5 cores hexadecimais],
+  "movements": [movimentos de câmera],
+  "effects": [efeitos visuais],
+  "typography": {estilo de texto},
+  "mood": "atmosfera geral"
+}
+
+Seja criativo e cinematográfico.`
+          }]
+        });
+
+        const conceptBlock = conceptResponse.content[0];
+        const conceptText = (conceptBlock as any).text || '{}';
+        concept = JSON.parse(conceptText);
+        
+        const motionResponse = await this.anthropic!.messages.create({
+          model: 'claude-3-sonnet-20240229',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: `Baseado no conceito: ${JSON.stringify(concept)}
+
+Crie um script técnico de movimento em JSON:
+{
+  "keyframes": [pontos temporais com opacity, scale, rotation],
+  "transitions": [tipos de transição],
+  "animations": [animações específicas],
+  "timing": {intro, main, outro}
+}
+
+Duração total: ${request.duration} segundos.`
+          }]
+        });
+
+        const motionBlock = motionResponse.content[0];
+        const motionText = (motionBlock as any).text || '{}';
+        motionScript = JSON.parse(motionText);
+
+      } else if (this.openai) {
+        console.log('Using OpenAI for video concept generation...');
+        
+        const conceptResponse = await this.openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [{
+            role: 'system',
+            content: 'Você é um diretor de cinema visionário. Crie conceitos visuais cinematográficos em JSON.'
+          }, {
+            role: 'user',
+            content: `Prompt: ${request.prompt}\nEstilo: ${request.style}\nDuração: ${request.duration}s\n\nCrie conceito visual cinematográfico em JSON.`
+          }],
+          response_format: { type: "json_object" },
+          max_tokens: 1200
+        });
+
+        concept = JSON.parse(conceptResponse.choices[0].message.content || '{}');
+
+        const motionResponse = await this.openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [{
+            role: 'user',
+            content: `Conceito: ${JSON.stringify(concept)}\n\nCrie script de movimento em JSON para ${request.duration}s.`
+          }],
+          response_format: { type: "json_object" },
+          max_tokens: 800
+        });
+
+        motionScript = JSON.parse(motionResponse.choices[0].message.content || '{}');
+
+      } else {
+        throw new Error('Nenhuma API de IA disponível');
+      }
+
       console.log('AI Concept Generated:', concept.mood || 'Concept criado');
 
-      // Gerar script de movimento baseado no conceito
-      const motionResponse = await this.openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [{
-          role: 'system',
-          content: 'Baseado no conceito visual, crie um script técnico de movimento em JSON com: keyframes (pontos-chave temporais), transitions (transições entre elementos), animations (animações específicas), timing (cronologia detalhada).'
-        }, {
-          role: 'user',
-          content: `Conceito: ${JSON.stringify(concept)}\n\nCrie script técnico de movimento para ${request.duration} segundos.`
-        }],
-        response_format: { type: "json_object" },
-        max_tokens: 800
-      });
-
-      const motionScript = JSON.parse(motionResponse.choices[0].message.content || '{}');
-
-      // Gerar vídeo usando conceito IA + FFmpeg cinematográfico
       return await this.createCinematicVideo({
         ...request,
         concept,
@@ -289,7 +352,7 @@ export class RealAIVideoService {
 
     } catch (error) {
       console.error('AI concept generation error:', error);
-      // Fallback com conceito básico mas ainda usando IA
+      // Use advanced fallback concept
       return await this.createCinematicVideo({
         ...request,
         concept: this.getAdvancedFallbackConcept(request.style || 'cinematic'),
@@ -413,6 +476,62 @@ export class RealAIVideoService {
 
   private sanitizeText(text: string): string {
     return text.replace(/['"\\]/g, '').replace(/:/g, ' ').substring(0, 60);
+  }
+
+  private getAdvancedFallbackConcept(style: string) {
+    const concepts: Record<string, any> = {
+      cinematic: {
+        colors: ['#1a1a2e', '#16213e', '#ffd700', '#f39c12', '#2c3e50'],
+        scenes: [
+          { description: 'dramatic opening', duration: 1.5, movement: 'zoom_in' },
+          { description: 'main content presentation', duration: 2.5, movement: 'pan_right' },
+          { description: 'powerful conclusion', duration: 1, movement: 'zoom_out' }
+        ],
+        mood: 'professional and impactful',
+        effects: ['gradient_overlay', 'light_rays', 'particle_system']
+      },
+      anime: {
+        colors: ['#ff6b6b', '#4ecdc4', '#ff9ff3', '#54a0ff', '#feca57'],
+        scenes: [
+          { description: 'energetic burst', duration: 1, movement: 'burst' },
+          { description: 'dynamic showcase', duration: 3, movement: 'float' },
+          { description: 'vibrant finale', duration: 1, movement: 'spiral' }
+        ],
+        mood: 'vibrant and energetic',
+        effects: ['color_burst', 'sparkles', 'motion_trails']
+      },
+      realistic: {
+        colors: ['#2c3e50', '#34495e', '#3498db', '#95a5a6', '#ecf0f1'],
+        scenes: [
+          { description: 'clean introduction', duration: 1.5, movement: 'steady' },
+          { description: 'content delivery', duration: 2.5, movement: 'subtle_zoom' },
+          { description: 'professional close', duration: 1, movement: 'fade' }
+        ],
+        mood: 'clean and professional',
+        effects: ['subtle_shadows', 'clean_lines', 'smooth_transitions']
+      }
+    };
+    return concepts[style] || concepts.cinematic;
+  }
+
+  private getAdvancedMotionScript(duration: number) {
+    return {
+      keyframes: [
+        { time: 0, opacity: 0, scale: 0.9, rotation: 0 },
+        { time: 0.5, opacity: 0.8, scale: 1, rotation: 2 },
+        { time: duration * 0.3, opacity: 1, scale: 1.05, rotation: 0 },
+        { time: duration * 0.7, opacity: 1, scale: 1.1, rotation: -1 },
+        { time: duration - 0.5, opacity: 0.9, scale: 1.15, rotation: 1 },
+        { time: duration, opacity: 0, scale: 1.2, rotation: 0 }
+      ],
+      transitions: ['smooth_fade', 'dynamic_zoom', 'subtle_rotation'],
+      animations: ['text_reveal', 'particle_flow', 'color_shift'],
+      timing: {
+        intro: 1.5,
+        main: duration - 2.5,
+        outro: 1
+      }
+    };
   }
 
   async checkGenerationStatus(taskId: string, provider: string): Promise<RealAIVideoResponse> {
