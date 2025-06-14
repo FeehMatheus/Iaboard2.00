@@ -17,6 +17,10 @@ import { heyGenAvatarService } from './heygen-avatar-service';
 import { googleTTSService } from './google-tts-service';
 import { typeformService } from './typeform-service';
 import { aiHealthCheck } from './ai-health-check';
+import { enhancedGoogleTTSService } from './enhanced-google-tts-service';
+import { enhancedMistralService } from './enhanced-mistral-service';
+import { enhancedStabilityService } from './enhanced-stability-service';
+import { enhancedTypeformService } from './enhanced-typeform-service';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -543,6 +547,444 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: 'Failed to generate copy'
+      });
+    }
+  });
+
+  // Enhanced Google Text-to-Speech Routes
+  app.post('/api/tts/synthesize', async (req, res) => {
+    try {
+      const { text, voice, style, speed, language, gender } = req.body;
+      
+      if (!text) {
+        return res.status(400).json({ success: false, error: 'Text is required' });
+      }
+
+      const result = await enhancedGoogleTTSService.generateProfessionalVoiceover(text, {
+        style: style || 'professional',
+        speed: speed || 'normal', 
+        language: language || 'pt-BR',
+        gender: gender || 'female'
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'TTS synthesis failed'
+      });
+    }
+  });
+
+  app.post('/api/tts/multilanguage', async (req, res) => {
+    try {
+      const { texts } = req.body;
+      
+      if (!texts || !Array.isArray(texts)) {
+        return res.status(400).json({ success: false, error: 'Texts array is required' });
+      }
+
+      const results = await enhancedGoogleTTSService.generateMultiLanguageVoiceover(texts);
+      res.json({ success: true, results });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Multi-language TTS failed'
+      });
+    }
+  });
+
+  app.get('/api/tts/voices/:language?', async (req, res) => {
+    try {
+      const language = req.params.language || 'pt-BR';
+      const voices = await enhancedGoogleTTSService.listAvailableVoices(language);
+      res.json({ success: true, voices });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch voices'
+      });
+    }
+  });
+
+  // Enhanced Mistral AI Routes
+  app.post('/api/mistral/generate', async (req, res) => {
+    try {
+      const { prompt, model, temperature, maxTokens, systemPrompt } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await enhancedMistralService.generateContent({
+        prompt,
+        model,
+        temperature,
+        maxTokens,
+        systemPrompt
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Mistral generation failed'
+      });
+    }
+  });
+
+  app.post('/api/mistral/copywriting', async (req, res) => {
+    try {
+      const { prompt, style, tone, length, target } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await enhancedMistralService.generateCopywriting(prompt, {
+        style,
+        tone,
+        length,
+        target
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Copywriting generation failed'
+      });
+    }
+  });
+
+  app.post('/api/mistral/product-strategy', async (req, res) => {
+    try {
+      const { prompt, industry, marketSize, budget, timeline } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await enhancedMistralService.generateProductStrategy(prompt, {
+        industry,
+        marketSize,
+        budget,
+        timeline
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Product strategy generation failed'
+      });
+    }
+  });
+
+  app.post('/api/mistral/traffic-strategy', async (req, res) => {
+    try {
+      const { prompt, platforms, budget, objective, audience } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await enhancedMistralService.generateTrafficStrategy(prompt, {
+        platforms,
+        budget,
+        objective,
+        audience
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Traffic strategy generation failed'
+      });
+    }
+  });
+
+  app.post('/api/mistral/analytics', async (req, res) => {
+    try {
+      const { prompt, dataType, timeframe, metrics } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await enhancedMistralService.generateAnalyticsInsights(prompt, {
+        dataType,
+        timeframe,
+        metrics
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Analytics generation failed'
+      });
+    }
+  });
+
+  app.get('/api/mistral/models', async (req, res) => {
+    try {
+      const models = await enhancedMistralService.listAvailableModels();
+      res.json({ success: true, models });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch models'
+      });
+    }
+  });
+
+  // Enhanced Stability AI Routes
+  app.post('/api/stability/generate-image', async (req, res) => {
+    try {
+      const { prompt, negativePrompt, width, height, samples, steps, cfgScale, seed, style } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await enhancedStabilityService.generateImage({
+        prompt,
+        negativePrompt,
+        width,
+        height,
+        samples,
+        steps,
+        cfgScale,
+        seed,
+        style
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Image generation failed'
+      });
+    }
+  });
+
+  app.post('/api/stability/generate-video', async (req, res) => {
+    try {
+      const { prompt, aspectRatio, duration, fps, motion, seed } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await enhancedStabilityService.generateVideo({
+        prompt,
+        aspectRatio,
+        duration,
+        fps,
+        motion,
+        seed
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Video generation failed'
+      });
+    }
+  });
+
+  app.post('/api/stability/product-images', async (req, res) => {
+    try {
+      const { productName, style } = req.body;
+      
+      if (!productName) {
+        return res.status(400).json({ success: false, error: 'Product name is required' });
+      }
+
+      const results = await enhancedStabilityService.generateProductImages(productName, style);
+      res.json({ success: true, results });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Product image generation failed'
+      });
+    }
+  });
+
+  app.post('/api/stability/marketing-visuals', async (req, res) => {
+    try {
+      const { campaign, brand, format, style, colors } = req.body;
+      
+      if (!campaign || !brand) {
+        return res.status(400).json({ success: false, error: 'Campaign and brand are required' });
+      }
+
+      const results = await enhancedStabilityService.generateMarketingVisuals(campaign, brand, {
+        format,
+        style,
+        colors
+      });
+      res.json({ success: true, results });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Marketing visual generation failed'
+      });
+    }
+  });
+
+  app.post('/api/stability/social-content', async (req, res) => {
+    try {
+      const { post, platform, style } = req.body;
+      
+      if (!post || !platform) {
+        return res.status(400).json({ success: false, error: 'Post content and platform are required' });
+      }
+
+      const result = await enhancedStabilityService.generateSocialMediaContent(post, platform, style);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Social content generation failed'
+      });
+    }
+  });
+
+  // Enhanced Typeform Routes
+  app.post('/api/typeform/create-form', async (req, res) => {
+    try {
+      const { title, description, fields, branding, settings } = req.body;
+      
+      if (!title || !fields) {
+        return res.status(400).json({ success: false, error: 'Title and fields are required' });
+      }
+
+      const result = await enhancedTypeformService.createAdvancedForm({
+        title,
+        description,
+        fields,
+        branding,
+        settings
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Form creation failed'
+      });
+    }
+  });
+
+  app.post('/api/typeform/market-research', async (req, res) => {
+    try {
+      const { product, targetAudience } = req.body;
+      
+      if (!product) {
+        return res.status(400).json({ success: false, error: 'Product is required' });
+      }
+
+      const result = await enhancedTypeformService.createMarketResearchForm(product, targetAudience || 'público geral');
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Market research form creation failed'
+      });
+    }
+  });
+
+  app.post('/api/typeform/customer-feedback', async (req, res) => {
+    try {
+      const { service, company } = req.body;
+      
+      if (!service) {
+        return res.status(400).json({ success: false, error: 'Service is required' });
+      }
+
+      const result = await enhancedTypeformService.createCustomerFeedbackForm(service, company || 'Nossa Empresa');
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Feedback form creation failed'
+      });
+    }
+  });
+
+  app.post('/api/typeform/lead-capture', async (req, res) => {
+    try {
+      const { offer, incentive } = req.body;
+      
+      if (!offer || !incentive) {
+        return res.status(400).json({ success: false, error: 'Offer and incentive are required' });
+      }
+
+      const result = await enhancedTypeformService.createLeadCaptureForm(offer, incentive);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Lead capture form creation failed'
+      });
+    }
+  });
+
+  app.get('/api/typeform/responses/:formId', async (req, res) => {
+    try {
+      const { formId } = req.params;
+      const { limit } = req.query;
+      
+      const responses = await enhancedTypeformService.getFormResponses(formId, parseInt(limit as string) || 25);
+      res.json({ success: true, responses });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch responses'
+      });
+    }
+  });
+
+  app.get('/api/typeform/analytics/:formId', async (req, res) => {
+    try {
+      const { formId } = req.params;
+      
+      const analytics = await enhancedTypeformService.getFormAnalytics(formId);
+      res.json({ success: true, analytics });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch analytics'
+      });
+    }
+  });
+
+  // Combined AI Health Check
+  app.get('/api/health/all-services', async (req, res) => {
+    try {
+      const healthChecks = await Promise.allSettled([
+        enhancedGoogleTTSService.listAvailableVoices('pt-BR'),
+        enhancedMistralService.listAvailableModels(),
+        enhancedStabilityService.generateImage({ prompt: 'test', width: 64, height: 64 }),
+        enhancedTypeformService.createAdvancedForm({ title: 'Test', fields: [] })
+      ]);
+
+      const results = {
+        googleTTS: healthChecks[0].status === 'fulfilled' ? 'operational' : 'error',
+        mistral: healthChecks[1].status === 'fulfilled' ? 'operational' : 'error', 
+        stability: healthChecks[2].status === 'fulfilled' ? 'operational' : 'error',
+        typeform: healthChecks[3].status === 'fulfilled' ? 'operational' : 'error'
+      };
+
+      res.json({ success: true, services: results });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Health check failed'
       });
     }
   });
