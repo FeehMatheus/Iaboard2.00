@@ -1,5 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { spawn } from "child_process";
+import fs from "fs/promises";
+import path from "path";
 import { storage } from "./storage";
 import OpenAI from "openai";
 import { aiContentGenerator } from "./ai-content-generator";
@@ -1681,18 +1684,16 @@ Make the content professional, persuasive, and conversion-focused.`;
                     prompt.toLowerCase().includes('digital') ? ['#0f3460', '#00d4ff'] : ['#1a1a2e', '#ffd700'];
 
       const result = await new Promise<any>((resolve) => {
+        const videoDuration = duration || 5;
         const ffmpegArgs = [
           '-f', 'lavfi',
-          '-i', `color=c=${colors[0]}:size=${dimensions}:duration=${duration || 5}`,
-          '-f', 'lavfi', 
-          '-i', `color=c=${colors[1]}:size=${dimensions}:duration=${duration || 5}`,
-          '-filter_complex',
-          '[0:v][1:v]blend=all_mode=multiply:all_opacity=0.7[bg];[bg]zoompan=z=\'if(lte(zoom,1.0),1.3,max(1.001,zoom-0.0008))\':d=125:x=\'iw/2-(iw/zoom/2)\':y=\'ih/2-(ih/zoom/2)\'',
+          '-i', `color=c=${colors[0]}:size=${dimensions}:duration=${videoDuration}:rate=25`,
           '-c:v', 'libx264',
-          '-preset', 'medium',
-          '-crf', '23',
+          '-preset', 'ultrafast',
+          '-crf', '28',
           '-pix_fmt', 'yuv420p',
           '-movflags', '+faststart',
+          '-t', videoDuration.toString(),
           '-y',
           outputPath
         ];
