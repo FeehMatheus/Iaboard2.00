@@ -60,14 +60,15 @@ export class ThumbnailGenerator {
     const colors = this.getStyleColors(style);
     const elements = this.getStyleElements(style);
     
-    // Create animated preview thumbnail with style-specific elements
+    // Create simple gradient thumbnail with text
+    const escapedPrompt = this.escapeText(prompt);
+    const fontSize = Math.floor(dimensions.width/25);
+    
     const ffmpegArgs = [
       '-f', 'lavfi',
       '-i', `color=c=${colors.primary}:size=${dimensions.width}x${dimensions.height}:duration=1`,
-      '-f', 'lavfi', 
-      '-i', `color=c=${colors.secondary}:size=${dimensions.width}x${dimensions.height}:duration=1`,
-      '-filter_complex', 
-      `[0:v][1:v]blend=all_mode=overlay:all_opacity=0.6[bg];[bg]drawtext=text='${this.escapeText(prompt)}':fontsize=${Math.floor(dimensions.width/25)}:fontcolor=${colors.text}:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=${colors.box}@0.8:boxborderw=8[textoverlay];[textoverlay]drawtext=text='PREVIEW':fontsize=${Math.floor(dimensions.width/40)}:fontcolor=${colors.accent}:x=20:y=20:box=1:boxcolor=${colors.accent}@0.3:boxborderw=4[final]`,
+      '-vf', 
+      `drawtext=text='${escapedPrompt}':fontsize=${fontSize}:fontcolor=white:x=(w-text_w)/2:y=(h-text_h)/2:box=1:boxcolor=black@0.8:boxborderw=5`,
       '-frames:v', '1',
       '-q:v', '2',
       '-y',
