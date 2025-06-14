@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import { nanoid } from 'nanoid';
+import { exec, execSync } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 interface DefinitiveAIRequest {
   prompt: string;
@@ -258,16 +262,7 @@ Analisando sua solicitação "${request.prompt}", desenvolvi uma estratégia com
       `[text]${animation}[final]" -map "[final]" -c:v libx264 -pix_fmt yuv420p -t ${duration} -y "${filepath}"`;
     
     try {
-      const { exec } = require('child_process');
-      await new Promise((resolve, reject) => {
-        exec(ffmpegCommand, { timeout: 30000 }, (error: any, stdout: any, stderr: any) => {
-          if (error) {
-            console.log('FFmpeg error, creating enhanced fallback video');
-            this.createEnhancedVideo(filepath, request.prompt, duration);
-          }
-          resolve(true);
-        });
-      });
+      await execAsync(ffmpegCommand, { timeout: 30000 });
 
       return {
         success: true,
@@ -335,7 +330,6 @@ Analisando sua solicitação "${request.prompt}", desenvolvi uma estratégia com
 
   private createEnhancedVideo(filepath: string, prompt: string, duration: number) {
     // Create enhanced fallback video using simple ffmpeg command
-    const { execSync } = require('child_process');
     try {
       const simpleCommand = `ffmpeg -f lavfi -i "color=c=blue:size=1920x1080:duration=${duration}" -c:v libx264 -pix_fmt yuv420p -t ${duration} -y "${filepath}"`;
       execSync(simpleCommand, { timeout: 10000 });

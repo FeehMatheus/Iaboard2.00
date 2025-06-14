@@ -9,7 +9,7 @@ import { freeRealVideoAPIs } from "./free-real-video-apis";
 import { tokenManager } from "./token-manager";
 import { realAIServices } from "./real-ai-services";
 import { freePublicAPIs } from "./free-public-apis";
-import { definitiveAISystem } from "./definitive-ai-system";
+import { ultimateAISystem } from "./ultimate-ai-system";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -29,7 +29,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🎬 Starting REAL AI video generation with public APIs:', { prompt, aspectRatio, style });
 
-      const result = await definitiveAISystem.generate({
+      const result = await ultimateAISystem.generate({
         type: 'video',
         prompt,
         parameters: {
@@ -82,8 +82,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🤖 Executing AI module:', { module, prompt });
 
-      // Use definitive AI system for execution
-      const result = await definitiveAISystem.generate({
+      // Use ultimate AI system for execution
+      const result = await ultimateAISystem.generate({
         type: 'text',
         prompt: `Como assistente de IA especializado em marketing digital: ${prompt}`,
         parameters: {
