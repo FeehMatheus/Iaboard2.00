@@ -82,32 +82,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🤖 Executing AI module:', { module, prompt });
 
-      // Use OpenAI for AI execution
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { 
-            role: "system", 
-            content: "Você é um assistente de IA especializado em marketing digital e criação de conteúdo. Forneça respostas práticas e acionáveis."
-          },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 2000,
-        temperature: 0.7
-      });
-
-      const result = response.choices[0].message.content;
-
-      res.json({
-        success: true,
-        result,
-        metadata: {
-          module,
-          prompt,
-          tokensUsed: response.usage?.total_tokens || 0,
-          model: "gpt-4o"
+      // Use working AI system for execution
+      const result = await workingAISystem.generate({
+        type: 'text',
+        prompt: `Como assistente de IA especializado em marketing digital: ${prompt}`,
+        parameters: {
+          maxTokens: 2000,
+          temperature: 0.7
         }
       });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          result: result.content,
+          metadata: {
+            module,
+            prompt,
+            provider: result.provider || 'Advanced AI System',
+            generated: true
+          }
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: result.error || 'AI execution failed'
+        });
+      }
 
     } catch (error) {
       console.error('AI execution error:', error);
