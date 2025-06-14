@@ -8,6 +8,7 @@ import { furionAI } from "./furion-ai-system";
 import { videoGenerator } from "./video-generator";
 import { advancedAIService } from "./advanced-ai-service";
 import { videoGenerationService } from "./video-generation-service";
+import { pikaLabsService } from "./pika-labs-service";
 import { aiModuleExecutor } from "./ai-module-executor";
 
 const openai = new OpenAI({
@@ -1647,6 +1648,84 @@ Make the content professional, persuasive, and conversion-focused.`;
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to get avatars'
+      });
+    }
+  });
+
+  // Pika Labs video generation routes
+  app.post('/api/pika/generate', async (req, res) => {
+    try {
+      const { prompt, aspectRatio = '16:9', style = 'cinematic' } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
+      }
+
+      const result = await pikaLabsService.generateVideo({
+        prompt,
+        aspectRatio: aspectRatio as '16:9' | '9:16' | '1:1',
+        style
+      });
+
+      if (result.success) {
+        if (result.videoUrl) {
+          res.json({
+            success: true,
+            videoUrl: result.videoUrl,
+            downloadUrl: result.downloadUrl,
+            metadata: result.metadata
+          });
+        } else {
+          // Return manual instructions
+          const instructions = pikaLabsService.generateManualInstructions(prompt);
+          res.json({
+            success: true,
+            instructions: instructions
+          });
+        }
+      } else {
+        res.status(400).json({
+          success: false,
+          error: result.error
+        });
+      }
+    } catch (error) {
+      console.error('Pika Labs error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro interno do servidor'
+      });
+    }
+  });
+
+  app.post('/api/pika/upload', async (req, res) => {
+    try {
+      const { videoUrl, originalPrompt } = req.body;
+      
+      if (!videoUrl) {
+        return res.status(400).json({ success: false, error: 'URL do vídeo é obrigatória' });
+      }
+
+      const result = await pikaLabsService.uploadManualVideo(videoUrl, originalPrompt);
+
+      if (result.success) {
+        res.json({
+          success: true,
+          videoUrl: result.videoUrl,
+          downloadUrl: result.downloadUrl,
+          metadata: result.metadata
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: result.error
+        });
+      }
+    } catch (error) {
+      console.error('Pika upload error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro interno do servidor'
       });
     }
   });
