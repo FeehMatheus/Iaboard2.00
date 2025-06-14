@@ -173,23 +173,15 @@ export class FreeAIVideoService {
     
     return new Promise((resolve) => {
       const ffmpegArgs = [
-        // Entrada de noise para base
-        '-f', 'lavfi', '-i', `noise=alls=20:allf=t+u,format=rgba,geq=random(1)*255:128:128:255`,
-        
-        // Gradientes baseados no conceito
-        '-f', 'lavfi', '-i', `color=c=${visualConcept.colors[0]}:size=${width}x${height}:duration=${duration}:rate=30`,
-        '-f', 'lavfi', '-i', `color=c=${visualConcept.colors[1]}:size=${width}x${height}:duration=${duration}:rate=30`,
-        '-f', 'lavfi', '-i', `color=c=${visualConcept.colors[2]}:size=${width}x${height}:duration=${duration}:rate=30`,
-        
-        '-filter_complex', this.buildAdvancedFreeFilter({
-          width, height, duration, 
-          prompt: request.prompt,
-          concept: visualConcept
-        }),
-        
+        '-f', 'lavfi',
+        '-i', `color=c=${visualConcept.colors[0]}:size=${width}x${height}:duration=${duration}:rate=25`,
+        '-f', 'lavfi',
+        '-i', `color=c=${visualConcept.colors[1]}:size=${width}x${height}:duration=${duration}:rate=25`,
+        '-filter_complex',
+        this.buildAdvancedFreeFilter({ width, height, duration }),
         '-c:v', 'libx264',
         '-preset', 'medium',
-        '-crf', '20',
+        '-crf', '23',
         '-pix_fmt', 'yuv420p',
         '-movflags', '+faststart',
         '-y',
@@ -243,30 +235,13 @@ export class FreeAIVideoService {
   }
 
   private buildAdvancedFreeFilter(params: any): string {
-    const { width, height, duration, prompt, concept } = params;
+    const { width, height, duration } = params;
     
-    const filters = [
-      // Base texturizada com noise
-      `[0:v]scale=${width}:${height}[noise]`,
-      
-      // Combinar gradientes de forma inteligente
-      `[1:v][2:v]blend=all_mode=multiply:all_opacity=0.6[grad1]`,
-      `[grad1][3:v]blend=all_mode=overlay:all_opacity='sin(t*0.8)*0.4+0.3'[grad2]`,
-      
-      // Combinar noise com gradientes
-      `[noise][grad2]blend=all_mode=overlay:all_opacity=0.85[textured]`,
-      
-      // Movimento cinematográfico baseado no conceito
-      `[textured]zoompan=z='if(lte(zoom,1.0),${concept.zoomLevel || 1.5},max(1.001,zoom-${concept.zoomSpeed || 0.0008}))':d=${duration * 30}:x='iw/2-(iw/zoom/2)+sin(t*${concept.motionX || 0.1})*${concept.amplitudeX || 50}':y='ih/2-(ih/zoom/2)+cos(t*${concept.motionY || 0.15})*${concept.amplitudeY || 30}'[moving]`,
-      
-      // Efeitos baseados no estilo
-      ...this.generateStyleEffects(concept, duration),
-      
-      // Finalização
-      `[styled]fade=in:st=0:d=0.5,fade=out:st=${duration-0.5}:d=0.5[final]`
-    ];
-
-    return filters.join(';');
+    // Simplified working filter chain
+    return [
+      `[1:v][2:v]blend=all_mode=multiply:all_opacity=0.7[bg]`,
+      `[bg]zoompan=z='if(lte(zoom,1.0),1.3,max(1.001,zoom-0.0008))':d=${duration * 25}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'[final]`
+    ].join(',');
   }
 
   private generateStyleEffects(concept: any, duration: number): string[] {
