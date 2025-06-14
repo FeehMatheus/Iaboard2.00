@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { OnboardingWizard } from '@/components/OnboardingWizard';
+import { useOnboardingStore } from '@/lib/onboardingStore';
 
 import { 
   Plus, ZoomIn, ZoomOut, Save, Download, Home, Brain, Crown,
@@ -63,6 +65,17 @@ export default function Board() {
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkNodeId, setLinkNodeId] = useState('');
+
+  // Onboarding state
+  const {
+    isFirstVisit,
+    hasCompletedOnboarding,
+    isWizardOpen,
+    shouldShowWizard,
+    setWizardOpen,
+    setOnboardingCompleted,
+    setOnboardingData
+  } = useOnboardingStore();
   
   const [contextMenu, setContextMenu] = useState<ContextMenu>({
     x: 0,
@@ -87,6 +100,35 @@ export default function Board() {
       setCanvasState(canvasData as CanvasState);
     }
   }, [canvasData]);
+
+  // Auto-trigger onboarding wizard for new users
+  useEffect(() => {
+    if (shouldShowWizard()) {
+      setTimeout(() => {
+        setWizardOpen(true);
+      }, 1000); // Small delay to let the interface load
+    }
+  }, [shouldShowWizard, setWizardOpen]);
+
+  // Handle onboarding completion
+  const handleOnboardingComplete = useCallback((workflowData: any) => {
+    setOnboardingData(workflowData);
+    setOnboardingCompleted(true);
+    setWizardOpen(false);
+    
+    toast({
+      title: "Bem-vindo ao IA Board!",
+      description: "Seu workspace foi configurado com sucesso. Comece a criar agora!"
+    });
+
+    // Hide initial decision dialog since user has completed onboarding
+    setShowInitialDecision(false);
+  }, [setOnboardingData, setOnboardingCompleted, setWizardOpen, toast]);
+
+  // Handle wizard close
+  const handleWizardClose = useCallback(() => {
+    setWizardOpen(false);
+  }, [setWizardOpen]);
 
   // Real AI Integration
   const executeRealAI = async (prompt: string, type: string): Promise<any> => {
