@@ -16,9 +16,13 @@ import {
   Loader2, 
   Settings, 
   X,
-  Zap
+  Zap,
+  Sparkles,
+  BarChart3
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ProgressVisualization } from './ProgressVisualization';
+import { useProgressTracking } from '../hooks/useProgressTracking';
 import {
   Select,
   SelectContent,
@@ -34,6 +38,8 @@ interface AIModuleData {
   result?: string;
   isExecuting?: boolean;
   files?: Array<{name: string, content: string, type: string}>;
+  progressMode?: boolean;
+  workflowTemplate?: 'complete-marketing' | 'video-suite' | 'copy-mastery' | 'custom';
 }
 
 const moduleConfigs = {
@@ -87,6 +93,40 @@ const moduleConfigs = {
   }
 };
 
+const workflowTemplates = {
+  'complete-marketing': {
+    name: 'Pacote Completo de Marketing',
+    description: 'Análise de mercado, copy persuasivo, vídeos promocionais e landing page',
+    steps: [
+      { title: 'Análise de Mercado', type: 'analysis' as const, estimatedTime: '30s' },
+      { title: 'Estratégia de Copy', type: 'copy' as const, estimatedTime: '45s' },
+      { title: 'Geração de Vídeo Promocional', type: 'video' as const, estimatedTime: '60s' },
+      { title: 'Landing Page Otimizada', type: 'text' as const, estimatedTime: '40s' },
+      { title: 'Materiais de Apoio', type: 'image' as const, estimatedTime: '25s' }
+    ]
+  },
+  'video-suite': {
+    name: 'Suíte de Conteúdo em Vídeo',
+    description: 'Múltiplos vídeos para diferentes plataformas e públicos',
+    steps: [
+      { title: 'Roteiro Principal', type: 'text' as const, estimatedTime: '20s' },
+      { title: 'Vídeo Longo (YouTube)', type: 'video' as const, estimatedTime: '90s' },
+      { title: 'Vídeo Curto (TikTok/Reels)', type: 'video' as const, estimatedTime: '60s' },
+      { title: 'Thumbnails Personalizados', type: 'image' as const, estimatedTime: '30s' }
+    ]
+  },
+  'copy-mastery': {
+    name: 'Pacote Master de Copy',
+    description: 'Copy completo para funis de vendas e campanhas',
+    steps: [
+      { title: 'Pesquisa de Avatar', type: 'analysis' as const, estimatedTime: '25s' },
+      { title: 'Headlines Magnéticas', type: 'copy' as const, estimatedTime: '30s' },
+      { title: 'Copy de Vendas', type: 'copy' as const, estimatedTime: '45s' },
+      { title: 'E-mail Marketing', type: 'copy' as const, estimatedTime: '35s' }
+    ]
+  }
+};
+
 export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
   const [moduleType, setModuleType] = useState<AIModuleData['moduleType']>(data?.moduleType || 'ia-total');
   const [prompt, setPrompt] = useState(data?.prompt || '');
@@ -95,10 +135,27 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
   const [isExecuting, setIsExecuting] = useState(data?.isExecuting || false);
   const [files, setFiles] = useState(data?.files || []);
   const [isResizing, setIsResizing] = useState(false);
+  const [progressMode, setProgressMode] = useState(data?.progressMode || false);
+  const [workflowTemplate, setWorkflowTemplate] = useState<keyof typeof workflowTemplates | 'custom'>(data?.workflowTemplate || 'complete-marketing');
+  const [generatedContent, setGeneratedContent] = useState<Array<{stepId: string, content: string, url?: string}>>([]);
 
   const { setNodes } = useReactFlow();
   const { toast } = useToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const {
+    steps,
+    currentStep,
+    isActive,
+    startProgress,
+    updateStepProgress,
+    completeStep,
+    failStep,
+    nextStep,
+    retryStep,
+    cancelProgress,
+    resetProgress
+  } = useProgressTracking();
 
   const config = moduleConfigs[moduleType];
   const IconComponent = config.icon;
@@ -118,14 +175,139 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
                 result,
                 isExecuting,
                 files,
+                progressMode,
+                workflowTemplate,
               },
             }
           : node
       )
     );
-  }, [moduleType, prompt, parameters, result, isExecuting, files, id, setNodes]);
+  }, [moduleType, prompt, parameters, result, isExecuting, files, progressMode, workflowTemplate, id, setNodes]);
+
+  const executeStep = useCallback(async (step: any, prompt: string) => {
+    try {
+      updateStepProgress(step.id, 10);
+      
+      const endpoint = step.type === 'video' ? '/api/ai/generate' : 
+                     step.type === 'copy' ? '/api/ia-copy/generate' :
+                     '/api/llm/generate';
+
+      const payload = step.type === 'video' ? {
+        type: 'video',
+        prompt: `${prompt} - ${step.description}`,
+        parameters: { duration: 5, style: 'professional' }
+      } : step.type === 'copy' ? {
+        prompt: `${prompt} - ${step.description}`,
+        copyType: 'professional',
+        parameters
+      } : {
+        prompt: `${prompt} - ${step.description}. Responda em português detalhadamente.`,
+        model: 'gpt-4o',
+        maxTokens: 1000
+      };
+
+      updateStepProgress(step.id, 30);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      updateStepProgress(step.id, 60);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      updateStepProgress(step.id, 90);
+
+      if (result.success) {
+        const content = {
+          stepId: step.id,
+          content: result.content || result.copy || result.result || 'Conteúdo gerado com sucesso',
+          url: result.url || result.videoUrl
+        };
+
+        setGeneratedContent(prev => [...prev, content]);
+        
+        completeStep(step.id, {
+          tokensUsed: result.tokensUsed,
+          provider: result.provider,
+          fileSize: result.metadata?.fileSize
+        });
+      } else {
+        throw new Error(result.error || 'Falha na geração');
+      }
+    } catch (error) {
+      console.error(`Error in step ${step.id}:`, error);
+      failStep(step.id, error instanceof Error ? error.message : 'Erro desconhecido');
+    }
+  }, [updateStepProgress, completeStep, failStep, parameters]);
+
+  const startProgressWorkflow = useCallback(async () => {
+    if (!prompt.trim()) {
+      toast({
+        title: "Entrada Obrigatória",
+        description: "Digite o prompt para iniciar o workflow.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const template = workflowTemplates[workflowTemplate as keyof typeof workflowTemplates];
+    if (!template) return;
+
+    setIsExecuting(true);
+    setGeneratedContent([]);
+    
+    const stepsWithIds = template.steps.map((step, index) => ({
+      ...step,
+      id: `step-${index}`,
+      description: step.title
+    }));
+
+    startProgress(
+      {
+        totalSteps: stepsWithIds.length,
+        estimatedDuration: stepsWithIds.length * 45,
+        enableRealTimeUpdates: true
+      },
+      stepsWithIds
+    );
+
+    // Execute steps sequentially
+    for (let i = 0; i < stepsWithIds.length; i++) {
+      const step = stepsWithIds[i];
+      await executeStep(step, prompt);
+      
+      if (i < stepsWithIds.length - 1) {
+        nextStep();
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    // Combine all generated content into result
+    const combinedResult = generatedContent.map((content, index) => 
+      `### ${template.steps[index]?.title}\n${content.content}\n${content.url ? `\nArquivo: ${content.url}` : ''}`
+    ).join('\n\n');
+    
+    setResult(combinedResult);
+    setIsExecuting(false);
+
+    toast({
+      title: "Workflow Concluído!",
+      description: `${template.name} executado com sucesso.`,
+    });
+  }, [prompt, workflowTemplate, startProgress, executeStep, nextStep, generatedContent, toast]);
 
   const executeModule = async () => {
+    if (progressMode) {
+      await startProgressWorkflow();
+      return;
+    }
+
     if (!prompt.trim()) {
       toast({
         title: "Entrada Obrigatória",
@@ -244,15 +426,61 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
         </CardHeader>
 
         <CardContent className="flex-1 p-4 space-y-3">
+          {/* Progress Mode Toggle */}
+          <div className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-purple-500" />
+              <span className="text-xs font-medium">Modo Progress Studio</span>
+            </div>
+            <Button
+              size="sm"
+              variant={progressMode ? "default" : "outline"}
+              onClick={() => setProgressMode(!progressMode)}
+              className="h-6 text-xs"
+            >
+              {progressMode ? "Ativo" : "Inativo"}
+            </Button>
+          </div>
+
+          {/* Workflow Template Selection (when in progress mode) */}
+          {progressMode && (
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">
+                Template de Workflow:
+              </label>
+              <Select value={workflowTemplate} onValueChange={setWorkflowTemplate}>
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(workflowTemplates).map(([key, template]) => (
+                    <SelectItem key={key} value={key}>
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="custom">Personalizado</SelectItem>
+                </SelectContent>
+              </Select>
+              {workflowTemplate !== 'custom' && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {workflowTemplates[workflowTemplate as keyof typeof workflowTemplates]?.description}
+                </p>
+              )}
+            </div>
+          )}
+
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">
-              Prompt / Parâmetros:
+              {progressMode ? "Prompt Principal:" : "Prompt / Parâmetros:"}
             </label>
             <Textarea
               ref={textareaRef}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder={`Digite o que deseja executar com ${config.name}...`}
+              placeholder={progressMode 
+                ? "Descreva o produto/serviço para gerar conteúdo completo..."
+                : `Digite o que deseja executar com ${config.name}...`
+              }
               className="min-h-[80px] text-sm"
               disabled={isExecuting}
             />
