@@ -1,0 +1,52 @@
+# PROMPT DE EXECUÇÃO AUTOMÁTICA — REPLIT / AUTOGPT
+# OBJETIVO ABSOLUTO: Reproduzir 1-para-1 o projeto Curiso (canvas infinito, blocos IA, exportações) — NÃO quero algo “inspirado”, “semelhante” ou “aproximado”. Quero uma réplica funcional e integral, com APIs reais e CTAs operacionais.
+
+### 1. CLONAGEM EXATA DO REPOSITÓRIO
+git clone https://github.com/metaspartan/curiso.git ia-board
+cd ia-board
+
+### 2. INSTALAÇÃO DE DEPENDÊNCIAS (Bun prioritário; npm como fallback)
+bun install || npm install
+
+### 3. CONFIGURAÇÃO DE VARIÁVEIS (.env)
+Criar .env na raiz com:
+OPENAI_API_KEY=sk-SUA_CHAVE_REAL
+ANTHROPIC_API_KEY=sk-ant-SUA_CHAVE_REAL
+GOOGLE_API_KEY=AIzaSUA_CHAVE_REAL
+
+PUBLIC_APP_NAME="IA Board by Filipe"
+PUBLIC_DEFAULT_MODEL="gpt-4o"
+PUBLIC_ALLOWED_MODELS="gpt-4o,claude-3-sonnet-20240229,gemini-1.5-pro"
+PUBLIC_BRANDING_COLOR="#00d9ff"
+
+### 4. AJUSTES NO CÓDIGO (MANTER EQUIVALÊNCIA PIXEL-PERFECT)
+4.1 Em src/meta/config.ts, ler APP_NAME e cor do .env  
+4.2 Inserir CTA fixo no header (`src/routes/+layout.svelte`) com:
+   Texto: “Baixar IA Board Desktop (.exe)”
+   Link: https://github.com/FeehMatheus/ia-board/releases
+4.3 NÃO alterar lógica interna de canvas, engine ou fluxos — apenas sobrepor branding.
+
+### 5. INTEGRAÇÕES DE IA (EXIGÊNCIA FUNCIONAL)
+- Cada nó do canvas deve suportar: GPT-4o, Claude-3, Gemini-1.5.
+- Seleção de modelo por nó.
+- Resposta em streaming em tempo real (mantendo UX do Curiso).
+
+### 6. EXPORTAÇÕES ATIVAS (OBRIGATÓRIO)
+JSON, Markdown, PDF plenamente operacionais via menu Export — sem placeholders.
+
+### 7. EXECUÇÃO LOCAL GARANTIDA
+bun run dev || npm run dev  
+URL resultante deve exibir o canvas infinito, blocos IA interativos e exportações ativas sem erros.
+
+### 8. COMPILAÇÃO DESKTOP (TAURI)
+bun run desktop || npm run desktop  
+Gerar artefatos finais (.exe /.app /.AppImage) com todas funcionalidades embutidas.
+
+### 9. ENTREGÁVEL FINAL
+- Projeto 100 % idêntico ao Curiso, com branding IA Board by Filipe.
+- APIs reais configuradas e testadas (OpenAI/Claude/Gemini).
+- CTA de download funcional.
+- Exportações operacionais.
+- Código limpo, sem funcionalidades faltantes ou simuladas.
+
+► IMPORTANTE: NÃO criar versões “inspiradas”, simplificadas ou parciais. Replique integralmente cada detalhe de interface, fluxo e funcionalidade do Curiso. O resultado deve ser indistinguível do original, exceto pelo branding.

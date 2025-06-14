@@ -1,0 +1,100 @@
+{
+    "identifier": "com.curiso.ai",
+    "productName": "Curiso AI",
+    "version": "1.2.2",
+    "build": {
+      "beforeBuildCommand": "bun run build",
+      "beforeDevCommand": "bun run dev",
+      "devUrl": "http://localhost:5173",
+        "frontendDist": "../dist"
+    },
+    "app": {
+      "withGlobalTauri": true,
+      "security": {
+       "csp": {
+          "default-src": ["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'", "http://localhost:*", "https://*"],
+          "script-src": ["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "blob:"],
+          "img-src": ["'self'", "data:", "https:"],
+          "style-src": ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://*", "http://*", "http://127.0.0.1:*", "http://localhost:*", "data:", "blob:"],
+          "connect-src": ["'self'", "http://127.0.0.1:*", "http://localhost:*", "https://*", "http://*", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+          "worker-src": ["'self'", "blob:", "data:", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://*", "http://*", "http://127.0.0.1:*", "http://localhost:*"]
+       },
+       "capabilities": [
+        {
+          "identifier": "fetch",
+          "windows": ["main"],
+          "permissions": [
+              "http:default",
+              {
+                "identifier": "http:default",
+                "allow": [
+                  {
+                    "url": "http://**"
+                  },
+                  {
+                    "url": "https://**"
+                  },
+                  {
+                    "url": "http://*:*"
+                  },
+                  {
+                    "url": "https://*:*"
+                  }
+                ]
+              }
+            ],
+          "scope": {
+            "url": ["*", "http://*", "https://*", "http://*/*", "https://*/*"]
+          }
+        },
+        {
+          "identifier": "shell",
+          "windows": ["main"],
+          "permissions": [
+            "shell:default",
+            {
+              "identifier": "shell:allow-open",
+              "allow": [
+                {
+                  "url": {
+                    "protocol": "https",
+                    "scheme": "https"
+                  }
+                },
+                {
+                  "url": {
+                    "protocol": "http",
+                    "scheme": "http"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+      },
+      "windows": [
+        {
+          "fullscreen": false,
+          "height": 800,
+          "resizable": true,
+          "title": "Curiso AI",
+          "width": 1200
+        }
+      ]
+    },
+    "bundle": {
+      "active": true,
+      "category": "DeveloperTool",
+      "copyright": "",
+      "resources": ["../client/src/assets/*"],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "targets": ["app", "deb", "dmg", "msi"]
+    }    
+  }

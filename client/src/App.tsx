@@ -7,6 +7,7 @@ import Landing from '@/pages/Landing';
 import Dashboard from '@/pages/Dashboard';
 import Board from '@/pages/Board';
 import AdvancedBoard from '@/pages/AdvancedBoard';
+import CurisoDashboard from '@/pages/CurisoDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
