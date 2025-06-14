@@ -1,0 +1,57 @@
+# CORREÇÃO OBRIGATÓRIA — FALHAS DETECTADAS APÓS A CLONAGEM DO CURISO
+
+Após a execução da instrução anterior, detectei **duas falhas graves**:
+
+---
+
+## ❌ 1. FALTA DE INTEGRAÇÃO DAS TECNOLOGIAS REAIS NO QUADRO INFINITO
+
+Você **não integrou todas as tecnologias funcionais já desenvolvidas** ao sistema clonado do Curiso.
+
+⚠️ O novo sistema está com o canvas visual correto, porém está **vazio de inteligência funcional real**.
+
+Deve ser corrigido imediatamente com a inclusão das seguintes funcionalidades DENTRO do quadro infinito:
+
+- ✅ Módulos IA reais com GPT-4o, Claude, Gemini (execução via API)
+- ✅ Modo IA Total™ e Pensamento Poderoso™ (colaboração automática entre IAs)
+- ✅ Módulo de geração de vídeo com IA (D-ID, RunwayML, Pika Labs)
+- ✅ IA Espiã: análise de concorrência real e templates prontos
+- ✅ IA Produto Rápido™: criação automática de produto com base em nicho e avatar
+- ✅ IA Copy: geração de textos, headlines e CTAs com base em dados
+- ✅ IA Tráfego Pago: criativos, campanha e segmentação real
+- ✅ IA Vídeo Avançado: geração de roteiro + vídeo real
+- ✅ Exportações funcionais: JSON, PDF, MP4
+
+🎯 Todas essas tecnologias **devem estar visivelmente integradas como blocos IA no quadro infinito**, com execução real.
+
+---
+
+## ❌ 2. RESPOSTAS DAS IAs NÃO SÃO TÉCNICAS, PRECISAS NEM DETALHADAS
+
+As inteligências artificiais atualmente integradas:
+
+- Estão dando respostas **genéricas**, vagas ou rasas
+- Não estão cumprindo o papel de **IA Estratégica Técnica**
+- Não entregam códigos, respostas de engenharia, planos detalhados nem decisões de alto nível
+
+⚠️ **Corrija isso imediatamente.**
+
+Todas as IAs devem:
+
+- Responder de forma técnica, com linguagem profissional
+- Entregar execuções completas (ex: código, texto, design, estratégia)
+- Usar o contexto dos blocos anteriores do funil para manter coerência
+- Interagir entre si no Modo Pensamento Poderoso™
+
+---
+
+## ✅ RESUMO DO QUE DEVE SER CORRIGIDO
+
+1. **Integre todas as tecnologias reais e módulos IA dentro do canvas do Curiso**
+2. **Garanta que cada IA responda com profundidade técnica e alta precisão**
+3. **Teste bloco por bloco** antes de considerar “funcional”
+4. **Não simule execução. Tudo deve funcionar de verdade.**
+
+---
+
+Se após isso o sistema ainda não estiver perfeito, REFAÇA as etapas com atenção, porque **o que está sendo exigido é um produto final com inteligência real, integração completa e performance profissional.**

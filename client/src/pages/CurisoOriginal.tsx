@@ -18,13 +18,17 @@ import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, MessageCirclePlus, Trash2 } from 'lucide-react';
+import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart } from 'lucide-react';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
+import { AIModuleNode } from '@/components/AIModuleNode';
+import { VideoNode } from '@/components/VideoNode';
 import { nanoid } from 'nanoid';
 import { useDebouncedCallback } from 'use-debounce';
 
 const nodeTypes = {
   chat: CurisoChatNodeOriginal,
+  aiModule: AIModuleNode,
+  video: VideoNode,
 };
 
 function Flow() {
@@ -152,6 +156,72 @@ function Flow() {
     });
   };
 
+  const addAIModule = (moduleType: string) => {
+    const id = nanoid();
+
+    const position = screenToFlowPosition({
+      x: window.innerWidth / 2 + Math.random() * 100 - 50,
+      y: window.innerHeight / 2 + Math.random() * 100 - 50,
+    });
+
+    const newNode = {
+      id,
+      type: 'aiModule',
+      position,
+      resizable: true,
+      data: {
+        moduleType,
+        prompt: '',
+        parameters: {},
+        result: '',
+        isExecuting: false,
+        files: [],
+      },
+    };
+
+    setSettings({
+      ...settings,
+      boards: settings.boards.map(board =>
+        board.id === settings.currentBoardId
+          ? { ...board, nodes: [...board.nodes, newNode] }
+          : board
+      ),
+    });
+  };
+
+  const addVideoNode = () => {
+    const id = nanoid();
+
+    const position = screenToFlowPosition({
+      x: window.innerWidth / 2 + Math.random() * 100 - 50,
+      y: window.innerHeight / 2 + Math.random() * 100 - 50,
+    });
+
+    const newNode = {
+      id,
+      type: 'video',
+      position,
+      resizable: true,
+      data: {
+        text: '',
+        voice: 'pt-BR-FranciscaNeural',
+        avatar: 'amy-jcwCkr1grs',
+        type: 'did',
+        videoUrl: '',
+        isGenerating: false,
+      },
+    };
+
+    setSettings({
+      ...settings,
+      boards: settings.boards.map(board =>
+        board.id === settings.currentBoardId
+          ? { ...board, nodes: [...board.nodes, newNode] }
+          : board
+      ),
+    });
+  };
+
   const delNode = () => {
     const selectedNodes = currentBoard.nodes.filter(node => node.selected);
     if (selectedNodes.length === 0) return;
@@ -232,14 +302,30 @@ function Flow() {
         </div>
       </Panel>
       <Panel position="top-right" className="space-x-2">
-        <Button onClick={addNode} size="icon" className="bg-primary hover:bg-primary/90">
-          <MessageCirclePlus className="h-4 w-4" />
-        </Button>
-        {selectedNodes.length > 0 && (
-          <Button onClick={delNode} size="icon" variant="outline">
-            <Trash2 className="h-4 w-4" />
+        <div className="flex gap-2 bg-background/80 backdrop-blur-sm rounded-lg p-2 border">
+          <Button onClick={addNode} size="sm" className="bg-primary hover:bg-primary/90">
+            <MessageCirclePlus className="h-4 w-4 mr-1" />
+            Chat
           </Button>
-        )}
+          <Button onClick={() => addAIModule('ia-total')} size="sm" className="bg-purple-600 hover:bg-purple-700">
+            <Brain className="h-4 w-4 mr-1" />
+            IA Total™
+          </Button>
+          <Button onClick={() => addAIModule('pensamento-poderoso')} size="sm" className="bg-yellow-600 hover:bg-yellow-700">
+            <Zap className="h-4 w-4 mr-1" />
+            Pensamento Poderoso™
+          </Button>
+          <Button onClick={addVideoNode} size="sm" className="bg-pink-600 hover:bg-pink-700">
+            <Video className="h-4 w-4 mr-1" />
+            Vídeo IA
+          </Button>
+          {selectedNodes.length > 0 && (
+            <Button onClick={delNode} size="sm" variant="destructive">
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete
+            </Button>
+          )}
+        </div>
       </Panel>
     </ReactFlow>
   );

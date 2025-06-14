@@ -8,6 +8,7 @@ import { furionAI } from "./furion-ai-system";
 import { videoGenerator } from "./video-generator";
 import { advancedAIService } from "./advanced-ai-service";
 import { videoGenerationService } from "./video-generation-service";
+import { aiModuleExecutor } from "./ai-module-executor";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1646,6 +1647,35 @@ Make the content professional, persuasive, and conversion-focused.`;
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to get avatars'
+      });
+    }
+  });
+
+  // AI Module execution routes
+  app.post('/api/ai/module/execute', async (req, res) => {
+    try {
+      const { moduleType, prompt, parameters } = req.body;
+      
+      if (!moduleType || !prompt) {
+        return res.status(400).json({
+          success: false,
+          error: 'Module type and prompt are required'
+        });
+      }
+
+      const result = await aiModuleExecutor.executeModule({
+        moduleType,
+        prompt,
+        parameters
+      });
+
+      res.json(result);
+      
+    } catch (error) {
+      console.error('AI Module execution error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'AI module execution failed'
       });
     }
   });
