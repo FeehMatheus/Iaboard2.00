@@ -29,19 +29,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🎬 Starting REAL AI video generation with public APIs:', { prompt, aspectRatio, style });
 
-      const result = await freeRealVideoAPIs.generateVideo({
+      const result = await workingAISystem.generate({
+        type: 'video',
         prompt,
-        aspectRatio,
-        style,
-        duration
+        parameters: {
+          aspectRatio,
+          style,
+          duration
+        }
       });
 
       if (result.success) {
         res.json({
           success: true,
-          videoUrl: result.videoUrl,
-          downloadUrl: result.videoUrl,
-          provider: 'Free AI Generation System',
+          videoUrl: result.url,
+          downloadUrl: result.url,
+          provider: result.provider || 'Advanced AI Video Generator',
           metadata: result.metadata
         });
       } else {
@@ -212,7 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const copyPrompt = `Create ${copyType || 'professional'} copy for: ${prompt}. Make it compelling, persuasive, and action-oriented.`;
 
-      const result = await freePublicAPIs.generateContent({
+      const result = await workingAISystem.generate({
         type: 'text',
         prompt: copyPrompt,
         parameters: {
