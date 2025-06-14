@@ -1,0 +1,87 @@
+##############################################################################################
+###########################  PROMPT TÉCNICO – INTEGRAÇÃO TOTAL  ##############################
+# Alvo: IA Board (novo nome).  Todas as APIs abaixo DEVEM funcionar em produção.
+# Se QUALQUER serviço retornar erro 401/403/quota ou timeout, peça ao usuário nova key
+# ou instruções adicionais antes de prosseguir.  Nenhum fallback “dummy” é permitido.
+##############################################################################################
+
+1. === VARIÁVEIS .ENV (copiar exatamente) =====================================
+
+OPENROUTER_API_KEY=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
+MISTRAL_API_KEY=7lCXEIqFPbgj7VUb7jAf9OY5Id93lJCH
+STABILITY_API_KEY=sk-hElW1SRtTMGE2N8QmHWMQFfc21fRc6qF0wSyAKFdb1ukwJEy
+PIKA_API_KEY=<em branco – serviço em manutenção>
+ELEVENLABS_API_KEY=sk_add29f66314cc62383b2652cdcfc78552d9e9608ddc4caaa
+MAILCHIMP_API_KEY=1ebe7b6e9a3d69b0389c894b5a495398-us17
+MAILCHIMP_SERVER_PREFIX=us17
+MIXPANEL_TOKEN=2b26e5157e13634d0b93b53eb4c04f9a
+MIXPANEL_API_KEY=b840f5180eaa229964d5d12a39c99be2
+MIXPANEL_API_SECRET=aa9eba884a4fb661786f514a1f08c6f9
+NOTION_API_KEY=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
+TYPEFORM_API_KEY=tfp_AdtBqVmwpmNj7YhHw7DhBEd2Yko3mDQ115dy2xL1B5sV_3pdYcugRXA7TDK
+HEYGEN_API_KEY=ZGY5MGJkOWM0OTE4NGVlODgyNjViNjhjNGUyM2Y2MDItMTc0OTkyMTQwNg==
+
+2. === INTEGRAR SERVIÇOS ========================================================
+
+2.1 LLM Router  
+    • Endpoint compatível OpenAI → OpenRouter.  
+    • Modelos: gpt-4o, claude-3-sonnet-20240229, gemini-1.5-pro, mistral-large.  
+    • Funcionamento: seleção por dropdown em cada bloco.
+
+2.2 ElevenLabs TTS  
+    • POST https://api.elevenlabs.io/v1/text-to-speech/{voice_id}  
+    • VOZ padrão: pt-BR-AntonioNeural (ou escolha no bloco).  
+    • Retornar MP3 e player embutido no popup.
+
+2.3 Vídeo IA  
+    • Se `PIKA_API_KEY` vazio → usar Stability Video.  
+    • Stability endpoint: POST https://api.stability.ai/v2beta/video/generate  
+    • Poll até `status: completed`, mostrar .mp4, botão Download.
+
+2.4 Mailchimp  
+    • Função `addSubscriber(email, listId)` via SDK.  
+    • Usar lista padrão configurada no painel.
+
+2.5 Mixpanel  
+    • `mixpanel.init(MIXPANEL_TOKEN)`; trackar eventos IA e vídeo.
+
+2.6 Notion  
+    • Salvar resultados complexos em banco Notion (`database_id` definido em blocos).
+
+2.7 Typeform  
+    • Criar formulário “Feedback IA Board” → embed no popup.
+
+2.8 Zapier (Webhook)  
+    • Disparar POST JSON para https://ia-board.zapier.app/api/webhook em cada evento “Vídeo Gerado” e “Lead Capturado”.
+
+2.9 HeyGen Avatar (opcional)  
+    • POST https://api.heygen.com/v1/video.generate se `HEYGEN_API_KEY` presente.
+
+3. === UX / UI ================================================================
+
+3.1 Nome do app: **IA Board** (substituir “Curiso”).  
+3.2 Zoom no scroll, drawer lateral ocultável, menu contexto conforme especificação anterior.  
+3.3 Paleta vermelha (#FF1639 + #FF355D) aplicada a bordas dos blocos, pop-ups e highlights internos.  
+3.4 Animações: on-create scale, on-hover translate, smoothing de pan e zoom.
+
+4. === HEALTHCHECK ============================================================
+
+`npm run health`:  
+ • Testar OpenRouter, Mistral, Claude, Gemini → 200 OK e ≥50 tokens.  
+ • Testar ElevenLabs → retorna MP3 válido.  
+ • Testar Stability Video → retorna link .mp4 (ou marcar “Pika offline”).  
+ • Testar Mailchimp adicionar contato fictício.  
+ • Testar Mixpanel track.  
+ • Testar Notion page create.  
+ • Testar Typeform create form.
+
+Saída deve ser “ALL PROVIDERS ✅”.
+
+5. === INSTRUÇÃO DE FALHA =====================================================
+
+Se **qualquer** serviço retornar 401 / 403 / quota / 5xx:  
+ → Mostrar toast “<Provider> falhou (status ##).  Solicitar nova API Key.”  
+ → Pausar execução desse módulo, continuar restante.  
+ → Não usar fallback ou texto genérico.
+
+################################################################################

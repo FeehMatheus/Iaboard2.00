@@ -1,217 +1,165 @@
-interface VideoGenerationRequest {
-  text: string;
-  voice?: string;
-  avatar?: string;
-  type: 'did' | 'runwayml' | 'pika';
+interface VideoRequest {
+  prompt: string;
+  aspect_ratio?: '16:9' | '9:16' | '1:1';
+  duration?: number;
+  fps?: number;
+  motion_bucket_id?: number;
+  seed?: number;
 }
 
-interface VideoGenerationResponse {
+interface VideoResponse {
   success: boolean;
-  videoUrl?: string;
-  downloadUrl?: string;
-  previewUrl?: string;
-  instructionsUrl?: string;
-  error?: string;
+  video_url?: string;
+  video_id?: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed';
   metadata?: {
     duration: number;
-    size: string;
-    format: string;
-    provider: string;
-    instructions?: string;
+    resolution: string;
+    fps: number;
+    file_size?: number;
+    processing_time?: number;
   };
+  error?: string;
 }
 
 export class VideoGenerationService {
-  private didApiKey: string;
+  private stabilityKey: string;
+  private baseUrl = 'https://api.stability.ai/v2beta/video/generate';
 
   constructor() {
-    this.didApiKey = process.env.D_ID_API_KEY || '';
+    this.stabilityKey = process.env.STABILITY_API_KEY || '';
   }
 
-  async generateVideo(request: VideoGenerationRequest): Promise<VideoGenerationResponse> {
-    try {
-      switch (request.type) {
-        case 'did':
-          return await this.generateWithDID(request);
-        case 'runwayml':
-          return this.generateWithRunwayML(request);
-        case 'pika':
-          return this.generateWithPika(request);
-        default:
-          throw new Error('Tipo de geração de vídeo não suportado');
-      }
-    } catch (error) {
-      console.error('Erro na geração de vídeo:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido na geração de vídeo'
-      };
-    }
-  }
-
-  private async generateWithDID(request: VideoGenerationRequest): Promise<VideoGenerationResponse> {
-    if (!this.didApiKey) {
-      return {
-        success: false,
-        error: 'D-ID API key não configurada. Configure a chave D_ID_API_KEY para usar geração de vídeo.'
-      };
+  async generateVideo(request: VideoRequest): Promise<VideoResponse> {
+    if (!this.stabilityKey) {
+      throw new Error('Stability AI API key not configured');
     }
 
-    try {
-      const didPayload = {
-        script: {
-          type: 'text',
-          input: request.text,
-          provider: {
-            type: 'microsoft',
-            voice_id: request.voice || 'pt-BR-FranciscaNeural'
-          }
-        },
-        presenter: {
-          type: 'talk',
-          presenter_id: request.avatar || 'amy-jcwCkr1grs',
-          driver_id: 'uM00QMwJ9x'
-        },
-        config: {
-          fluent: true,
-          pad_audio: 0,
-          align_driver: true,
-          auto_match: true,
-          normalization_factor: 1,
-          sharpen: true,
-          stitch: true,
-          result_format: 'mp4'
-        }
-      };
+    console.log(`🎬 Starting video generation: ${request.prompt.substring(0, 50)}...`);
 
-      const createResponse = await fetch('https://api.d-id.com/talks', {
+    try {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${Buffer.from(`${this.didApiKey}:`).toString('base64')}`
+          'Authorization': `Bearer ${this.stabilityKey}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(didPayload)
+        body: JSON.stringify({
+          prompt: request.prompt,
+          aspect_ratio: request.aspect_ratio || '16:9',
+          duration: request.duration || 5,
+          fps: request.fps || 24,
+          motion_bucket_id: request.motion_bucket_id || 127,
+          seed: request.seed || Math.floor(Math.random() * 1000000)
+        })
       });
 
-      if (!createResponse.ok) {
-        const errorData = await createResponse.text();
-        throw new Error(`D-ID API error: ${createResponse.status} - ${errorData}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Stability AI video error: ${response.status} - ${errorText}`);
       }
 
-      const createData = await createResponse.json();
-      const talkId = createData.id;
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(`Stability AI error: ${data.error.message}`);
+      }
 
       // Poll for completion
-      let attempts = 0;
-      const maxAttempts = 60;
+      const completedVideo = await this.pollVideoCompletion(data.id);
       
-      while (attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        
-        const statusResponse = await fetch(`https://api.d-id.com/talks/${talkId}`, {
+      return completedVideo;
+
+    } catch (error) {
+      console.error(`❌ Video generation failed:`, error);
+      
+      if (error instanceof Error && error.message.includes('401')) {
+        throw new Error('Stability AI authentication failed. Please check API key.');
+      }
+      
+      if (error instanceof Error && error.message.includes('403')) {
+        throw new Error('Stability AI access denied. API key may be invalid or expired.');
+      }
+      
+      if (error instanceof Error && error.message.includes('quota')) {
+        throw new Error('Stability AI quota exceeded. Please upgrade your plan.');
+      }
+      
+      throw error;
+    }
+  }
+
+  private async pollVideoCompletion(videoId: string): Promise<VideoResponse> {
+    const maxAttempts = 60; // 5 minutes max
+    const pollInterval = 5000; // 5 seconds
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const response = await fetch(`https://api.stability.ai/v2beta/video/result/${videoId}`, {
           headers: {
-            'Authorization': `Basic ${Buffer.from(`${this.didApiKey}:`).toString('base64')}`
+            'Authorization': `Bearer ${this.stabilityKey}`
           }
         });
 
-        if (!statusResponse.ok) {
-          throw new Error(`Erro ao verificar status: ${statusResponse.status}`);
+        if (!response.ok) {
+          throw new Error(`Poll error: ${response.status}`);
         }
 
-        const statusData = await statusResponse.json();
+        const data = await response.json();
         
-        if (statusData.status === 'done') {
+        if (data.status === 'completed') {
+          console.log(`✅ Video generation completed: ${videoId}`);
+          
           return {
             success: true,
-            videoUrl: statusData.result_url,
-            downloadUrl: statusData.result_url,
+            video_url: data.video_url,
+            video_id: videoId,
+            status: 'completed',
             metadata: {
-              duration: Math.max(30, Math.round(request.text.split(' ').length / 2.5)),
-              size: '1920x1080',
-              format: 'mp4',
-              provider: 'D-ID'
+              duration: data.duration || 5,
+              resolution: data.resolution || '1024x576',
+              fps: data.fps || 24,
+              file_size: data.file_size,
+              processing_time: attempt * pollInterval
             }
           };
-        } else if (statusData.status === 'error') {
-          throw new Error(`Erro na geração: ${statusData.error?.description || 'Unknown error'}`);
         }
         
-        attempts++;
+        if (data.status === 'failed') {
+          throw new Error(`Video generation failed: ${data.error || 'Unknown error'}`);
+        }
+        
+        console.log(`⏳ Video processing... (${attempt + 1}/${maxAttempts})`);
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
+        
+      } catch (error) {
+        if (attempt === maxAttempts - 1) {
+          throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
       }
+    }
+    
+    throw new Error('Video generation timeout after 5 minutes');
+  }
+
+  async testConnection(): Promise<{ success: boolean; credits?: number; error?: string }> {
+    try {
+      const testResponse = await this.generateVideo({
+        prompt: 'A simple test animation of a bouncing ball',
+        duration: 3,
+        aspect_ratio: '1:1'
+      });
       
-      throw new Error('Timeout na geração do vídeo');
+      return {
+        success: testResponse.success
+      };
     } catch (error) {
-      console.error('Erro D-ID:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Erro desconhecido na geração de vídeo'
+        error: error instanceof Error ? error.message : 'Unknown error'
       };
     }
-  }
-
-  private generateWithRunwayML(request: VideoGenerationRequest): VideoGenerationResponse {
-    const videoId = `runway_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    return {
-      success: true,
-      videoUrl: `https://content.runwayml.com/preview/${videoId}.mp4`,
-      downloadUrl: `https://content.runwayml.com/download/${videoId}.mp4`,
-      metadata: {
-        duration: Math.max(30, Math.round(request.text.split(' ').length / 2.5)),
-        size: '1920x1080',
-        format: 'mp4',
-        provider: 'RunwayML',
-        instructions: `Vídeo gerado com RunwayML baseado no texto: ${request.text.substring(0, 100)}...`
-      }
-    };
-  }
-
-  private generateWithPika(request: VideoGenerationRequest): VideoGenerationResponse {
-    const videoId = `pika_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    return {
-      success: true,
-      videoUrl: `https://cdn.pika.art/videos/${videoId}.mp4`,
-      downloadUrl: `https://cdn.pika.art/videos/${videoId}.mp4`,
-      metadata: {
-        duration: Math.max(30, Math.round(request.text.split(' ').length / 2.5)),
-        size: '1920x1080',
-        format: 'mp4',
-        provider: 'Pika Labs',
-        instructions: `Vídeo animado gerado com Pika Labs: ${request.text.substring(0, 100)}...`
-      }
-    };
-  }
-
-  async getAvailableVoices(): Promise<string[]> {
-    return [
-      'pt-BR-FranciscaNeural',
-      'pt-BR-AntonioNeural',
-      'pt-BR-BrendaNeural',
-      'pt-BR-DonatoNeural',
-      'pt-BR-ElzaNeural',
-      'pt-BR-FabioNeural',
-      'pt-BR-GiovannaNeural',
-      'pt-BR-HumbertoNeural',
-      'pt-BR-JulioNeural',
-      'pt-BR-LeilaNeural',
-      'pt-BR-LeticiaNeural',
-      'pt-BR-ManuelaNeural',
-      'pt-BR-NicolauNeural',
-      'pt-BR-ValerioNeural',
-      'pt-BR-YaraNeural'
-    ];
-  }
-
-  async getAvailableAvatars(): Promise<Array<{id: string, name: string, preview_url?: string}>> {
-    return [
-      { id: 'amy-jcwCkr1grs', name: 'Amy - Professional Business' },
-      { id: 'eric-jK8nGKZdjE', name: 'Eric - Executive' },
-      { id: 'jennifer-h_w0xSENxQ', name: 'Jennifer - Marketing' },
-      { id: 'josh-_dGGcBE2pLs', name: 'Josh - Technical' },
-      { id: 'mike-gYMJEX5A', name: 'Mike - Sales' },
-      { id: 'sarah-h8kEXvq7', name: 'Sarah - Creative' }
-    ];
   }
 }
 
