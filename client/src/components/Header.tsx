@@ -1,7 +1,14 @@
-import { Settings, Download } from "lucide-react";
+import { Settings, Download, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useOnboardingStore } from "@/lib/onboardingStore";
 
 export default function Header() {
+  const { setWizardOpen } = useOnboardingStore();
+
+  const handleStartOnboarding = () => {
+    setWizardOpen(true);
+  };
+
   return (
     <header className="relative z-10 p-6">
       <nav className="glass-effect rounded-2xl p-4 max-w-7xl mx-auto">
@@ -16,6 +23,14 @@ export default function Header() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              onClick={handleStartOnboarding}
+              className="glass-effect hover:bg-white/20 transition-all duration-300 text-white border-white/20"
+            >
+              <Lightbulb className="w-4 h-4 mr-2" />
+              Tutorial
+            </Button>
             <Button 
               variant="ghost" 
               className="glass-effect hover:bg-white/20 transition-all duration-300 text-white border-white/20"

@@ -1336,6 +1336,13 @@ export default function Board() {
           </Card>
         </div>
       )}
+
+      {/* Onboarding Wizard */}
+      <OnboardingWizard
+        isOpen={isWizardOpen}
+        onClose={handleWizardClose}
+        onComplete={handleOnboardingComplete}
+      />
     </div>
   );
 }
