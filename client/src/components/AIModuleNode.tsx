@@ -18,7 +18,7 @@ import {
   X,
   Zap,
   Sparkles,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProgressVisualization } from './ProgressVisualization';
@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/select';
 
 interface AIModuleData {
-  moduleType: 'ia-total' | 'pensamento-poderoso' | 'ia-espia' | 'ia-produto' | 'ia-copy' | 'ia-trafego' | 'ia-video' | 'ia-analytics';
+  moduleType: 'ia-copy' | 'ia-video' | 'ia-produto' | 'ia-trafego' | 'ia-analytics';
   prompt?: string;
   parameters?: any;
   result?: string;
@@ -43,53 +43,35 @@ interface AIModuleData {
 }
 
 const moduleConfigs = {
-  'ia-total': {
-    name: 'IA Total™',
-    icon: Brain,
-    color: 'from-purple-600 to-violet-600',
-    description: 'Orquestra múltiplas IAs para solução completa'
-  },
-  'pensamento-poderoso': {
-    name: 'Pensamento Poderoso™',
-    icon: Zap,
-    color: 'from-yellow-500 to-orange-500',
-    description: 'Colaboração automática entre IAs'
-  },
-  'ia-espia': {
-    name: 'IA Espiã',
-    icon: Search,
-    color: 'from-red-500 to-pink-500',
-    description: 'Análise de concorrência e market intelligence'
-  },
-  'ia-produto': {
-    name: 'IA Produto Rápido™',
-    icon: Package,
-    color: 'from-green-500 to-emerald-500',
-    description: 'Criação automática de produto digital'
-  },
   'ia-copy': {
     name: 'IA Copy',
     icon: PenTool,
-    color: 'from-blue-500 to-cyan-500',
-    description: 'Geração de textos persuasivos e CTAs'
-  },
-  'ia-trafego': {
-    name: 'IA Tráfego Pago',
-    icon: Target,
-    color: 'from-indigo-500 to-purple-500',
-    description: 'Criativos e campanhas de tráfego pago'
+    color: 'from-red-500 to-red-600',
+    description: 'Geração exclusiva de headlines e textos persuasivos'
   },
   'ia-video': {
-    name: 'IA Vídeo Avançado',
+    name: 'IA Vídeo',
     icon: Video,
-    color: 'from-pink-500 to-rose-500',
-    description: 'Roteiro + vídeo real com avatar'
+    color: 'from-red-500 to-red-600',
+    description: 'Geração de vídeos reais com IA'
+  },
+  'ia-produto': {
+    name: 'IA Produto',
+    icon: Package,
+    color: 'from-red-500 to-red-600',
+    description: 'Criação de fichas técnicas de produtos'
+  },
+  'ia-trafego': {
+    name: 'IA Tráfego',
+    icon: Target,
+    color: 'from-red-500 to-red-600',
+    description: 'Criativos para campanhas de tráfego pago'
   },
   'ia-analytics': {
-    name: 'IA Analytics Plus',
-    icon: Brain,
-    color: 'from-teal-500 to-cyan-500',
-    description: 'Análise de métricas e otimização'
+    name: 'IA Analytics',
+    icon: BarChart3,
+    color: 'from-red-500 to-red-600',
+    description: 'Análise de dados e métricas'
   }
 };
 
@@ -128,7 +110,7 @@ const workflowTemplates = {
 };
 
 export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
-  const [moduleType, setModuleType] = useState<AIModuleData['moduleType']>(data?.moduleType || 'ia-total');
+  const [moduleType, setModuleType] = useState<AIModuleData['moduleType']>(data?.moduleType || 'ia-copy');
   const [prompt, setPrompt] = useState(data?.prompt || '');
   const [parameters, setParameters] = useState(data?.parameters || {});
   const [result, setResult] = useState(data?.result || '');

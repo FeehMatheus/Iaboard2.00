@@ -1,0 +1,75 @@
+############################  INSTRUÇÃO DE AJUSTE E APRIMORAMENTO  ############################
+
+👇  O sistema deverá realizar **ajustes cirúrgicos** em todos os módulos do quadro infinito
+(agora denominado **IA Board**) para eliminar redundâncias e aprimorar a experiência de uso.
+Execute cada item com rigor técnico; qualquer coisa fora do escopo deve ser ignorada.
+
+────────────────────────────────────────────────────────────────────────
+1. 🔄 **Elimine Redundâncias de Função**
+   • Verifique todos os módulos/nós atuais.  
+   • Cada módulo deve executar **apenas** a função que condiz com seu nome (Ex.:  
+     – “IA Copy” → única responsabilidade: gerar copies / headlines;  
+     – “IA Vídeo” → única responsabilidade: gerar ou incorporar vídeo IA;  
+     – “IA Produto” → gerar ficha técnica de produto, etc.).
+   • Módulos sobrepostos devem ser fundidos ou removidos.
+
+2. 🧩 **Restaure Naming & Branding**
+   • Nome oficial do app: **IA Board** (não Curiso).  
+   • Atualize logo, título, favicon, manifest – **sem alterar layout do quadro**.
+
+3. 🖱️ **Zoom com Scroll do Mouse**
+   • Scroll ↑  ➜ zoom-in (20 % por notch).  
+   • Scroll ↓  ➜ zoom-out (20 % por notch).  
+   • Zoom limitado: 10 %–500 %.  
+   • Transição suave em 120 ms.
+
+4. 🖱️ **Menu de Contexto (Botão Direito)**
+   • No quadro vazio:  
+     – “Adicionar Novo Módulo”  
+     – “Centralizar Canvas”  
+     – “Exportar → JSON | PDF | Markdown”  
+   • Sobre um módulo:  
+     – “Renomear”  
+     – “Duplicar”  
+     – “Deletar”  
+     – “Reexecutar IA”  
+   • Implementar via listener `contextmenu`; impedir menu nativo.
+
+5. 🏎️ **Scroll Horizontal/Vertical e “Friction”**
+   • Habilite “panning” com middle-mouse ou shift+drag.  
+   • Aplique **interpolação de movimento** (ease-out 180 ms) para sensação fluida.  
+   • Módulos seguem o scroll suavemente (requestAnimationFrame).
+
+6. 🎨 **Paleta Vibrante Tecnológica (Vermelho)**
+   • Cor principal: `#FF1639` (vermelho neon).  
+   • Gradientes secundários: `#FF355D` → `#FF1639`.  
+   • Módulos em repouso: borda `rgba(255,22,57,0.25)`; on-hover: `rgba(255,22,57,0.6)`.  
+   • Não alterar cores de grid/canvas – apenas elementos de UI.
+
+7. 🤖 **Garantir Funcionamento das IAs**
+   • Cada módulo IA deve:
+     – Ler sua key correta do `.env`.  
+     – Retornar resposta **técnica, precisa e detalhada** (≥ 50 tokens).  
+     – Exibir spinner até `status: success` ou toast de erro HTTP.
+   • Evitar fallback “dummy”: em caso de erro, mostrar mensagem exata (código+texto).
+
+8. 🧠 **Sistema de Progresso**
+   • Manter indicador de progresso global já existente (barra ou toast).  
+   • Incrementos:
+     – 10 % quando IA recebe prompt  
+     – 40 % quando API responde  
+     – 50 % no render final do bloco  
+   • Reset após conclusão.
+
+9. ✅ **Testes de Aceite**
+   • Zoom in/out funciona sem lag.  
+   • Menu direito exibe opções corretas.  
+   • Módulo “IA Vídeo” gera vídeo real via Pika/StableVideo.  
+   • Cor red-tech aplicada a botões, highlights e ícones (não ao grid).  
+   • Todos módulos respondem com dados técnicos (sem placeholder).
+
+────────────────────────────────────────────────────────────────────────
+**IMPORTANTE:** Não modificar o motor do quadro infinito (layout, grid, minimapa).  
+Apenas **melhore a fluidez** e **corrija as funções** como descrito acima.
+Quando cada item for concluído, salve, reinicie e rode `npm run health` → deve sair **exit 0**.
+###############################################################################################
