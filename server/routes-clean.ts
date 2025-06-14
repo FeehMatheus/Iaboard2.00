@@ -340,41 +340,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // IA Board Module Execution - Main endpoint for all modules
-  app.post('/api/ai/module/execute', (req, res) => {
-    console.log('Module execute endpoint hit');
-    console.log('Request body:', req.body);
-    console.log('Headers:', req.headers);
-    
-    const { moduleType, prompt, parameters = {} } = req.body || {};
+  app.post('/api/ai/module/execute', async (req, res) => {
+    try {
+      const body = req.body || {};
+      const moduleType = body.moduleType;
+      const prompt = body.prompt;
+      const parameters = body.parameters || {};
 
-    if (!moduleType || !prompt) {
-      console.log('Validation failed:', { moduleType, prompt, bodyType: typeof req.body });
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Module type and prompt are required',
-        debug: { 
-          receivedBody: req.body,
-          moduleType: moduleType,
-          prompt: prompt,
-          contentType: req.headers['content-type']
+      console.log('Module execution:', { moduleType, promptLength: prompt?.length });
+
+      if (!moduleType || !prompt || typeof moduleType !== 'string' || typeof prompt !== 'string') {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Module type and prompt are required'
+        });
+      }
+
+      // Generate authentic content using the organized APIs
+      let result;
+      switch (moduleType) {
+        case 'ia-copy':
+          result = await generateCopyContent(prompt, parameters);
+          break;
+        case 'ia-video':
+          result = await generateVideoContent(prompt, parameters);
+          break;
+        case 'ia-produto':
+          result = await generateProductContent(prompt, parameters);
+          break;
+        case 'ia-trafego':
+          result = await generateTrafficContent(prompt, parameters);
+          break;
+        case 'ia-analytics':
+          result = await generateAnalyticsContent(prompt, parameters);
+          break;
+        default:
+          return res.status(400).json({
+            success: false,
+            error: `Unknown module type: ${moduleType}`
+          });
+      }
+
+      res.json({
+        success: true,
+        result: result.content,
+        files: result.files || [],
+        metadata: {
+          tokensUsed: result.tokensUsed || 0,
+          processingTime: result.processingTime || 0,
+          confidence: result.confidence || 0.95
         }
       });
-    }
 
-    // Return immediate success with fallback content
-    const fallbackContent = getFallbackContentForModule(moduleType, prompt);
-    
-    res.json({
-      success: true,
-      result: fallbackContent.content,
-      files: fallbackContent.files,
-      metadata: {
-        tokensUsed: 0,
-        processingTime: 0.1,
-        confidence: 0.95,
-        provider: 'IA Board Fallback'
-      }
-    });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: `Module execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      });
+    }
   });
 
   // AI Module Execution (legacy endpoint)
