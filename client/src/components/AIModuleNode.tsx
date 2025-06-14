@@ -486,14 +486,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
             </div>
           )}
 
-          {moduleType === 'ia-espia' && (
-            <Input
-              placeholder="URL do concorrente"
-              value={parameters.competitorUrl || ''}
-              onChange={(e) => setParameters({...parameters, competitorUrl: e.target.value})}
-              className="text-sm"
-            />
-          )}
+
 
           {moduleType === 'ia-trafego' && (
             <div className="grid grid-cols-2 gap-2">

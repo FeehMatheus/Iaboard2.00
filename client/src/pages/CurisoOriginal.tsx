@@ -18,7 +18,7 @@ import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, Sparkles } from 'lucide-react';
+import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles } from 'lucide-react';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
@@ -283,11 +283,14 @@ function Flow() {
       nodeTypes={nodeTypes}
       fitView
       minZoom={0.1}
-      maxZoom={6}
+      maxZoom={5}
       snapToGrid={true}
       snapGrid={[30, 30]}
       panOnDrag={true}
-      panOnScroll={true}
+      panOnScroll={false}
+      zoomOnScroll={true}
+      zoomOnPinch={true}
+      zoomOnDoubleClick={false}
       zoomOnScroll={true}
       zoomOnDoubleClick={true}
       className="dark bg-background"
@@ -317,39 +320,27 @@ function Flow() {
             </Button>
           </div>
 
-          <div className="text-xs font-medium text-muted-foreground mt-2 mb-1">ADVANCED AI:</div>
+          <div className="text-xs font-medium text-muted-foreground mt-2 mb-1">MÓDULOS IA:</div>
           <div className="grid grid-cols-1 gap-1">
-            <Button onClick={() => addAIModule('ia-total')} size="sm" className="bg-purple-600 hover:bg-purple-700 text-xs justify-start">
-              <Brain className="h-3 w-3 mr-1" />
-              IA Total™
-            </Button>
-            <Button onClick={() => addAIModule('pensamento-poderoso')} size="sm" className="bg-yellow-600 hover:bg-yellow-700 text-xs justify-start">
-              <Zap className="h-3 w-3 mr-1" />
-              Pensamento Poderoso™
-            </Button>
-            <Button onClick={() => addAIModule('ia-espia')} size="sm" className="bg-red-600 hover:bg-red-700 text-xs justify-start">
-              <Search className="h-3 w-3 mr-1" />
-              IA Espiã
-            </Button>
-            <Button onClick={() => addAIModule('ia-produto')} size="sm" className="bg-green-600 hover:bg-green-700 text-xs justify-start">
-              <Package className="h-3 w-3 mr-1" />
-              IA Produto Rápido™
-            </Button>
-            <Button onClick={() => addAIModule('ia-copy')} size="sm" className="bg-blue-600 hover:bg-blue-700 text-xs justify-start">
+            <Button onClick={() => addAIModule('ia-copy')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
               <PenTool className="h-3 w-3 mr-1" />
               IA Copy
             </Button>
-            <Button onClick={() => addAIModule('ia-trafego')} size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-xs justify-start">
-              <Target className="h-3 w-3 mr-1" />
-              IA Tráfego Pago
-            </Button>
-            <Button onClick={() => addAIModule('ia-video')} size="sm" className="bg-rose-600 hover:bg-rose-700 text-xs justify-start">
+            <Button onClick={() => addAIModule('ia-video')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
               <Video className="h-3 w-3 mr-1" />
-              IA Vídeo Avançado
+              IA Vídeo
             </Button>
-            <Button onClick={() => addAIModule('ia-analytics')} size="sm" className="bg-teal-600 hover:bg-teal-700 text-xs justify-start">
-              <BarChart className="h-3 w-3 mr-1" />
-              IA Analytics Plus
+            <Button onClick={() => addAIModule('ia-produto')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+              <Package className="h-3 w-3 mr-1" />
+              IA Produto
+            </Button>
+            <Button onClick={() => addAIModule('ia-trafego')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+              <Target className="h-3 w-3 mr-1" />
+              IA Tráfego
+            </Button>
+            <Button onClick={() => addAIModule('ia-analytics')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+              <BarChart3 className="h-3 w-3 mr-1" />
+              IA Analytics
             </Button>
           </div>
 
