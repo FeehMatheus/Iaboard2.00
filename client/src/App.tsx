@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import SmartGuidance from '@/components/SmartGuidance';
-import CurisoOriginal from '@/pages/CurisoOriginal';
+import IABoard from '@/pages/CurisoOriginal';
 import ProgressDemo from '@/pages/ProgressDemo';
 
 const queryClient = new QueryClient({
@@ -35,10 +35,10 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-background">
           <Switch>
-            <Route path="/" component={CurisoOriginal} />
+            <Route path="/" component={IABoard} />
             <Route path="/progress" component={ProgressDemo} />
             <Route>
-              <CurisoOriginal />
+              <IABoard />
             </Route>
           </Switch>
           <SmartGuidance 

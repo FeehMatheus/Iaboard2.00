@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles } from 'lucide-react';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
@@ -271,30 +271,60 @@ function Flow() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
 
+  const [contextMenu, setContextMenu] = useState<{x: number, y: number, nodeId?: string} | null>(null);
+
+  const handleContextMenu = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    const rect = event.currentTarget.getBoundingClientRect();
+    setContextMenu({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    });
+  }, []);
+
+  const handleNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const rect = event.currentTarget.getBoundingClientRect();
+    setContextMenu({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+      nodeId: node.id,
+    });
+  }, []);
+
+  const { fitView } = useReactFlow();
+  
+  const centerCanvas = useCallback(() => {
+    fitView({ padding: 0.2 });
+    setContextMenu(null);
+  }, [fitView]);
+
   const selectedNodes = currentBoard.nodes.filter(node => node.selected);
 
   return (
-    <ReactFlow
-      nodes={currentBoard.nodes}
-      edges={currentBoard.edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      nodeTypes={nodeTypes}
-      fitView
-      minZoom={0.1}
-      maxZoom={5}
-      snapToGrid={true}
-      snapGrid={[30, 30]}
-      panOnDrag={true}
-      panOnScroll={false}
-      zoomOnScroll={true}
-      zoomOnPinch={true}
-      zoomOnDoubleClick={false}
-      zoomOnScroll={true}
-      zoomOnDoubleClick={true}
-      className="dark bg-background"
-    >
+    <div className="relative w-full h-full" onContextMenu={handleContextMenu}>
+      <ReactFlow
+        nodes={currentBoard.nodes}
+        edges={currentBoard.edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes}
+        fitView
+        minZoom={0.1}
+        maxZoom={5}
+        snapToGrid={true}
+        snapGrid={[30, 30]}
+        panOnDrag={true}
+        panOnScroll={false}
+        zoomOnScroll={true}
+        zoomOnPinch={true}
+        zoomOnDoubleClick={false}
+        className="dark bg-background"
+        onNodeContextMenu={handleNodeContextMenu}
+        onPaneClick={() => setContextMenu(null)}
+      >
       <Background className="bg-background" />
       <Controls />
       <Panel position="top-left" className="space-x-2">
@@ -352,11 +382,70 @@ function Flow() {
           )}
         </div>
       </Panel>
+      
+      {/* Context Menu */}
+      {contextMenu && (
+        <div 
+          className="absolute bg-background border rounded-lg shadow-lg py-2 z-50"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+        >
+          {contextMenu.nodeId ? (
+            <>
+              <button 
+                className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                onClick={() => setContextMenu(null)}
+              >
+                Renomear
+              </button>
+              <button 
+                className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                onClick={() => setContextMenu(null)}
+              >
+                Duplicar
+              </button>
+              <button 
+                className="w-full px-4 py-2 text-left hover:bg-accent text-sm text-destructive"
+                onClick={() => setContextMenu(null)}
+              >
+                Deletar
+              </button>
+              <button 
+                className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                onClick={() => setContextMenu(null)}
+              >
+                Reexecutar IA
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                onClick={() => { addNode(); setContextMenu(null); }}
+              >
+                Adicionar Novo Módulo
+              </button>
+              <button 
+                className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                onClick={centerCanvas}
+              >
+                Centralizar Canvas
+              </button>
+              <button 
+                className="w-full px-4 py-2 text-left hover:bg-accent text-sm"
+                onClick={() => setContextMenu(null)}
+              >
+                Exportar → JSON
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </ReactFlow>
+    </div>
   );
 }
 
-export default function CurisoOriginal() {
+export default function IABoard() {
   return (
     <div className="w-screen h-screen bg-background">
       <ReactFlowProvider>
