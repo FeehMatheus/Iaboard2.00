@@ -1,0 +1,63 @@
+Crie um sistema completo, idêntico ao projeto Curiso (https://github.com/metaspartan/curiso), com as seguintes exigências técnicas. O objetivo é construir, configurar e executar automaticamente uma aplicação visual com canvas infinito, blocos interativos conectados a múltiplas IAs reais, e funções completas de exportação e CTA. Tudo deve estar pronto para rodar no Replit ou ambiente compatível com Node.js + Bun.
+
+### 1. Clonagem do projeto
+- Clone o repositório Curiso:
+  git clone https://github.com/metaspartan/curiso.git ia-board
+- Acesse a pasta:
+  cd ia-board
+
+### 2. Instalação de dependências
+- Verifique se `bun` está disponível. Caso não esteja, use `npm`:
+  bun install
+  ou
+  npm install
+
+### 3. Criação do arquivo `.env` na raiz do projeto
+Inclua as chaves reais e configurações da aplicação:
+
+OPENAI_API_KEY=sk-CHAVE_REAL ANTHROPIC_API_KEY=sk-ant-CHAVE_REAL GOOGLE_API_KEY=AIzaCHAVE_REAL
+
+PUBLIC_APP_NAME="IA Board by Filippe" PUBLIC_DEFAULT_MODEL="gpt-4o" PUBLIC_ALLOWED_MODELS="gpt-4o,claude-3-sonnet-20240229,gemini-1.5-pro" PUBLIC_BRANDING_COLOR="#00d9ff"
+
+### 4. Modificações no código (branding e CTAs)
+- No arquivo `src/meta/config.ts`, substitua os dados para refletir as variáveis `.env` corretamente.
+- No layout principal (`src/routes/+layout.svelte`), adicione um botão fixo de CTA com o texto:
+  **"Baixar IA Board Desktop (.exe)"**
+  Esse botão deve abrir:
+  https://github.com/FeehMatheus/ia-board/releases
+
+### 5. Funcionalidade dos blocos IA
+- Garante que cada nó do canvas (bloco IA) esteja conectado a uma API real:
+  - OpenAI (GPT-4o)
+  - Claude 3 (Anthropic)
+  - Gemini 1.5 (Google)
+- Os modelos devem ser selecionáveis em cada bloco e enviar prompt direto com retorno em tempo real.
+
+### 6. Exportações
+- Habilite e teste os seguintes formatos de exportação no menu principal:
+  - JSON (.json)
+  - Markdown (.md)
+  - PDF (.pdf)
+
+### 7. Execução local
+- O sistema deve ser iniciado via:
+  bun run dev
+  ou
+  npm run dev
+- A interface deve abrir um canvas infinito com os blocos IA interativos e exportação funcional.
+
+### 8. Empacotamento Desktop (opcional)
+- Configure o Tauri com ícone, nome e versão.
+- Execute:
+  bun run desktop
+  ou
+  npm run desktop
+- Geração final deve resultar em `.exe` (Windows), `.app` (macOS) ou `.AppImage` (Linux), com todas funcionalidades embarcadas.
+
+### 9. Entrega esperada
+- Sistema pronto, sem falhas, visualmente idêntico ou superior ao Curiso.
+- APIs integradas e funcionais.
+- Botões e funções 100% operacionais (sem placeholders).
+- Código organizado, limpo e pronto para exportação e publicação.
+
+Execute todos os passos automaticamente e entregue o sistema funcional, sem necessidade de intervenção manual. Use as tecnologias reais. Não simule funcionalidades. Implemente-as de fato. Seja preciso, completo e entregue o projeto 100% utilizável por um usuário final.

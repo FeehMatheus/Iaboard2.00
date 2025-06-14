@@ -6,6 +6,7 @@ import { aiContentGenerator } from "./ai-content-generator";
 import { aiEngineSupreme } from "./ai-engine-supreme";
 import { furionAI } from "./furion-ai-system";
 import { videoGenerator } from "./video-generator";
+import { advancedAIService } from "./advanced-ai-service";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
