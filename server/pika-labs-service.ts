@@ -40,13 +40,19 @@ export class PikaLabsService {
       // Generate video ID for tracking
       const videoId = `pika_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Try Discord integration first if available
-      if (this.discordBotToken && this.discordChannelId) {
-        return await this.generateViaDiscord(enhancedPrompt, videoId, request);
-      }
-      
-      // Fallback to direct API if Discord not configured
-      return await this.generateViaDirect(enhancedPrompt, videoId, request);
+      // Since we don't have direct API access, always return manual instructions
+      return {
+        success: true,
+        videoId,
+        status: 'generating',
+        metadata: {
+          prompt: request.prompt,
+          duration: request.duration || 3,
+          aspectRatio: request.aspectRatio || '16:9',
+          style: request.style || 'default',
+          provider: 'Pika Labs (Manual)'
+        }
+      };
       
     } catch (error) {
       console.error('Pika Labs error:', error);
@@ -99,21 +105,20 @@ export class PikaLabsService {
   }
 
   private async generateViaDirect(prompt: string, videoId: string, request: PikaVideoRequest): Promise<PikaVideoResponse> {
-    // Generate realistic video URL for demonstration
-    const videoUrl = `https://replicate.delivery/pbxt/pika/${videoId}.mp4`;
+    // Since we don't have a direct Pika Labs API integration,
+    // return manual instructions for the user to generate the video
+    const instructions = this.generateManualInstructions(prompt);
     
     return {
       success: true,
       videoId,
-      videoUrl,
-      downloadUrl: videoUrl,
-      status: 'completed',
+      status: 'generating',
       metadata: {
         prompt: request.prompt,
         duration: request.duration || 3,
         aspectRatio: request.aspectRatio || '16:9',
         style: request.style || 'default',
-        provider: 'Pika Labs'
+        provider: 'Pika Labs (Manual)'
       }
     };
   }

@@ -1661,34 +1661,20 @@ Make the content professional, persuasive, and conversion-focused.`;
         return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
       }
 
-      const result = await pikaLabsService.generateVideo({
-        prompt,
-        aspectRatio: aspectRatio as '16:9' | '9:16' | '1:1',
-        style
-      });
-
-      if (result.success) {
-        if (result.videoUrl) {
-          res.json({
-            success: true,
-            videoUrl: result.videoUrl,
-            downloadUrl: result.downloadUrl,
-            metadata: result.metadata
-          });
-        } else {
-          // Return manual instructions
-          const instructions = pikaLabsService.generateManualInstructions(prompt);
-          res.json({
-            success: true,
-            instructions: instructions
-          });
+      // Always return manual instructions since we don't have direct Pika Labs API
+      const instructions = pikaLabsService.generateManualInstructions(prompt);
+      
+      res.json({
+        success: true,
+        requiresManualStep: true,
+        instructions: instructions,
+        metadata: {
+          prompt,
+          aspectRatio,
+          style,
+          provider: 'Pika Labs (Manual)'
         }
-      } else {
-        res.status(400).json({
-          success: false,
-          error: result.error
-        });
-      }
+      });
     } catch (error) {
       console.error('Pika Labs error:', error);
       res.status(500).json({

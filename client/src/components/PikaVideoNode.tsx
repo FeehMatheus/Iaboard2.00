@@ -95,7 +95,15 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
       const data = await response.json();
 
       if (data.success) {
-        if (data.videoUrl) {
+        if (data.requiresManualStep && data.instructions) {
+          setDiscordInstructions(data.instructions);
+          setShowManualUpload(true);
+          updateNodeData({ isGenerating: false });
+          toast({
+            title: "Instruções Geradas",
+            description: "Siga as instruções para gerar o vídeo no Pika Labs"
+          });
+        } else if (data.videoUrl) {
           setVideoUrl(data.videoUrl);
           updateNodeData({ 
             videoUrl: data.videoUrl, 
@@ -104,14 +112,6 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
           toast({
             title: "Vídeo Gerado!",
             description: "Seu vídeo foi gerado com sucesso"
-          });
-        } else if (data.instructions) {
-          setDiscordInstructions(data.instructions);
-          setShowManualUpload(true);
-          updateNodeData({ isGenerating: false });
-          toast({
-            title: "Instruções Geradas",
-            description: "Siga as instruções para gerar o vídeo no Pika Labs"
           });
         }
       } else {
