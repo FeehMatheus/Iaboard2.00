@@ -21,6 +21,13 @@ import { enhancedGoogleTTSService } from './enhanced-google-tts-service';
 import { enhancedMistralService } from './enhanced-mistral-service';
 import { enhancedStabilityService } from './enhanced-stability-service';
 import { enhancedTypeformService } from './enhanced-typeform-service';
+import { llmRouterService } from './llm-router-service';
+import { elevenLabsService } from './elevenlabs-service';
+import { videoGenerationService } from './video-generation-service';
+import { mailchimpService } from './mailchimp-service';
+import { mixpanelService } from './mixpanel-service';
+import { notionService } from './notion-service';
+import { healthCheckService } from './health-check-service';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -963,28 +970,258 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Combined AI Health Check
-  app.get('/api/health/all-services', async (req, res) => {
+  // LLM Router Routes
+  app.post('/api/llm/generate', async (req, res) => {
     try {
-      const healthChecks = await Promise.allSettled([
-        enhancedGoogleTTSService.listAvailableVoices('pt-BR'),
-        enhancedMistralService.listAvailableModels(),
-        enhancedStabilityService.generateImage({ prompt: 'test', width: 64, height: 64 }),
-        enhancedTypeformService.createAdvancedForm({ title: 'Test', fields: [] })
-      ]);
+      const { model, messages, temperature, max_tokens } = req.body;
+      
+      if (!model || !messages) {
+        return res.status(400).json({ success: false, error: 'Model and messages are required' });
+      }
 
-      const results = {
-        googleTTS: healthChecks[0].status === 'fulfilled' ? 'operational' : 'error',
-        mistral: healthChecks[1].status === 'fulfilled' ? 'operational' : 'error', 
-        stability: healthChecks[2].status === 'fulfilled' ? 'operational' : 'error',
-        typeform: healthChecks[3].status === 'fulfilled' ? 'operational' : 'error'
-      };
+      const result = await llmRouterService.generateResponse({
+        model,
+        messages,
+        temperature,
+        max_tokens
+      });
 
-      res.json({ success: true, services: results });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'LLM generation failed'
+      });
+    }
+  });
+
+  // ElevenLabs TTS Routes
+  app.post('/api/elevenlabs/synthesize', async (req, res) => {
+    try {
+      const { text, voice_id, voice_settings } = req.body;
+      
+      if (!text) {
+        return res.status(400).json({ success: false, error: 'Text is required' });
+      }
+
+      const result = await elevenLabsService.synthesizeSpeech({
+        text,
+        voice_id,
+        voice_settings
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'TTS synthesis failed'
+      });
+    }
+  });
+
+  app.get('/api/elevenlabs/voices', async (req, res) => {
+    try {
+      const voices = await elevenLabsService.getAvailableVoices();
+      res.json({ success: true, voices });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch voices'
+      });
+    }
+  });
+
+  // Video Generation Routes
+  app.post('/api/video/generate', async (req, res) => {
+    try {
+      const { prompt, aspect_ratio, duration, fps } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt is required' });
+      }
+
+      const result = await videoGenerationService.generateVideo({
+        prompt,
+        aspect_ratio,
+        duration,
+        fps
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Video generation failed'
+      });
+    }
+  });
+
+  // Mailchimp Routes
+  app.post('/api/mailchimp/subscribe', async (req, res) => {
+    try {
+      const { email, list_id, first_name, last_name } = req.body;
+      
+      if (!email || !list_id) {
+        return res.status(400).json({ success: false, error: 'Email and list_id are required' });
+      }
+
+      const result = await mailchimpService.addSubscriber(email, list_id, {
+        first_name,
+        last_name
+      });
+
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Subscription failed'
+      });
+    }
+  });
+
+  app.get('/api/mailchimp/lists', async (req, res) => {
+    try {
+      const lists = await mailchimpService.getLists();
+      res.json({ success: true, lists });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch lists'
+      });
+    }
+  });
+
+  // Mixpanel Routes
+  app.post('/api/mixpanel/track', async (req, res) => {
+    try {
+      const { event, properties, distinct_id } = req.body;
+      
+      if (!event) {
+        return res.status(400).json({ success: false, error: 'Event is required' });
+      }
+
+      const result = await mixpanelService.trackEvent(event, properties, distinct_id);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Event tracking failed'
+      });
+    }
+  });
+
+  app.post('/api/mixpanel/track-video', async (req, res) => {
+    try {
+      const { prompt, model, duration } = req.body;
+      
+      const result = await mixpanelService.trackVideoGeneration(prompt, model, duration);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Video tracking failed'
+      });
+    }
+  });
+
+  app.post('/api/mixpanel/track-lead', async (req, res) => {
+    try {
+      const { email, source } = req.body;
+      
+      const result = await mixpanelService.trackLeadCapture(email, source);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Lead tracking failed'
+      });
+    }
+  });
+
+  // Notion Routes
+  app.post('/api/notion/save-result', async (req, res) => {
+    try {
+      const { type, prompt, result, metadata } = req.body;
+      
+      if (!type || !prompt || !result) {
+        return res.status(400).json({ success: false, error: 'Type, prompt, and result are required' });
+      }
+
+      const notionResult = await notionService.saveAIResult(type, prompt, result, metadata);
+      res.json(notionResult);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to save to Notion'
+      });
+    }
+  });
+
+  app.post('/api/notion/save-video', async (req, res) => {
+    try {
+      const { prompt, video_url, metadata } = req.body;
+      
+      const result = await notionService.saveVideoResult(prompt, video_url, metadata);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to save video to Notion'
+      });
+    }
+  });
+
+  // Zapier Webhook
+  app.post('/api/zapier/webhook', async (req, res) => {
+    try {
+      const webhookUrl = 'https://ia-board.zapier.app/api/webhook';
+      
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...req.body,
+          timestamp: new Date().toISOString(),
+          source: 'IA Board'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Zapier webhook failed: ${response.status}`);
+      }
+
+      res.json({ success: true, webhook_triggered: true });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Webhook failed'
+      });
+    }
+  });
+
+  // Comprehensive Health Check
+  app.get('/api/health/full', async (req, res) => {
+    try {
+      const report = await healthCheckService.runFullHealthCheck();
+      res.json(report);
     } catch (error) {
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Health check failed'
+      });
+    }
+  });
+
+  app.get('/api/health/quick', async (req, res) => {
+    try {
+      const result = await healthCheckService.quickCheck();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Quick health check failed'
       });
     }
   });
