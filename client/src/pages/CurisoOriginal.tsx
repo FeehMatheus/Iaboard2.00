@@ -18,12 +18,13 @@ import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart } from 'lucide-react';
+import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, Sparkles } from 'lucide-react';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
 import { nanoid } from 'nanoid';
 import { useDebouncedCallback } from 'use-debounce';
+import { useLocation } from 'wouter';
 
 const nodeTypes = {
   chat: CurisoChatNodeOriginal,
@@ -34,6 +35,7 @@ const nodeTypes = {
 function Flow() {
   const { settings, setSettings } = useStore();
   const { getViewport, screenToFlowPosition } = useReactFlow();
+  const [, setLocation] = useLocation();
 
   const currentBoard = settings.boards.find(b => b.id === settings.currentBoardId)!;
 
@@ -317,6 +319,10 @@ function Flow() {
 
           <div className="text-xs font-medium text-muted-foreground mt-2 mb-1">ADVANCED AI:</div>
           <div className="grid grid-cols-1 gap-1">
+            <Button onClick={() => setLocation('/progress')} size="sm" className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-xs justify-start">
+              <Sparkles className="h-3 w-3 mr-1" />
+              Progress Studio
+            </Button>
             <Button onClick={() => addAIModule('ia-total')} size="sm" className="bg-purple-600 hover:bg-purple-700 text-xs justify-start">
               <Brain className="h-3 w-3 mr-1" />
               IA Total™
