@@ -51,6 +51,8 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
   const [isResizing, setIsResizing] = useState(false);
   const [showManualUpload, setShowManualUpload] = useState(false);
   const [discordInstructions, setDiscordInstructions] = useState<any>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState('');
+  const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(false);
 
   const { setNodes } = useReactFlow();
   const { toast } = useToast();
@@ -65,6 +67,54 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
       )
     );
   }, [id, setNodes]);
+
+  const generateThumbnail = async () => {
+    if (!prompt.trim()) {
+      toast({
+        title: "Erro",
+        description: "Digite um prompt para gerar o preview",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingThumbnail(true);
+
+    try {
+      const response = await fetch('/api/pika/thumbnail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt,
+          aspectRatio,
+          style
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.thumbnailUrl) {
+        setThumbnailUrl(data.thumbnailUrl);
+        toast({
+          title: "Preview Gerado!",
+          description: "Thumbnail criado com sucesso"
+        });
+      } else {
+        throw new Error(data.error || 'Falha na geração do thumbnail');
+      }
+    } catch (error) {
+      console.error('Erro na geração do thumbnail:', error);
+      toast({
+        title: "Erro no Preview",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingThumbnail(false);
+    }
+  };
 
   const generateVideo = async () => {
     if (!prompt.trim()) {
@@ -273,7 +323,45 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
           />
         </div>
 
+        {/* Thumbnail Preview Section */}
+        {thumbnailUrl && (
+          <div className="space-y-2">
+            <div className="relative">
+              <img
+                src={thumbnailUrl}
+                alt="Video Preview"
+                className="w-full rounded-lg border-2 border-purple-300 shadow-md"
+              />
+              <div className="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 rounded text-xs font-semibold">
+                PREVIEW
+              </div>
+              <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                {style.toUpperCase()}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-2">
+          <Button
+            onClick={generateThumbnail}
+            disabled={isGeneratingThumbnail || !prompt.trim()}
+            variant="outline"
+            className="flex-1"
+          >
+            {isGeneratingThumbnail ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Preview...
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4 mr-2" />
+                Preview
+              </>
+            )}
+          </Button>
+
           <Button
             onClick={generateVideo}
             disabled={isGenerating || !prompt.trim()}
@@ -290,14 +378,6 @@ export const PikaVideoNode = memo(({ id, data }: NodeProps<PikaVideoNodeData>) =
                 Gerar Vídeo
               </>
             )}
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => setShowManualUpload(true)}
-            size="sm"
-          >
-            <Upload className="w-4 h-4" />
           </Button>
         </div>
 
