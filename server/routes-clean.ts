@@ -9,7 +9,7 @@ import { freeRealVideoAPIs } from "./free-real-video-apis";
 import { tokenManager } from "./token-manager";
 import { realAIServices } from "./real-ai-services";
 import { freePublicAPIs } from "./free-public-apis";
-import { workingAISystem } from "./working-ai-system";
+import { definitiveAISystem } from "./definitive-ai-system";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -29,7 +29,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🎬 Starting REAL AI video generation with public APIs:', { prompt, aspectRatio, style });
 
-      const result = await workingAISystem.generate({
+      const result = await definitiveAISystem.generate({
         type: 'video',
         prompt,
         parameters: {
@@ -82,8 +82,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('🤖 Executing AI module:', { module, prompt });
 
-      // Use working AI system for execution
-      const result = await workingAISystem.generate({
+      // Use definitive AI system for execution
+      const result = await definitiveAISystem.generate({
         type: 'text',
         prompt: `Como assistente de IA especializado em marketing digital: ${prompt}`,
         parameters: {
@@ -171,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`🤖 Generating ${type} content with real AI services:`, prompt);
 
-      const result = await workingAISystem.generate({
+      const result = await definitiveAISystem.generate({
         type,
         prompt,
         parameters
@@ -216,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const copyPrompt = `Create ${copyType || 'professional'} copy for: ${prompt}. Make it compelling, persuasive, and action-oriented.`;
 
-      const result = await workingAISystem.generate({
+      const result = await definitiveAISystem.generate({
         type: 'text',
         prompt: copyPrompt,
         parameters: {
