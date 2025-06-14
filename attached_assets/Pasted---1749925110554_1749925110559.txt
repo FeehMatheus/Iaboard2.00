@@ -1,0 +1,69 @@
+################################################################################################
+###  PROMPT COMPLETO — AJUSTES FINAIS E FLUIDEZ DO IA BOARD  ###################################
+#  Objetivo: 1) Corrigir falhas de IA; 2) Remover redundâncias; 3) Aprimorar UX/UI e animações;
+#            4) Garantir módulo próprio e autônomo; 5) Trocar branding “Curiso” → “IA Board”.
+################################################################################################
+
+1. 🔄  **Scroll Automático de Módulos**
+    • Quando um bloco estiver em geração (estado `loading`), o canvas deve PAN até ele
+      automaticamente via `canvas.scrollIntoView({ behavior: "smooth", block: "center" })`.
+    • Ao terminar (`status=success`), o canvas volta ao centro anterior (persistir scrollPos).
+
+2. 🎞️  **Aprimorar Animações de Módulos**
+    • Adicionar `transform: scale(0.96) -> scale(1)` na criação (120 ms, ease-out).
+    • On-hover: leve `translateY(-3px)` e sombra `rgba(255,22,57,0.45)` (80 ms).
+    • On-connect (link drag): highlight bordo `#FF1639` pulsando (keyframes 0.3 s).
+
+3. 📑 **Menu Lateral Repensado**
+    • Transformar painel fixo em drawer ocultável (hambúrguer “☰” canto superior-esquerdo).
+    • Estado “fechado” → largura 0; “aberto” → 280 px; transição `width 220 ms ease`.
+    • Botão hambúrguer sticky (z-index 100).
+
+4. 🎨 **Cores Modernas (Tons Vermelho Tech)**
+    • Manter layout, mas trocar APENAS elementos DENTRO do canvas:
+      – Bordas dos blocos: `#FF1639 2px solid`.
+      – Pop-ups: fundo `#1b0008`, borda `#FF355D`.
+      – Linhas de conexão: gradiente `#FF355D -> #FF1639`.
+    • O painel lateral mantém as cores originais (neutras).
+
+5. 🧩 **Remover Redundância de Funções**
+    • Cada módulo deve fazer apenas sua especialidade:
+      – **IA Copy**  → copies/headlines somente.
+      – **IA Vídeo** → geração (Pika / Stability) somente.
+      – **IA Produto** → ficha e características de produto.
+      – **IA Tráfego Pago** → criativo + target.
+    • Se dois módulos geram mesmos dados, unifique e apague o redundante.
+
+6. 🔧 **IA não funciona como esperado — CORRIGIR**
+    • Verificar `.env` → todas keys válidas (OPENROUTER, MISTRAL, PERPLEXITY, etc).
+    • Cada chamada deve retornar ≥ 50 tokens técnicos; senão, lançar toast de erro HTTP.
+    • Lógica fallback proibida; se provider offline, mostrar motivo real.
+
+7. 🛠️ **Scroll Fluido no Canvas**
+    • Middle-mouse ou Shift+drag → panning com inércia (velocity * 0.9 / frame).
+    • Zoom wheel: ±20 % por notch; limite 10 %–500 % (ease-out 120 ms).
+
+8. 🖱️ **Menu de Contexto (Clique Direito)**
+    • Sobre canvas vazio → “Adicionar Módulo”, “Centralizar”, “Exportar”.
+    • Sobre bloco → “Renomear”, “Duplicar”, “Excluir”, “Reexecutar IA”.
+    • Usar listener `contextmenu`, suprimir menu default.
+
+9. 🏷️ **Rebranding Completo**
+    • Substituir qualquer referência “Curiso” por **“IA Board”** (logo, title, meta tags, manifest).
+    • Atualizar favicon (vermelho neon #FF1639).
+
+10. 📊 **Sistema de Progresso**
+    • Barra global (top 100 %) avançando: 10 % on-prompt, +40 % on-API response,
+      +50 % no render final. Reset ao concluir.
+
+11. ✅ **Checklist Final**
+    • Canvas zoom/scroll fluido.
+    • Drawer lateral retraível.
+    • Blocos animam e usam nova paleta.
+    • Módulos sem redundância, cada um com resposta IA técnica (> 50 tokens).
+    • Vídeo IA Pika/Stability retorna link .mp4 no popup, botão Download.
+    • `npm run health` → exit 0 / All providers OK.
+
+# Se qualquer item não cumprir os requisitos, refatore até estar perfeito.
+################################################################################################
+

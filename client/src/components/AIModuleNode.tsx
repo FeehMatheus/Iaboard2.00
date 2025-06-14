@@ -369,7 +369,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
         onResizeEnd={() => setIsResizing(false)}
       />
       
-      <Card className="w-full h-full bg-card border-border shadow-lg">
+      <Card className="w-full h-full bg-card border-2 border-red-500 shadow-lg transition-all duration-300 hover:shadow-red-500/45 hover:-translate-y-1 animate-in slide-in-from-bottom-4 duration-300">
         <CardHeader className="pb-3 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

@@ -18,7 +18,7 @@ import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles } from 'lucide-react';
+import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles, Menu } from 'lucide-react';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
@@ -272,6 +272,7 @@ function Flow() {
   }, []);
 
   const [contextMenu, setContextMenu] = useState<{x: number, y: number, nodeId?: string} | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
@@ -327,61 +328,80 @@ function Flow() {
       >
       <Background className="bg-background" />
       <Controls />
-      <Panel position="top-left" className="space-x-2">
-        <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 border">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">C</span>
-          </div>
-          <span className="text-sm font-medium">Curiso.ai</span>
-        </div>
+      {/* Hamburger Menu Button */}
+      <Panel position="top-left" className="z-50">
+        <Button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          size="sm"
+          variant="secondary"
+          className="bg-background/80 backdrop-blur-sm border"
+        >
+          <Menu className="h-4 w-4" />
+        </Button>
       </Panel>
-      <Panel position="top-right" className="space-x-2">
-        <div className="grid grid-cols-1 gap-1 bg-background/90 backdrop-blur-sm rounded-lg p-3 border shadow-lg max-w-xs">
-          <div className="text-xs font-semibold text-muted-foreground mb-2 text-center">CURISO AI MODULES</div>
-          
-          <div className="grid grid-cols-2 gap-1">
-            <Button onClick={addNode} size="sm" className="bg-primary hover:bg-primary/90 text-xs">
-              <MessageCirclePlus className="h-3 w-3 mr-1" />
-              Chat
-            </Button>
-            <Button onClick={addVideoNode} size="sm" className="bg-pink-600 hover:bg-pink-700 text-xs">
-              <Video className="h-3 w-3 mr-1" />
-              Vídeo
-            </Button>
+
+      {/* Collapsible Sidebar */}
+      <div 
+        className={`fixed top-0 left-0 h-full bg-background/95 backdrop-blur-sm border-r transition-all duration-300 z-40 ${
+          sidebarOpen ? 'w-80' : 'w-0 overflow-hidden'
+        }`}
+      >
+        <div className="p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">IA</span>
+              </div>
+              <span className="text-sm font-medium">IA Board</span>
+            </div>
           </div>
 
-          <div className="text-xs font-medium text-muted-foreground mt-2 mb-1">MÓDULOS IA:</div>
-          <div className="grid grid-cols-1 gap-1">
-            <Button onClick={() => addAIModule('ia-copy')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-              <PenTool className="h-3 w-3 mr-1" />
-              IA Copy
-            </Button>
-            <Button onClick={() => addAIModule('ia-video')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-              <Video className="h-3 w-3 mr-1" />
-              IA Vídeo
-            </Button>
-            <Button onClick={() => addAIModule('ia-produto')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-              <Package className="h-3 w-3 mr-1" />
-              IA Produto
-            </Button>
-            <Button onClick={() => addAIModule('ia-trafego')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-              <Target className="h-3 w-3 mr-1" />
-              IA Tráfego
-            </Button>
-            <Button onClick={() => addAIModule('ia-analytics')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-              <BarChart3 className="h-3 w-3 mr-1" />
-              IA Analytics
-            </Button>
-          </div>
+          <div className="space-y-3">
+            <div className="text-xs font-medium text-muted-foreground mb-2">ADICIONAR:</div>
+            <div className="grid grid-cols-2 gap-1">
+              <Button onClick={addNode} size="sm" className="bg-primary hover:bg-primary/90 text-xs">
+                <MessageCirclePlus className="h-3 w-3 mr-1" />
+                Chat
+              </Button>
+              <Button onClick={addVideoNode} size="sm" className="bg-pink-600 hover:bg-pink-700 text-xs">
+                <Video className="h-3 w-3 mr-1" />
+                Vídeo
+              </Button>
+            </div>
 
-          {selectedNodes.length > 0 && (
-            <Button onClick={delNode} size="sm" variant="destructive" className="mt-2 text-xs">
-              <Trash2 className="h-3 w-3 mr-1" />
-              Delete ({selectedNodes.length})
-            </Button>
-          )}
+            <div className="text-xs font-medium text-muted-foreground mt-4 mb-1">MÓDULOS IA:</div>
+            <div className="grid grid-cols-1 gap-1">
+              <Button onClick={() => addAIModule('ia-copy')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+                <PenTool className="h-3 w-3 mr-1" />
+                IA Copy
+              </Button>
+              <Button onClick={() => addAIModule('ia-video')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+                <Video className="h-3 w-3 mr-1" />
+                IA Vídeo
+              </Button>
+              <Button onClick={() => addAIModule('ia-produto')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+                <Package className="h-3 w-3 mr-1" />
+                IA Produto
+              </Button>
+              <Button onClick={() => addAIModule('ia-trafego')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+                <Target className="h-3 w-3 mr-1" />
+                IA Tráfego
+              </Button>
+              <Button onClick={() => addAIModule('ia-analytics')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
+                <BarChart3 className="h-3 w-3 mr-1" />
+                IA Analytics
+              </Button>
+            </div>
+
+            {selectedNodes.length > 0 && (
+              <Button onClick={delNode} size="sm" variant="destructive" className="mt-4 text-xs w-full">
+                <Trash2 className="h-3 w-3 mr-1" />
+                Delete ({selectedNodes.length})
+              </Button>
+            )}
+          </div>
         </div>
-      </Panel>
+      </div>
       
       {/* Context Menu */}
       {contextMenu && (
