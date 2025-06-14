@@ -18,7 +18,7 @@ import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles, Menu } from 'lucide-react';
+import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles, Menu, X } from 'lucide-react';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
@@ -460,7 +460,7 @@ function Flow() {
           )}
         </div>
       )}
-    </ReactFlow>
+      </ReactFlow>
     </div>
   );
 }

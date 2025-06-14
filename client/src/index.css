@@ -47,10 +47,84 @@
     @apply bg-gradient-to-r from-orange-400 via-red-500 to-purple-600 bg-clip-text text-transparent;
   }
 
+  /* Enhanced animations and fluidity for IA Board */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px) scale(1.02);
+    filter: brightness(1.1);
+  }
+
+  .smooth-entrance {
+    animation: smoothEntrance 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .pulse-red {
+    animation: pulseRed 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .fluid-scroll {
+    scroll-behavior: smooth;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .tech-border {
+    border: 2px solid;
+    border-image: linear-gradient(45deg, #FF1639, #FF4066, #FF1639) 1;
+    animation: borderFlow 3s linear infinite;
+  }
+
   .quantum-glow {
     box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
   }
+}
 
+/* Keyframes for IA Board animations */
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px #FF1639, 0 0 10px #FF1639, 0 0 15px #FF1639;
+  }
+  to {
+    box-shadow: 0 0 10px #FF1639, 0 0 20px #FF1639, 0 0 30px #FF1639;
+  }
+}
+
+@keyframes smoothEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulseRed {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes borderFlow {
+  0% {
+    border-image-source: linear-gradient(45deg, #FF1639, #FF4066, #FF1639);
+  }
+  50% {
+    border-image-source: linear-gradient(45deg, #FF4066, #FF1639, #FF4066);
+  }
+  100% {
+    border-image-source: linear-gradient(45deg, #FF1639, #FF4066, #FF1639);
+  }
   .supreme-glow {
     box-shadow: 0 0 20px rgba(251, 146, 60, 0.3);
   }
