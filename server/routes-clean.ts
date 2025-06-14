@@ -8,6 +8,8 @@ import OpenAI from "openai";
 import { freeRealVideoAPIs } from "./free-real-video-apis";
 import { tokenManager } from "./token-manager";
 import { realAIServices } from "./real-ai-services";
+import { freePublicAPIs } from "./free-public-apis";
+import { workingAISystem } from "./working-ai-system";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -165,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`🤖 Generating ${type} content with real AI services:`, prompt);
 
-      const result = await realAIServices.generate({
+      const result = await workingAISystem.generate({
         type,
         prompt,
         parameters
@@ -210,7 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const copyPrompt = `Create ${copyType || 'professional'} copy for: ${prompt}. Make it compelling, persuasive, and action-oriented.`;
 
-      const result = await realAIServices.generate({
+      const result = await freePublicAPIs.generateContent({
         type: 'text',
         prompt: copyPrompt,
         parameters: {
