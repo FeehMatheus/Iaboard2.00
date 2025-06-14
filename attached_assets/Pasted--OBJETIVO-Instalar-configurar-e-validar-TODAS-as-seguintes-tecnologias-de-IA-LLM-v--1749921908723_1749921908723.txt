@@ -1,0 +1,101 @@
+# === OBJETIVO ===
+Instalar, configurar e validar **TODAS** as seguintes tecnologias de IA (LLM, vídeo, voz-TTS, formulários) no IA Board.
+Caso algum módulo falhe, recrie a estrutura necessária até obter 100 % de funcionamento real (sem fallbacks).
+
+# === VARIÁVEIS .ENV (copiar exatamente) ===
+OPENROUTER_API_KEY=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
+MISTRAL_API_KEY=7lCXEIqFPbgj7VUb7jAf9OY5Id93lJCH
+STABILITY_API_KEY=sk-hElW1SRtTMGE2N8QmHWMQFfc21fRc6qF0wSyAKFdb1ukwJEy
+TYPEFORM_API_KEY=tfp_AdtBqVmwpmNj7YhHw7DhBEd2Yko3mDQ115dy2xL1B5sV_3pdYcugRXA7TDK
+HEYGEN_API_KEY=ZGY5MGJkOWM0OTE4NGVlODgyNjViNjhjNGUyM2Y2MDItMTc0OTkyMTQwNg==
+# GOOGLE TTS usa Application-Default Credentials (ADC). Configure gcloud abaixo.
+
+# === PASSOS TÉCNICOS ===
+
+1. **LLM MULTI-PROVEDOR (OpenRouter)**
+   - Endpoint compatível OpenAI: https://openrouter.ai/api/v1/chat/completions
+   - Modelos mínimos: gpt-4o, claude-3-sonnet-20240229, gemini-1.5-pro
+   - Header → `Authorization: Bearer $OPENROUTER_API_KEY`
+   - Teste: prompt “Teste técnico IA Board” devolvendo ≥ 50 tokens.
+
+2. **MISTRAL LARGE**
+   - Base URL: https://api.mistral.ai/v1/chat/completions
+   - Header → `Authorization: Bearer $MISTRAL_API_KEY`
+   - Modelo: mistral-large
+   - Validar resposta ≥ 50 tokens.
+
+3. **VÍDEO IA – Stability Video β**
+POST https://api.stability.ai/v2beta/video/generate
+Headers:
+Authorization: Bearer $STABILITY_API_KEY
+Content-Type: application/json
+Body:
+{
+"prompt": "Cinematic drone shot of neo-tokyo at sunset, 4k",
+"seed": 42
+}
+
+bash
+Copiar
+Editar
+- Poll até `status: completed`.
+- Baixar `.mp4` → exibir em popup IA Board.
+
+4. **AVATAR FALANTE – HeyGen API**
+- Base URL: https://api.heygen.com/v1/video.generate
+- Header → `X-Api-Key: $HEYGEN_API_KEY`
+- Use avatar default + voz PT-BR; salvar link de vídeo no canvas.
+
+5. **FORMULÁRIOS DINÂMICOS – Typeform**
+- Endpoint: https://api.typeform.com/forms
+- Header → `Authorization: Bearer $TYPEFORM_API_KEY`
+- Criar formulário “Feedback IA Board” com 2 campos (Nome, Opinião).
+
+6. **GOOGLE TTS – Texto → Áudio (MP3)**
+- Configure gcloud ADC:
+  ```bash
+  gcloud auth application-default login
+  gcloud config set project <PROJECT_ID>
+  ```
+- Exemplo de chamada (substitua PROJECT_ID):
+  ```
+  POST https://texttospeech.googleapis.com/v1/text:synthesize?key=$GOOGLE_API_KEY
+  {
+    "input": { "text": "Olá! Este áudio foi gerado pela IA Board." },
+    "voice": { "languageCode": "pt-BR", "name": "pt-BR-Wavenet-A", "ssmlGender": "FEMALE" },
+    "audioConfig": { "audioEncoding": "MP3" }
+  }
+  ```
+- Reproduzir e permitir download do `.mp3` no bloco de áudio.
+
+7. **INTEGRAÇÃO NO CURISO (CANVAS)**
+- Cada módulo acima se torna um **bloco IA**:
+  • 🌐 LLM (multi-modelo)  
+  • 🎞️ Vídeo (Stability)  
+  • 🗣️ Avatar (HeyGen)  
+  • 🔊 TTS (Google)  
+  • 📋 Form (Typeform)
+- Dropdown de seleção de modelo ou serviço em cada bloco.
+- Salvar estado no localStorage/IndexedDB.
+
+8. **TESTE AUTOMATIZADO (`npm run healthcheck`)**
+- Verificar:
+  • LLM responde ≥ 50 tokens  
+  • Stability devolve link `.mp4` válido (HTTP 200)  
+  • HeyGen gera vídeo status “done”  
+  • Google TTS retorna `audioContent` base64 ≠ vazio  
+  • Typeform cria form e retorna id  
+- Se qualquer teste falhar → retornar exit 1.
+
+9. **LOGS**
+- `logs/ai.log` para LLMs (+ latência & custo)
+- `logs/video.log` para Stability/HeyGen
+- `logs/tts.log` para Google TTS
+- `logs/webhook.log` para Typeform
+
+10. **ENTREGA**
+ - IA Board rodando local (`npm run dev`) e desktop (`npm run desktop`)
+ - `.env.example` com placeholders
+ - README atualizado ❤️
+
+# Se qualquer etapa não atingir 100 % de êxito, refatore até passar em `npm run healthcheck`.
