@@ -514,14 +514,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Health check
-  app.get('/api/health', (req, res) => {
-    res.json({ 
-      success: true, 
-      message: 'IA Board API is running',
-      timestamp: new Date().toISOString()
-    });
-  });
-
   return httpServer;
 }
