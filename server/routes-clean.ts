@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { spawn } from "child_process";
 import fs from "fs/promises";
@@ -17,6 +18,23 @@ const openai = new OpenAI({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
+
+  // Serve AI-generated content with proper MIME types
+  app.use('/ai-content', (req, res, next) => {
+    const filePath = path.join(process.cwd(), 'public', 'ai-content', req.path);
+    
+    if (req.path.endsWith('.mp4')) {
+      res.set('Content-Type', 'video/mp4');
+    } else if (req.path.endsWith('.svg')) {
+      res.set('Content-Type', 'image/svg+xml');
+    } else if (req.path.endsWith('.mp3')) {
+      res.set('Content-Type', 'audio/mpeg');
+    }
+    
+    next();
+  });
+  
+  app.use('/ai-content', express.static(path.join(process.cwd(), 'public', 'ai-content')));
 
   // AI Module Execution
   app.post('/api/ai/module/execute', async (req, res) => {
