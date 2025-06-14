@@ -274,7 +274,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
         estimatedDuration: stepsWithIds.length * 45,
         enableRealTimeUpdates: true
       },
-      stepsWithIds
+      stepsWithIds as any
     );
 
     // Execute steps sequentially
@@ -448,7 +448,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
               <label className="text-xs text-muted-foreground mb-1 block">
                 Template de Workflow:
               </label>
-              <Select value={workflowTemplate} onValueChange={setWorkflowTemplate}>
+              <Select value={workflowTemplate} onValueChange={(value: any) => setWorkflowTemplate(value)}>
                 <SelectTrigger className="h-8 text-sm">
                   <SelectValue />
                 </SelectTrigger>
@@ -579,17 +579,28 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
             {isExecuting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Executando {config.name}...
+                {progressMode ? "Executando Workflow..." : `Executando ${config.name}...`}
               </>
             ) : (
               <>
-                <Play className="h-4 w-4 mr-2" />
-                Executar {config.name}
+                {progressMode ? <Sparkles className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                {progressMode ? "Iniciar Workflow" : `Executar ${config.name}`}
               </>
             )}
           </Button>
         </CardFooter>
       </Card>
+
+      {/* Progress Visualization for workflows */}
+      {progressMode && (
+        <ProgressVisualization
+          steps={steps}
+          currentStep={currentStep}
+          isActive={isActive}
+          onCancel={cancelProgress}
+          onRetry={(stepId) => retryStep(stepId)}
+        />
+      )}
 
       {/* Connection Handles */}
       <Handle

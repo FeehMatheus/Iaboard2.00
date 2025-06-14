@@ -319,10 +319,6 @@ function Flow() {
 
           <div className="text-xs font-medium text-muted-foreground mt-2 mb-1">ADVANCED AI:</div>
           <div className="grid grid-cols-1 gap-1">
-            <Button onClick={() => setLocation('/progress')} size="sm" className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-xs justify-start">
-              <Sparkles className="h-3 w-3 mr-1" />
-              Progress Studio
-            </Button>
             <Button onClick={() => addAIModule('ia-total')} size="sm" className="bg-purple-600 hover:bg-purple-700 text-xs justify-start">
               <Brain className="h-3 w-3 mr-1" />
               IA Total™
