@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import SmartGuidance from '@/components/SmartGuidance';
 import CurisoOriginal from '@/pages/CurisoOriginal';
+import ProgressDemo from '@/pages/ProgressDemo';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +26,7 @@ export default function App() {
   const getCurrentContext = () => {
     if (location === '/board') return 'board';
     if (location === '/dashboard') return 'dashboard';
+    if (location === '/progress') return 'progress';
     return 'landing';
   };
 
@@ -34,6 +36,7 @@ export default function App() {
         <div className="min-h-screen bg-background">
           <Switch>
             <Route path="/" component={CurisoOriginal} />
+            <Route path="/progress" component={ProgressDemo} />
             <Route>
               <CurisoOriginal />
             </Route>
