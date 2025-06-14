@@ -10,7 +10,7 @@ import { advancedAIService } from "./advanced-ai-service";
 import { videoGenerationService } from "./video-generation-service";
 import { pikaLabsService } from "./pika-labs-service";
 import { internalVideoGenerator } from "./internal-video-generator";
-import { simpleThumbnailGenerator } from "./simple-thumbnail-generator";
+import { cssBasedThumbnailGenerator } from "./css-thumbnail-generator";
 import { aiModuleExecutor } from "./ai-module-executor";
 
 const openai = new OpenAI({
@@ -1734,7 +1734,7 @@ Make the content professional, persuasive, and conversion-focused.`;
         return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
       }
 
-      const result = await simpleThumbnailGenerator.generateThumbnail({
+      const result = await cssBasedThumbnailGenerator.generateThumbnail({
         prompt,
         aspectRatio: aspectRatio as '16:9' | '9:16' | '1:1',
         style
