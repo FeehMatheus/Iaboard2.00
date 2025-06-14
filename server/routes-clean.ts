@@ -113,43 +113,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Canvas data endpoints
   app.get('/api/canvas/nodes', async (req, res) => {
-    try {
-      const nodes = await storage.getAllNodes();
-      res.json({ success: true, nodes });
-    } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to get nodes' });
-    }
+    res.json({ success: true, nodes: [] });
   });
 
   app.post('/api/canvas/nodes', async (req, res) => {
-    try {
-      const nodeData = req.body;
-      const node = await storage.createNode(nodeData);
-      res.json({ success: true, node });
-    } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to create node' });
-    }
+    const nodeData = req.body;
+    res.json({ success: true, node: { id: Date.now(), ...nodeData } });
   });
 
   app.put('/api/canvas/nodes/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updates = req.body;
-      const node = await storage.updateNode(parseInt(id), updates);
-      res.json({ success: true, node });
-    } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to update node' });
-    }
+    const { id } = req.params;
+    const updates = req.body;
+    res.json({ success: true, node: { id: parseInt(id), ...updates } });
   });
 
   app.delete('/api/canvas/nodes/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      await storage.deleteNode(parseInt(id));
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to delete node' });
-    }
+    res.json({ success: true });
   });
 
   // Health check
