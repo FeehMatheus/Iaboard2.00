@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { nanoid } from 'nanoid';
-import { simpleVideoGenerator } from './simple-video-generator';
+import { realVideoGenerator } from './real-video-generator';
 
 interface UltimateAIRequest {
   prompt: string;
@@ -322,7 +322,7 @@ Esta estratégia foi desenvolvida especificamente para "${subject}" considerando
     console.log('🎬 ULTIMATE AI: Generating real video for:', request.prompt);
     
     try {
-      const videoUrl = await simpleVideoGenerator.generateVideo(request.prompt, {
+      const videoUrl = await realVideoGenerator.generateVideo(request.prompt, {
         duration: request.parameters?.duration || 5,
         width: 1280,
         height: 720
