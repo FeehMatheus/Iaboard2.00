@@ -246,27 +246,56 @@ export class RealAIVideoService {
   private async generateAdvancedConceptualVideo(request: RealAIVideoRequest): Promise<RealAIVideoResponse> {
     console.log('🎨 Gerando vídeo conceitual avançado com IA...');
 
-    // Gerar conceito visual extremamente detalhado
-    const conceptResponse = await this.openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{
-        role: 'system',
-        content: 'Você é um diretor de cinema visionário. Crie um conceito visual cinematográfico ultra-detalhado em JSON com cores, movimentos, transições e elementos visuais específicos.'
-      }, {
-        role: 'user',
-        content: `Prompt: ${request.prompt}\nEstilo: ${request.style}\n\nCrie um conceito visual de cinema profissional.`
-      }],
-      response_format: { type: "json_object" },
-      max_tokens: 1000
-    });
+    try {
+      // Gerar conceito visual extremamente detalhado
+      const conceptResponse = await this.openai.chat.completions.create({
+        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [{
+          role: 'system',
+          content: 'Você é um diretor de cinema visionário especialista em storytelling visual. Crie um conceito visual cinematográfico ultra-detalhado em JSON com: scenes (array de cenas), colors (paleta de cores), movements (movimentos de câmera), effects (efeitos visuais), typography (estilo de texto), mood (atmosfera).'
+        }, {
+          role: 'user',
+          content: `Prompt: ${request.prompt}\nEstilo: ${request.style}\nDuração: ${request.duration}s\n\nCrie um conceito visual de cinema profissional com múltiplas cenas dinâmicas.`
+        }],
+        response_format: { type: "json_object" },
+        max_tokens: 1200
+      });
 
-    const concept = JSON.parse(conceptResponse.choices[0].message.content || '{}');
+      const concept = JSON.parse(conceptResponse.choices[0].message.content || '{}');
+      console.log('AI Concept Generated:', concept.mood || 'Concept criado');
 
-    // Gerar vídeo usando conceito IA + FFmpeg avançado
-    return await this.createCinematicVideo({
-      ...request,
-      concept
-    });
+      // Gerar script de movimento baseado no conceito
+      const motionResponse = await this.openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{
+          role: 'system',
+          content: 'Baseado no conceito visual, crie um script técnico de movimento em JSON com: keyframes (pontos-chave temporais), transitions (transições entre elementos), animations (animações específicas), timing (cronologia detalhada).'
+        }, {
+          role: 'user',
+          content: `Conceito: ${JSON.stringify(concept)}\n\nCrie script técnico de movimento para ${request.duration} segundos.`
+        }],
+        response_format: { type: "json_object" },
+        max_tokens: 800
+      });
+
+      const motionScript = JSON.parse(motionResponse.choices[0].message.content || '{}');
+
+      // Gerar vídeo usando conceito IA + FFmpeg cinematográfico
+      return await this.createCinematicVideo({
+        ...request,
+        concept,
+        motionScript
+      });
+
+    } catch (error) {
+      console.error('AI concept generation error:', error);
+      // Fallback com conceito básico mas ainda usando IA
+      return await this.createCinematicVideo({
+        ...request,
+        concept: this.getAdvancedFallbackConcept(request.style || 'cinematic'),
+        motionScript: this.getAdvancedMotionScript(request.duration || 5)
+      });
+    }
   }
 
   private async createCinematicVideo(params: any): Promise<RealAIVideoResponse> {

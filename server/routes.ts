@@ -11,6 +11,7 @@ import { videoGenerationService } from "./video-generation-service";
 import { pikaLabsService } from "./pika-labs-service";
 import { internalVideoGenerator } from "./internal-video-generator";
 import { cssBasedThumbnailGenerator } from "./css-thumbnail-generator";
+import { realAIVideoService } from "./real-ai-video-service";
 import { aiModuleExecutor } from "./ai-module-executor";
 
 const openai = new OpenAI({
@@ -1654,41 +1655,85 @@ Make the content professional, persuasive, and conversion-focused.`;
     }
   });
 
-  // Pika Labs video generation routes
+  // Real AI Video Generation
   app.post('/api/pika/generate', async (req, res) => {
     try {
-      const { prompt, aspectRatio = '16:9', style = 'cinematic' } = req.body;
+      const { prompt, aspectRatio = '16:9', style = 'cinematic', duration = 5 } = req.body;
       
       if (!prompt) {
         return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
       }
 
-      // Generate video directly using internal generator
-      const result = await internalVideoGenerator.generateVideo({
+      console.log('🤖 Generating REAL AI video:', { prompt, aspectRatio, style });
+
+      // Force real AI video generation - no fallbacks to basic generators
+      const result = await realAIVideoService.generateRealAIVideo({
         prompt,
         aspectRatio: aspectRatio as '16:9' | '9:16' | '1:1',
-        duration: 5,
-        style
+        style,
+        duration
       });
 
       if (result.success) {
-        res.json({
-          success: true,
-          videoUrl: result.videoUrl,
-          downloadUrl: result.downloadUrl,
-          metadata: result.metadata
-        });
+        if (result.status === 'processing') {
+          res.json({
+            success: true,
+            status: 'processing',
+            taskId: result.taskId,
+            provider: result.provider,
+            message: 'Vídeo AI sendo gerado. Use o taskId para verificar o progresso.'
+          });
+        } else {
+          res.json({
+            success: true,
+            videoUrl: result.videoUrl,
+            downloadUrl: result.videoUrl,
+            provider: result.provider,
+            metadata: {
+              prompt,
+              duration,
+              aspectRatio,
+              style,
+              provider: result.provider
+            }
+          });
+        }
       } else {
         res.status(500).json({
           success: false,
-          error: result.error
+          error: result.error || 'Falha na geração do vídeo AI'
         });
       }
     } catch (error) {
-      console.error('Pika Labs error:', error);
+      console.error('Real AI video generation error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Erro interno na geração de vídeo AI' 
+      });
+    }
+  });
+
+  // Check AI video generation status
+  app.get('/api/pika/status/:taskId', async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const { provider } = req.query;
+      
+      if (!taskId || !provider) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'TaskId e provider são obrigatórios' 
+        });
+      }
+
+      const result = await realAIVideoService.checkGenerationStatus(taskId, provider as string);
+
+      res.json(result);
+    } catch (error) {
+      console.error('Status check error:', error);
       res.status(500).json({
         success: false,
-        error: 'Erro interno do servidor'
+        error: 'Erro ao verificar status da geração'
       });
     }
   });
