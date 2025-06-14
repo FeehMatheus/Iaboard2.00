@@ -23,6 +23,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { ProgressVisualization } from './ProgressVisualization';
 import { DynamicProgressVisualization } from './DynamicProgressVisualization';
+import { AdvancedProgressDashboard } from './AdvancedProgressDashboard';
 import { useProgressTracking } from '../hooks/useProgressTracking';
 import {
   Select,
@@ -286,6 +287,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
   }, [prompt, workflowTemplate, startProgress, executeStep, nextStep, generatedContent, toast]);
 
   const [showProgressVisualization, setShowProgressVisualization] = useState(false);
+  const [progressVisualizationMode, setProgressVisualizationMode] = useState<'simple' | 'advanced' | 'minimal'>('simple');
 
   const executeModule = async () => {
     if (progressMode) {
@@ -457,6 +459,25 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
             </div>
           )}
 
+          {/* Progress Visualization Mode (when not in progress mode) */}
+          {!progressMode && (
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">
+                Visualização de Progresso:
+              </label>
+              <Select value={progressVisualizationMode} onValueChange={(value: any) => setProgressVisualizationMode(value)}>
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="simple">Simples</SelectItem>
+                  <SelectItem value="advanced">Avançado</SelectItem>
+                  <SelectItem value="minimal">Mínimo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div>
             <label className="text-xs text-muted-foreground mb-1 block">
               {progressMode ? "Prompt Principal:" : "Prompt / Parâmetros:"}
@@ -586,11 +607,27 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
       {/* Dynamic Progress Visualization (Standard Mode) */}
       {!progressMode && showProgressVisualization && (
         <div className="absolute top-full left-0 mt-2 z-50">
-          <DynamicProgressVisualization
-            moduleType={moduleType}
-            isActive={isExecuting}
-            onComplete={() => setShowProgressVisualization(false)}
-          />
+          {progressVisualizationMode === 'advanced' ? (
+            <AdvancedProgressDashboard
+              moduleType={moduleType}
+              isActive={isExecuting}
+              onComplete={() => setShowProgressVisualization(false)}
+              showDetailedMetrics={true}
+            />
+          ) : progressVisualizationMode === 'simple' ? (
+            <DynamicProgressVisualization
+              moduleType={moduleType}
+              isActive={isExecuting}
+              onComplete={() => setShowProgressVisualization(false)}
+            />
+          ) : (
+            <div className="bg-background border border-border rounded-lg p-3 shadow-lg">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium">Processando {moduleType.replace('-', ' ').toUpperCase()}...</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
