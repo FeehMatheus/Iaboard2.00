@@ -11,6 +11,7 @@ export function NavigationHeader() {
     { path: '/canvas', label: 'Quadro Infinito', icon: Grid3X3 },
     { path: '/board', label: 'Board Original', icon: Target },
     { path: '/supreme', label: 'Supreme AI', icon: Brain },
+    { path: '/ia-board-supreme', label: 'IA Board Supreme', icon: Zap },
   ];
 
   return (

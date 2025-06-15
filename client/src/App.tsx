@@ -7,6 +7,7 @@ import Board from "./pages/Board";
 import AdvancedBoard from "./pages/AdvancedBoard";
 import SupremeFurionDashboard from "./pages/SupremeFurionDashboard";
 import InfiniteCanvasPage from "./pages/InfiniteCanvasPage";
+import IABoardSupremePage from "./pages/IABoardSupremePage";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="/advanced-board" component={AdvancedBoard} />
             <Route path="/supreme" component={SupremeFurionDashboard} />
             <Route path="/canvas" component={InfiniteCanvasPage} />
+            <Route path="/ia-board-supreme" component={IABoardSupremePage} />
             <Route>
               <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center bg-black/40 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
