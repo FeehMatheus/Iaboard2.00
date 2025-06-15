@@ -402,29 +402,121 @@ class SmartLLMSystem {
     };
   }
 
-  private async executeGroq(provider: ProviderConfig, request: SmartLLMRequest): Promise<SmartLLMResponse> {
-    const openai = new OpenAI({
-      apiKey: process.env.GROQ_API_KEY,
-      baseURL: provider.baseUrl,
+  private async executeAnthropic(provider: ProviderConfig, request: SmartLLMRequest): Promise<SmartLLMResponse> {
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
-    const response = await openai.chat.completions.create({
+    const response = await anthropic.messages.create({
       model: provider.models[0],
+      max_tokens: request.maxTokens || 1500,
+      system: request.systemPrompt || '',
       messages: [
-        ...(request.systemPrompt ? [{ role: 'system' as const, content: request.systemPrompt }] : []),
-        { role: 'user' as const, content: request.prompt }
+        { role: 'user', content: request.prompt }
       ],
-      max_tokens: request.maxTokens || 3000,
       temperature: request.temperature || 0.7,
     });
 
+    const content = response.content[0].type === 'text' ? response.content[0].text : '';
+
     return {
       success: true,
-      content: response.choices[0].message.content || '',
-      provider: 'groq',
+      content,
+      provider: 'anthropic',
       model: provider.models[0],
       latency: 0,
-      tokensUsed: response.usage?.total_tokens || 0
+      tokensUsed: response.usage.input_tokens + response.usage.output_tokens
+    };
+  }
+
+  private async executeStabilityVideo(provider: ProviderConfig, request: VideoRequest): Promise<VideoResponse> {
+    const response = await fetch(`${provider.baseUrl}/image-to-video`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.STABILITY_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: request.prompt,
+        duration: request.duration || 5,
+        aspect_ratio: request.aspectRatio || "16:9",
+        seed: Math.floor(Math.random() * 1000000)
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Stability API error: ${response.status}`);
+    }
+
+    const videoBuffer = await response.arrayBuffer();
+    const fileName = `video-${Date.now()}.mp4`;
+    const filePath = path.join(process.cwd(), 'public', 'downloads', fileName);
+    
+    fs.writeFileSync(filePath, Buffer.from(videoBuffer));
+
+    return {
+      success: true,
+      videoUrl: `/downloads/${fileName}`
+    };
+  }
+
+  private async executePikaVideo(provider: ProviderConfig, request: VideoRequest): Promise<VideoResponse> {
+    const response = await fetch(`${provider.baseUrl}/generate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.PIKA_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: request.prompt,
+        style: request.style || 'realistic'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Pika API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return {
+      success: true,
+      videoUrl: data.video_url || `/downloads/video-fallback-${Date.now()}.mp4`
+    };
+  }
+
+  private async executeElevenLabsTTS(provider: ProviderConfig, request: TTSRequest): Promise<TTSResponse> {
+    const voiceId = 'EXAVITQu4vr4xnSDxMaL'; // Default voice
+    
+    const response = await fetch(`${provider.baseUrl}/text-to-speech/${voiceId}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': process.env.ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: request.text,
+        model_id: 'eleven_monolingual_v1',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.5
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`ElevenLabs API error: ${response.status}`);
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const fileName = `audio-${Date.now()}.mp3`;
+    const filePath = path.join(process.cwd(), 'public', 'downloads', fileName);
+    
+    fs.writeFileSync(filePath, Buffer.from(audioBuffer));
+
+    return {
+      success: true,
+      audioUrl: `/downloads/${fileName}`
     };
   }
 

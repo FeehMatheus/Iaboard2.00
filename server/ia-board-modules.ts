@@ -25,14 +25,14 @@ router.post('/api/ia-copy/generate', async (req, res) => {
     }
 
     const aiResult = await smartLLM.smartLLM({
-      prompt: `Crie copy persuasivo completo para: ${prompt}. 
+      prompt: `Crie copy persuasivo para: ${prompt}. 
       Nicho: ${niche}
       Público: ${targetAudience}
       Objetivo: ${objective}
       
-      Inclua: headlines magnéticos, bullets irresistíveis, prova social, CTAs poderosos, ofertas irresistíveis com urgência e escassez.`,
-      systemPrompt: 'Você é um copywriter mundial especialista em vendas com 20 anos de experiência. Crie copy persuasivo de alta conversão em português brasileiro.',
-      maxTokens: 1500
+      Inclua: headlines, bullets, prova social, CTAs, ofertas com urgência.`,
+      systemPrompt: 'Você é um copywriter especialista. Crie copy persuasivo de alta conversão em português brasileiro.',
+      maxTokens: 600
     });
 
     if (!aiResult.success) {
