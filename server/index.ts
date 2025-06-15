@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { registerRoutes } from "./routes-clean";
 import youtubeRoutes from "./routes";
 import enhancedRoutes from "./enhanced-routes";
+import realAIRoutes from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables

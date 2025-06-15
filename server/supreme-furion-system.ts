@@ -480,24 +480,25 @@ Foque em conversão e retenção.
 
   private async callAI(prompt: string): Promise<string> {
     try {
-      if (this.anthropic) {
-        const response = await this.anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4000,
-          messages: [{ role: 'user', content: prompt }],
-          system: 'Você é um especialista em criação de produtos digitais e marketing. Forneça respostas detalhadas, práticas e executáveis.'
-        });
-        return response.content[0].text;
-      } else if (this.openai) {
+      // Prioritize OpenAI since Anthropic credits are low
+      if (this.openai) {
         const response = await this.openai.chat.completions.create({
           model: 'gpt-4o',
           messages: [
-            { role: 'system', content: 'Você é um especialista em criação de produtos digitais e marketing. Forneça respostas detalhadas, práticas e executáveis.' },
+            { role: 'system', content: 'Você é um especialista em criação de produtos digitais e marketing. Forneça respostas detalhadas, práticas e executáveis em português.' },
             { role: 'user', content: prompt }
           ],
           max_tokens: 4000,
         });
         return response.choices[0].message.content || '';
+      } else if (this.anthropic) {
+        const response = await this.anthropic.messages.create({
+          model: 'claude-3-sonnet-20240229',
+          max_tokens: 4000,
+          messages: [{ role: 'user', content: prompt }],
+          system: 'Você é um especialista em criação de produtos digitais e marketing. Forneça respostas detalhadas, práticas e executáveis.'
+        });
+        return response.content[0].text;
       } else {
         throw new Error('Nenhuma API de IA configurada');
       }
