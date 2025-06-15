@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import { registerRoutes } from "./routes-clean";
 import youtubeRoutes from "./routes";
 import enhancedRoutes from "./enhanced-routes";
-import realAIRoutes from "./routes";
+import aiModuleRoutes from "./ai-module-routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -49,6 +49,9 @@ app.use((req, res, next) => {
   
   // Add enhanced AI routes
   app.use(enhancedRoutes);
+  
+  // Add hybrid AI module routes (priority)
+  app.use(aiModuleRoutes);
   
   const server = await registerRoutes(app);
 
