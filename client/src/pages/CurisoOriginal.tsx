@@ -362,8 +362,18 @@ function Flow() {
         onNodeContextMenu={handleNodeContextMenu}
         onPaneClick={() => setContextMenu(null)}
       >
-      <Background className="bg-background" />
-      <Controls />
+      <Background 
+        gap={20} 
+        size={1}
+        className="opacity-30"
+        color="#6366f1"
+      />
+      <Controls 
+        className="bg-background/80 backdrop-blur-sm border rounded-lg shadow-lg"
+        showZoom={true}
+        showFitView={true}
+        showInteractive={true}
+      />
       {/* Hamburger Menu Button */}
       <Panel position="top-left" className="z-50">
         <Button
@@ -376,70 +386,118 @@ function Flow() {
         </Button>
       </Panel>
 
-      {/* Collapsible Sidebar */}
+      {/* Enhanced Collapsible Sidebar */}
       <div 
-        className={`fixed top-0 left-0 h-full bg-background/95 backdrop-blur-sm border-r transition-all duration-300 z-40 ${
+        className={`fixed top-0 left-0 h-full bg-gradient-to-b from-background/98 via-background/95 to-background/98 backdrop-blur-xl border-r border-border/50 transition-all duration-300 z-40 shadow-2xl ${
           sidebarOpen ? 'w-80' : 'w-0 overflow-hidden'
         }`}
       >
-        <div className="p-4 space-y-4">
+        <div className="p-6 space-y-6">
+          {/* Header */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">IA</span>
               </div>
-              <span className="text-sm font-medium">IA Board</span>
+              <div>
+                <h2 className="text-base font-semibold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">IA Board</h2>
+                <p className="text-xs text-muted-foreground">Infinite Canvas</p>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-3">
-            <div className="text-xs font-medium text-muted-foreground mb-2">ADICIONAR:</div>
-            <div className="grid grid-cols-2 gap-1">
-              <Button onClick={addNode} size="sm" className="bg-primary hover:bg-primary/90 text-xs">
+          {/* Quick Actions */}
+          <div className="space-y-4">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Quick Add</div>
+            <div className="grid grid-cols-2 gap-2">
+              <Button 
+                onClick={addNode} 
+                size="sm" 
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-xs shadow-lg hover:shadow-xl transition-all duration-200"
+              >
                 <MessageCirclePlus className="h-3 w-3 mr-1" />
                 Chat
               </Button>
-              <Button onClick={addVideoNode} size="sm" className="bg-pink-600 hover:bg-pink-700 text-xs">
+              <Button 
+                onClick={addVideoNode} 
+                size="sm" 
+                className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-xs shadow-lg hover:shadow-xl transition-all duration-200"
+              >
                 <Video className="h-3 w-3 mr-1" />
                 Vídeo
               </Button>
-              <Button onClick={addFurionNode} size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-xs">
-                <Sparkles className="h-3 w-3 mr-1" />
-                Furion AI
-              </Button>
             </div>
-
-            <div className="text-xs font-medium text-muted-foreground mt-4 mb-1">MÓDULOS IA:</div>
-            <div className="grid grid-cols-1 gap-1">
-              <Button onClick={() => addAIModule('ia-copy')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-                <PenTool className="h-3 w-3 mr-1" />
-                IA Copy
-              </Button>
-              <Button onClick={() => addAIModule('ia-video')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-                <Video className="h-3 w-3 mr-1" />
-                IA Vídeo
-              </Button>
-              <Button onClick={() => addAIModule('ia-produto')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-                <Package className="h-3 w-3 mr-1" />
-                IA Produto
-              </Button>
-              <Button onClick={() => addAIModule('ia-trafego')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-                <Target className="h-3 w-3 mr-1" />
-                IA Tráfego
-              </Button>
-              <Button onClick={() => addAIModule('ia-analytics')} size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-xs justify-start text-white">
-                <BarChart3 className="h-3 w-3 mr-1" />
-                IA Analytics
-              </Button>
-            </div>
-
-            {selectedNodes.length > 0 && (
-              <Button onClick={delNode} size="sm" variant="destructive" className="mt-4 text-xs w-full">
-                <Trash2 className="h-3 w-3 mr-1" />
-                Delete ({selectedNodes.length})
-              </Button>
-            )}
+            <Button 
+              onClick={addFurionNode} 
+              size="sm" 
+              className="w-full bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-700 hover:via-violet-700 hover:to-indigo-700 text-xs shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <Sparkles className="h-3 w-3 mr-2" />
+              Furion AI Pro
+            </Button>
           </div>
+
+          {/* AI Modules */}
+          <div className="space-y-3">
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">AI Modules</div>
+            <div className="space-y-2">
+              <Button 
+                onClick={() => addAIModule('ia-copy')} 
+                size="sm" 
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-xs justify-start shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <PenTool className="h-3 w-3 mr-2" />
+                Copy Writer AI
+              </Button>
+              <Button 
+                onClick={() => addAIModule('ia-video')} 
+                size="sm" 
+                className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-xs justify-start shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <Video className="h-3 w-3 mr-2" />
+                Video Creator AI
+              </Button>
+              <Button 
+                onClick={() => addAIModule('ia-produto')} 
+                size="sm" 
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-xs justify-start shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <Package className="h-3 w-3 mr-2" />
+                Product Strategy AI
+              </Button>
+              <Button 
+                onClick={() => addAIModule('ia-trafego')} 
+                size="sm" 
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-xs justify-start shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <Target className="h-3 w-3 mr-2" />
+                Traffic Generator AI
+              </Button>
+              <Button 
+                onClick={() => addAIModule('ia-analytics')} 
+                size="sm" 
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-xs justify-start shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <BarChart3 className="h-3 w-3 mr-2" />
+                Analytics AI
+              </Button>
+            </div>
+          </div>
+
+          {/* Delete Section */}
+          {selectedNodes.length > 0 && (
+            <div className="pt-4 border-t border-border/50">
+              <Button 
+                onClick={delNode} 
+                size="sm" 
+                variant="destructive" 
+                className="w-full text-xs bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                <Trash2 className="h-3 w-3 mr-2" />
+                Delete Selected ({selectedNodes.length})
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       

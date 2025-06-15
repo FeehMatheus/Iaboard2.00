@@ -172,22 +172,44 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
     try {
       updateStepProgress(step.id, 10);
       
-      const endpoint = step.type === 'video' ? '/api/ai/generate' : 
+      // Use the correct real API endpoints
+      const endpoint = step.type === 'video' ? '/api/ia-video/generate' : 
                      step.type === 'copy' ? '/api/ia-copy/generate' :
-                     '/api/llm/generate';
+                     step.type === 'product' ? '/api/ia-produto/generate' :
+                     step.type === 'traffic' ? '/api/ia-trafego/generate' :
+                     step.type === 'analytics' ? '/api/ia-analytics/generate' :
+                     '/api/ia-copy/generate'; // Default fallback
 
       const payload = step.type === 'video' ? {
-        type: 'video',
-        prompt: `${prompt} - ${step.description}`,
-        parameters: { duration: 5, style: 'professional' }
+        concept: `${prompt} - ${step.description}`,
+        duration: '5 minutos',
+        style: 'profissional',
+        objective: 'vendas'
       } : step.type === 'copy' ? {
         prompt: `${prompt} - ${step.description}`,
-        copyType: 'professional',
-        parameters
+        niche: 'marketing digital',
+        targetAudience: 'empreendedores',
+        objective: 'conversão'
+      } : step.type === 'product' ? {
+        idea: `${prompt} - ${step.description}`,
+        market: 'digital',
+        budget: 'R$ 50.000',
+        timeline: '3 meses'
+      } : step.type === 'traffic' ? {
+        business: `${prompt} - ${step.description}`,
+        budget: 'R$ 10.000/mês',
+        goals: 'gerar leads qualificados',
+        platforms: 'Google, Facebook, LinkedIn'
+      } : step.type === 'analytics' ? {
+        business: `${prompt} - ${step.description}`,
+        metrics: 'conversões, ROI, CAC',
+        goals: 'otimizar performance',
+        platforms: 'Google Analytics, Facebook Pixel'
       } : {
-        prompt: `${prompt} - ${step.description}. Responda em português detalhadamente.`,
-        model: 'gpt-4o',
-        maxTokens: 1000
+        prompt: `${prompt} - ${step.description}`,
+        niche: 'marketing digital',
+        targetAudience: 'empreendedores',
+        objective: 'conversão'
       };
 
       updateStepProgress(step.id, 30);
@@ -309,22 +331,67 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
     setResult('');
 
     try {
-      const response = await fetch('/api/ai/module/execute', {
+      // Use specific endpoints for each module type
+      const endpoints = {
+        'ia-copy': '/api/ia-copy/generate',
+        'ia-video': '/api/ia-video/generate',
+        'ia-produto': '/api/ia-produto/generate',
+        'ia-trafego': '/api/ia-trafego/generate',
+        'ia-analytics': '/api/ia-analytics/generate'
+      };
+
+      const endpoint = endpoints[moduleType];
+      
+      // Create specific payload for each module type
+      const payloads = {
+        'ia-copy': {
+          prompt: prompt.trim(),
+          niche: parameters.niche || 'marketing digital',
+          targetAudience: parameters.targetAudience || 'empreendedores',
+          objective: parameters.objective || 'conversão'
+        },
+        'ia-video': {
+          concept: prompt.trim(),
+          duration: parameters.duration || '5 minutos',
+          style: parameters.style || 'profissional',
+          objective: parameters.objective || 'vendas'
+        },
+        'ia-produto': {
+          idea: prompt.trim(),
+          market: parameters.market || 'digital',
+          budget: parameters.budget || 'R$ 50.000',
+          timeline: parameters.timeline || '3 meses'
+        },
+        'ia-trafego': {
+          business: prompt.trim(),
+          budget: parameters.budget || 'R$ 10.000/mês',
+          goals: parameters.goals || 'gerar leads qualificados',
+          platforms: parameters.platforms || 'Google, Facebook, LinkedIn'
+        },
+        'ia-analytics': {
+          business: prompt.trim(),
+          metrics: parameters.metrics || 'conversões, ROI, CAC',
+          goals: parameters.goals || 'otimizar performance',
+          platforms: parameters.platforms || 'Google Analytics, Facebook Pixel'
+        }
+      };
+
+      const payload = payloads[moduleType];
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          moduleType,
-          prompt: prompt.trim(),
-          parameters,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        setResult(data.result);
+      if (data.success || data.content || data.result) {
+        const resultContent = data.content || data.result || data.analysis || 'Conteúdo gerado com sucesso';
+        setResult(resultContent);
+        
         if (data.files) {
           setFiles(data.files);
         }
@@ -345,7 +412,6 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
       });
     } finally {
       setIsExecuting(false);
-      // Keep progress visualization visible for 2 seconds after completion
       setTimeout(() => setShowProgressVisualization(false), 2000);
     }
   };
@@ -377,16 +443,16 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
         onResizeEnd={() => setIsResizing(false)}
       />
       
-      <Card className="w-full h-full bg-card border-2 border-red-500 shadow-lg transition-all duration-300 hover:shadow-red-500/45 hover:-translate-y-1 animate-in slide-in-from-bottom-4 duration-300">
-        <CardHeader className="pb-3 space-y-2">
+      <Card className="w-full h-full bg-gradient-to-br from-background/95 via-background/98 to-background/95 backdrop-blur-xl border-2 border-violet-500/30 shadow-2xl transition-all duration-300 hover:shadow-violet-500/25 hover:shadow-2xl hover:-translate-y-1 hover:border-violet-400/50 animate-in slide-in-from-bottom-4 duration-300">
+        <CardHeader className="pb-3 space-y-3 bg-gradient-to-r from-violet-500/5 to-purple-500/5 rounded-t-lg border-b border-border/30">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 bg-gradient-to-r ${config.color} rounded-lg flex items-center justify-center`}>
-                <IconComponent className="h-4 w-4 text-white" />
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 bg-gradient-to-br ${config.color} rounded-xl flex items-center justify-center shadow-lg ring-2 ring-white/10`}>
+                <IconComponent className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-foreground">{config.name}</h3>
-                <p className="text-xs text-muted-foreground">{config.description}</p>
+                <h3 className="text-sm font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">{config.name}</h3>
+                <p className="text-xs text-muted-foreground/80">{config.description}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -394,7 +460,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
                 size="sm"
                 variant="ghost"
                 onClick={deleteNode}
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-200"
               >
                 <X className="h-3 w-3" />
               </Button>
