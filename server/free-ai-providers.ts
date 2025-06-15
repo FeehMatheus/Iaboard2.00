@@ -551,20 +551,18 @@ Em 2 horas, retiramos esta oferta do ar e o preço volta para R$ 1.997.
 - YouTube: Vídeos promocionais
 
 **Estrutura de Campanha Search:**
-```
-Campanha: [Produto] - Palavras Comerciais
-├── Grupo 1: Termos Exatos (CPC: R$ 2-4)
-│   ├── [produto] curso
-│   ├── como [objetivo]
-│   └── [produto] online
-├── Grupo 2: Termos Amplos (CPC: R$ 1-2)
-│   ├── aprender [área]
-│   ├── curso online
-│   └── treinamento [área]
-└── Grupo 3: Concorrência (CPC: R$ 3-6)
-    ├── [concorrente] alternativa
-    └── melhor que [concorrente]
-```
+- Campanha: Produto - Palavras Comerciais
+- Grupo 1: Termos Exatos (CPC: R$ 2-4)
+  - produto curso
+  - como objetivo
+  - produto online
+- Grupo 2: Termos Amplos (CPC: R$ 1-2)
+  - aprender area
+  - curso online
+  - treinamento area
+- Grupo 3: Concorrencia (CPC: R$ 3-6)
+  - concorrente alternativa
+  - melhor que concorrente
 
 ### Facebook/Instagram Ads (35% do orçamento)
 **Campanhas Estratégicas:**

@@ -37,7 +37,11 @@ router.post('/api/ia-copy/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await hybridAISystem.generateCopy(prompt, niche, targetAudience, objective);
+    const aiResult = await freeAIProviders.generateContent({
+      prompt: `Crie copy persuasivo para: ${prompt}. Nicho: ${niche}, Público: ${targetAudience}, Objetivo: ${objective}`,
+      systemPrompt: 'Você é um copywriter especialista com 20 anos de experiência. Crie copy persuasivo e de alta conversão em português brasileiro.',
+      maxTokens: 3000
+    });
     
     if (!aiResult.success) {
       return res.status(500).json({
@@ -80,7 +84,11 @@ router.post('/api/ia-produto/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await hybridAISystem.generateProduct(idea, market, budget, timeline);
+    const aiResult = await freeAIProviders.generateContent({
+      prompt: `Crie estratégia completa de produto para: ${idea}. Mercado: ${market}, Orçamento: ${budget}, Prazo: ${timeline}`,
+      systemPrompt: 'Você é um consultor de negócios especialista com 15 anos de experiência em lançamento de produtos digitais. Crie estratégias detalhadas e implementáveis.',
+      maxTokens: 3000
+    });
     
     if (!aiResult.success) {
       return res.status(500).json({
@@ -128,7 +136,11 @@ router.post('/api/ia-trafego/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await hybridAISystem.generateTraffic(business, budget, goals, platforms);
+    const aiResult = await freeAIProviders.generateContent({
+      prompt: `Crie estratégia completa de tráfego para: ${business}. Orçamento: ${budget}, Objetivos: ${goals}, Plataformas: ${platforms}`,
+      systemPrompt: 'Você é um especialista em tráfego pago e orgânico com 20 anos de experiência. Crie estratégias de tráfego detalhadas e implementáveis com foco em ROI.',
+      maxTokens: 3000
+    });
     
     if (!aiResult.success) {
       return res.status(500).json({
@@ -176,7 +188,11 @@ router.post('/api/ia-video/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await hybridAISystem.generateVideo(concept, duration, style, objective);
+    const aiResult = await freeAIProviders.generateContent({
+      prompt: `Crie roteiro completo de vídeo para: ${concept}. Duração: ${duration}, Estilo: ${style}, Objetivo: ${objective}`,
+      systemPrompt: 'Você é um roteirista especialista em vídeos de conversão com 15 anos de experiência. Crie roteiros envolventes e persuasivos com estrutura clara.',
+      maxTokens: 3000
+    });
     
     if (!aiResult.success) {
       return res.status(500).json({
@@ -224,7 +240,11 @@ router.post('/api/ia-analytics/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await hybridAISystem.generateAnalytics(business, metrics, goals, platforms);
+    const aiResult = await freeAIProviders.generateContent({
+      prompt: `Crie estratégia completa de analytics para: ${business}. Métricas: ${metrics}, Objetivos: ${goals}, Plataformas: ${platforms}`,
+      systemPrompt: 'Você é um especialista em analytics e mensuração digital com 15 anos de experiência. Crie estratégias detalhadas de tracking e otimização.',
+      maxTokens: 3000
+    });
     
     if (!aiResult.success) {
       return res.status(500).json({
@@ -258,12 +278,12 @@ router.post('/api/ia-analytics/generate', async (req, res) => {
 // Health check endpoint
 router.get('/api/ai/health', async (req, res) => {
   try {
-    const providers = hybridAISystem.getProviderStatus();
+    const providers = freeAIProviders.getProviderStatus();
     res.json({
       success: true,
       providers,
       totalProviders: providers.length,
-      activeProviders: providers.filter(p => p.enabled).length
+      activeProviders: providers.filter((p: any) => p.enabled).length
     });
   } catch (error) {
     console.error('Erro no health check:', error);
@@ -277,7 +297,7 @@ router.get('/api/ai/health', async (req, res) => {
 // Reset usage endpoint (for development)
 router.post('/api/ai/reset-usage', async (req, res) => {
   try {
-    hybridAISystem.resetUsage();
+    freeAIProviders.resetUsage();
     res.json({
       success: true,
       message: 'Uso dos provedores resetado com sucesso'
