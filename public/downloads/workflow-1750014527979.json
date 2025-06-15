@@ -1,0 +1,85 @@
+{
+  "id": "workflow-1750014527979",
+  "goal": "Lançar produto SaaS inovador no mercado B2B",
+  "createdAt": "2025-06-15T19:08:47.979Z",
+  "nodes": [
+    {
+      "id": "node-market-research-1750014527978-0",
+      "type": "ia-analytics",
+      "position": {
+        "x": -12.92243469844756,
+        "y": 14.667622396156554
+      },
+      "data": {
+        "prompt": "Conduct comprehensive market research for Lançar produto SaaS inovador no mercado B2B targeting CTOs e gerentes de TI",
+        "parameters": {
+          "estimatedTime": 300,
+          "moduleType": "market-research",
+          "priority": 10,
+          "outputs": [
+            "market-analysis",
+            "competitor-data",
+            "opportunity-insights"
+          ]
+        },
+        "dependencies": [],
+        "outputs": [
+          "market-analysis",
+          "competitor-data",
+          "opportunity-insights"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-analytics-setup-1750014527978-1",
+      "type": "ia-analytics",
+      "position": {
+        "x": 287.5989241131468,
+        "y": -5.294639256591427
+      },
+      "data": {
+        "prompt": "Setup analytics and tracking for Lançar produto SaaS inovador no mercado B2B",
+        "parameters": {
+          "estimatedTime": 180,
+          "moduleType": "analytics-setup",
+          "priority": 3,
+          "outputs": [
+            "tracking-setup",
+            "kpi-dashboard",
+            "reporting-system"
+          ]
+        },
+        "dependencies": [],
+        "outputs": [
+          "tracking-setup",
+          "kpi-dashboard",
+          "reporting-system"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    }
+  ],
+  "connections": [],
+  "executionPlan": {
+    "phases": [
+      {
+        "phase": 1,
+        "name": "Research & Analysis",
+        "description": "Comprehensive market and audience research to understand the landscape",
+        "nodes": [
+          "node-market-research-1750014527978-0",
+          "node-analytics-setup-1750014527978-1"
+        ],
+        "estimatedTime": 300
+      }
+    ],
+    "totalEstimatedTime": 300,
+    "criticalPath": [
+      "node-market-research-1750014527978-0"
+    ]
+  },
+  "recommendations": []
+}
