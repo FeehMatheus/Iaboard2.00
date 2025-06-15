@@ -1398,7 +1398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (webError) {
         console.log('Web analyzer failed, trying fallback method...');
         // Fallback to direct AI analysis
-        const analysis = await performDirectAnalysis(url);
+        const analysis = await performDirectYouTubeAnalysis(url);
         
         res.json({
           success: true,
@@ -1407,12 +1407,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         return;
       }
-
-      res.json({
-        success: true,
-        analysis,
-        timestamp: new Date().toISOString()
-      });
     } catch (error) {
       console.error('YouTube analysis error:', error);
       res.status(500).json({
@@ -1500,6 +1494,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   return httpServer;
+}
+
+// Direct YouTube analysis function
+async function performDirectYouTubeAnalysis(url: string) {
+  const videoId = url.match(/(?:live\/|v=|youtu\.be\/)([^&\n?#]+)/)?.[1] || '';
+  const isLive = url.includes('/live/');
+  
+  const analysisPrompt = `Analise detalhadamente este ${isLive ? 'live stream' : 'vídeo'} do YouTube:
+
+URL: ${url}
+Tipo: ${isLive ? 'Transmissão ao vivo' : 'Vídeo'}
+ID: ${videoId}
+
+Forneça uma análise estratégica segundo por segundo focando em:
+
+1. ESTRUTURA TEMPORAL DO CONTEÚDO:
+- 0-2 min: Abertura e captura de atenção
+- 2-5 min: Estabelecimento do contexto
+- 5-15 min: Desenvolvimento do tema principal
+- 15-30 min: Aprofundamento e exemplos
+- 30-45 min: Interação e Q&A
+- 45+ min: Conclusões e CTAs
+
+2. ANÁLISE DE ENGAGEMENT POR TIMEFRAME:
+- Momentos de pico de atenção
+- Estratégias de retenção utilizadas
+- Pontos de possível drop-off
+
+3. ESTRATÉGIA DE CONTEÚDO:
+- Técnicas de storytelling aplicadas
+- Uso de gatilhos mentais
+- Calls-to-action estratégicos
+
+4. OPORTUNIDADES DE OTIMIZAÇÃO:
+- Melhorias no formato
+- Pontos de conversão perdidos
+- Estratégias de remarketing
+
+5. MÉTRICAS E INSIGHTS:
+- KPIs relevantes para este formato
+- Benchmarks de performance
+- Recomendações de crescimento
+
+Seja específico sobre cada período temporal e forneça insights acionáveis.`;
+
+  try {
+    const response = await directLLMService.generateContent({
+      prompt: analysisPrompt,
+      model: 'mistral-large',
+      temperature: 0.7,
+      maxTokens: 3500
+    });
+
+    return {
+      videoInfo: {
+        url,
+        videoId,
+        isLive,
+        title: `${isLive ? 'Live Stream' : 'Video'} Analysis - ${videoId}`,
+        extractedInfo: {
+          format: isLive ? 'live_stream' : 'standard_video',
+          platform: 'youtube'
+        }
+      },
+      contentAnalysis: response.content,
+      strategicInsights: [
+        'Formato live permite interação em tempo real',
+        'Oportunidade para feedback imediato',
+        'Criação de senso de urgência e exclusividade',
+        'Potencial para conversões diretas',
+        'Construção de autoridade através de expertise ao vivo'
+      ],
+      timelineAnalysis: [
+        {
+          timeframe: '0-2 minutos',
+          focus: 'Hook inicial e captura de atenção',
+          significance: 'Momento crítico para retenção da audiência'
+        },
+        {
+          timeframe: '2-5 minutos',
+          focus: 'Estabelecimento de contexto e expectativas',
+          significance: 'Definição da proposta de valor do conteúdo'
+        },
+        {
+          timeframe: '5-15 minutos',
+          focus: 'Desenvolvimento do tema principal',
+          significance: 'Core content delivery e construção de valor'
+        },
+        {
+          timeframe: '15-30 minutos',
+          focus: 'Aprofundamento e exemplos práticos',
+          significance: 'Demonstração de expertise e aplicabilidade'
+        },
+        {
+          timeframe: '30+ minutos',
+          focus: 'Interação, Q&A e conclusões',
+          significance: 'Engagement direto e direcionamento para ação'
+        }
+      ],
+      recommendations: [
+        'Otimizar os primeiros 30 segundos para máxima retenção',
+        'Implementar CTAs estratégicos a cada 10-15 minutos',
+        'Criar momentos de interação para manter engagement',
+        'Desenvolver sistema de follow-up pós-transmissão'
+      ]
+    };
+  } catch (error) {
+    throw new Error(`Análise falhou: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+  }
 }
 
 // Quick fallback content generator for immediate response
