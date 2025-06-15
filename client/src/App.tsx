@@ -1,64 +1,59 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "./lib/queryClient";
-import { Route, Switch } from "wouter";
-import "./index.css";
-import Landing from "./pages/Landing";
-import Board from "./pages/Board";
-import AdvancedBoard from "./pages/AdvancedBoard";
-import SupremeFurionDashboard from "./pages/SupremeFurionDashboard";
-import InfiniteCanvasPage from "./pages/InfiniteCanvasPage";
-import IABoardSupremePage from "./pages/IABoardSupremePage";
+import { Switch, Route, useLocation } from 'wouter';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
+import { ThemeProvider } from '@/components/ui/theme-provider';
+import SmartGuidance from '@/components/SmartGuidance';
+import IABoard from '@/pages/CurisoOriginal';
+import ProgressDemo from '@/pages/ProgressDemo';
+import { IABoardProductionDashboard } from '@/components/IABoardProductionDashboard';
+import { FixedSystemTester } from '@/components/FixedSystemTester';
+import { YouTubeAnalyzer } from '@/components/YouTubeAnalyzer';
 
-function App() {
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      queryFn: async ({ queryKey }) => {
+        const res = await fetch(queryKey[0] as string);
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        return res.json();
+      },
+    },
+  },
+});
+
+export default function App() {
+  const [location] = useLocation();
+  
+  const getCurrentContext = () => {
+    if (location === '/board') return 'board';
+    if (location === '/dashboard') return 'dashboard';
+    if (location === '/progress') return 'progress';
+    return 'landing';
+  };
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-black relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_rgba(120,119,198,0.3),_transparent_50%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_rgba(255,122,122,0.3),_transparent_50%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,_rgba(147,51,234,0.2),_transparent_50%)] pointer-events-none" />
-
-        {/* Grid Pattern */}
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px'
-          }}
-        />
-
-        <div className="relative z-10">
+    <ThemeProvider defaultTheme="dark">
+      <QueryClientProvider client={queryClient}>
+        <div className="min-h-screen bg-background">
           <Switch>
-            <Route path="/" component={SupremeFurionDashboard} />
-            <Route path="/landing" component={Landing} />
-            <Route path="/board" component={Board} />
-            <Route path="/advanced-board" component={AdvancedBoard} />
-            <Route path="/supreme" component={SupremeFurionDashboard} />
-            <Route path="/canvas" component={InfiniteCanvasPage} />
-            <Route path="/ia-board-supreme" component={IABoardSupremePage} />
+            <Route path="/" component={IABoard} />
+            <Route path="/progress" component={ProgressDemo} />
+            <Route path="/production" component={IABoardProductionDashboard} />
+            <Route path="/tests" component={FixedSystemTester} />
+            <Route path="/youtube" component={YouTubeAnalyzer} />
             <Route>
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center bg-black/40 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                    404 - Página não encontrada
-                  </h1>
-                  <a 
-                    href="/" 
-                    className="text-cyan-400 hover:text-cyan-300 transition-colors duration-300 font-semibold"
-                  >
-                    ← Voltar ao IA Board
-                  </a>
-                </div>
-              </div>
+              <IABoard />
             </Route>
           </Switch>
+          <SmartGuidance 
+            currentContext={getCurrentContext()}
+            userLevel="beginner"
+          />
+          <Toaster />
         </div>
-      </div>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
-
-export default App;

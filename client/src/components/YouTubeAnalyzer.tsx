@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,125 +85,66 @@ interface Analysis {
   structure: ProgramStructure[];
 }
 
-import { 
-  Zap,
-  Crown,
-  Rocket
-} from 'lucide-react';
-
-interface AnalysisResult {
-  id: number;
-  videoInfo: {
-    title: string;
-    duration: number;
-    thumbnail: string;
-    channelTitle: string;
-    isLive: boolean;
-  };
-  overallMetrics: {
-    engagementScore: number;
-    persuasionLevel: number;
-    contentQuality: number;
-    marketingEffectiveness: number;
-  };
-  segments: Array<{
-    startTime: number;
-    endTime: number;
-    transcript: string;
-    visualDescription: string;
-    audioAnalysis: string;
-    emotions: any;
-    keyTopics: string[];
-    engagementScore: number;
-  }>;
-  insights: Array<{
-    insightType: string;
-    timestamp: number;
-    description: string;
-    confidence: number;
-    actionable: string;
-    category: string;
-  }>;
-  structure: Array<{
-    sectionType: string;
-    startTime: number;
-    endTime: number;
-    description: string;
-    effectiveness: number;
-    improvements: string;
-  }>;
-}
-
-export const YouTubeAnalyzer: React.FC = () => {
-  const [url, setUrl] = useState('');
+export function YouTubeAnalyzer() {
+  const [url, setUrl] = useState("https://www.youtube.com/live/PL4rWZ0vg14?si=N2G-iWvqP0-a7Q5Y");
+  const [currentAnalysis, setCurrentAnalysis] = useState<Analysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState('');
-
-  const analyzeVideo = async () => {
-    if (!url.trim()) return;
-
-    setIsAnalyzing(true);
-    setProgress(0);
-    setCurrentStep('Iniciando análise superior ao Furion...');
-
-    try {
-      const response = await fetch('/api/furion/superior-analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Simular progresso com etapas avançadas
-        const steps = [
-          '🚀 Extraindo dados do vídeo...',
-          '🧠 Análise de IA avançada do conteúdo...',
-          '🎯 Identificando gatilhos psicológicos...',
-          '💡 Analisando estratégias de copywriting...',
-          '📊 Avaliando métricas de performance...',
-          '🔍 Detectando oportunidades de melhoria...',
-          '💰 Calculando potencial de monetização...',
-          '✨ Gerando insights superiores...'
-        ];
-
-        for (let i = 0; i < steps.length; i++) {
-          setCurrentStep(steps[i]);
-          setProgress((i + 1) * (100 / steps.length));
-          await new Promise(resolve => setTimeout(resolve, 1200));
-        }
-
-        // Buscar resultado da análise
-        const resultResponse = await fetch(`/api/youtube/analysis/${data.analysisId}`);
-        const result = await resultResponse.json();
-
-        setAnalysisResult(result);
-        setCurrentStep('✅ Análise concluída com sucesso!');
-      } else {
-        console.error('Erro na análise:', data.error);
-        setCurrentStep('❌ Erro na análise');
-      }
-    } catch (error) {
-      console.error('Erro:', error);
-      setCurrentStep('❌ Erro de conexão');
-    } finally {
-      setTimeout(() => {
-        setIsAnalyzing(false);
-        setProgress(0);
-        setCurrentStep('');
-      }, 2000);
-    }
-  };
+  const [analysisId, setAnalysisId] = useState<number | null>(null);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const startAnalysis = async () => {
+    if (!url.trim()) return;
+
+    setIsAnalyzing(true);
+    setCurrentAnalysis(null);
+
+    try {
+      const response = await fetch('/api/furion/superior-analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setAnalysisId(result.analysisId);
+        // Start polling for results
+        pollAnalysis(result.analysisId);
+      } else {
+        console.error('Analysis failed:', result.error);
+        setIsAnalyzing(false);
+      }
+    } catch (error) {
+      console.error('Failed to start analysis:', error);
+      setIsAnalyzing(false);
+    }
+  };
+
+  const pollAnalysis = async (id: number) => {
+    try {
+      const response = await fetch(`/api/youtube/analysis/${id}`);
+      const analysis = await response.json();
+
+      if (analysis.status === 'completed') {
+        setCurrentAnalysis(analysis);
+        setIsAnalyzing(false);
+      } else if (analysis.status === 'failed') {
+        console.error('Analysis failed');
+        setIsAnalyzing(false);
+      } else {
+        // Continue polling
+        setTimeout(() => pollAnalysis(id), 2000);
+      }
+    } catch (error) {
+      console.error('Failed to poll analysis:', error);
+      setIsAnalyzing(false);
+    }
   };
 
   const getPhaseColor = (phase: string) => {
@@ -249,14 +190,14 @@ export const YouTubeAnalyzer: React.FC = () => {
               className="flex-1"
             />
             <Button 
-              onClick={analyzeVideo} 
+              onClick={startAnalysis} 
               disabled={isAnalyzing || !url.trim()}
               className="min-w-32"
             >
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {currentStep || 'Analisando...'}
+                  Analisando...
                 </>
               ) : (
                 <>
@@ -266,28 +207,25 @@ export const YouTubeAnalyzer: React.FC = () => {
               )}
             </Button>
           </div>
-          {isAnalyzing && (
-            <Progress value={progress} className="mt-4" />
-          )}
         </CardContent>
       </Card>
 
       {/* Analysis Results */}
-      {analysisResult && (
+      {currentAnalysis && (
         <div className="space-y-6">
           {/* Overview */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Video className="w-5 h-5" />
-                {analysisResult.videoInfo.title}
+                {currentAnalysis.title}
               </CardTitle>
               <div className="flex gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  {formatTime(analysisResult.videoInfo.duration)}
+                  {formatTime(currentAnalysis.duration)}
                 </span>
-                {analysisResult.videoInfo.isLive && (
+                {currentAnalysis.metadata.isLive && (
                   <Badge variant="secondary" className="bg-red-100 text-red-700">
                     LIVE
                   </Badge>
@@ -295,31 +233,37 @@ export const YouTubeAnalyzer: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {analysisResult.overallMetrics && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {currentAnalysis.metadata.overallMetrics && (
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">
-                      {Math.round(analysisResult.overallMetrics.engagementScore * 100)}%
+                      {Math.round(currentAnalysis.metadata.overallMetrics.retentionPotential * 100)}%
                     </div>
-                    <div className="text-xs text-muted-foreground">Engajamento</div>
+                    <div className="text-xs text-muted-foreground">Potencial de Retenção</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">
-                      {Math.round(analysisResult.overallMetrics.persuasionLevel * 100)}%
+                      {Math.round(currentAnalysis.metadata.overallMetrics.engagementPotential * 100)}%
                     </div>
-                    <div className="text-xs text-muted-foreground">Persuasão</div>
+                    <div className="text-xs text-muted-foreground">Potencial de Engajamento</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">
-                      {Math.round(analysisResult.overallMetrics.contentQuality * 100)}%
+                      {Math.round(currentAnalysis.metadata.overallMetrics.monetizationReadiness * 100)}%
                     </div>
-                    <div className="text-xs text-muted-foreground">Qualidade</div>
+                    <div className="text-xs text-muted-foreground">Pronto para Monetização</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">
-                      {Math.round(analysisResult.overallMetrics.marketingEffectiveness * 100)}%
+                      {Math.round(currentAnalysis.metadata.overallMetrics.productionQuality * 100)}%
                     </div>
-                    <div className="text-xs text-muted-foreground">Marketing</div>
+                    <div className="text-xs text-muted-foreground">Qualidade de Produção</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-indigo-600">
+                      {Math.round(currentAnalysis.metadata.overallMetrics.contentValue * 100)}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">Valor do Conteúdo</div>
                   </div>
                 </div>
               )}
@@ -346,8 +290,8 @@ export const YouTubeAnalyzer: React.FC = () => {
                 <CardContent>
                   <ScrollArea className="h-96">
                     <div className="space-y-3">
-                      {analysisResult.segments.map((segment, index) => (
-                        <div key={segment.startTime} className="border rounded-lg p-4 hover:bg-muted/50">
+                      {currentAnalysis.segments.map((segment, index) => (
+                        <div key={segment.id} className="border rounded-lg p-4 hover:bg-muted/50">
                           <div className="flex justify-between items-start mb-2">
                             <div className="flex items-center gap-2">
                               <Badge variant="outline">
@@ -358,13 +302,12 @@ export const YouTubeAnalyzer: React.FC = () => {
                                 <span className="text-xs">{Math.round(segment.engagementScore * 100)}%</span>
                               </div>
                             </div>
-                            {/* Badge para emoções aqui, se necessário */}
+                            <Badge variant="secondary" className="capitalize">
+                              {segment.emotions.dominant}
+                            </Badge>
                           </div>
-
+                          
                           <div className="space-y-2 text-sm">
-                            <div>
-                              <strong>Transcrição:</strong> {segment.transcript}
-                            </div>
                             <div>
                               <strong>Visual:</strong> {segment.visualDescription}
                             </div>
@@ -377,6 +320,21 @@ export const YouTubeAnalyzer: React.FC = () => {
                                   {topic}
                                 </Badge>
                               ))}
+                            </div>
+                          </div>
+
+                          <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <div className="text-muted-foreground">Áudio</div>
+                              <Progress value={segment.technicalQuality.audioQuality * 100} className="h-1" />
+                            </div>
+                            <div>
+                              <div className="text-muted-foreground">Vídeo</div>
+                              <Progress value={segment.technicalQuality.videoQuality * 100} className="h-1" />
+                            </div>
+                            <div>
+                              <div className="text-muted-foreground">Estabilidade</div>
+                              <Progress value={segment.technicalQuality.stability * 100} className="h-1" />
                             </div>
                           </div>
                         </div>
@@ -397,15 +355,15 @@ export const YouTubeAnalyzer: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {analysisResult.insights.map((insight) => (
-                      <div key={insight.timestamp} className="border rounded-lg p-4">
+                    {currentAnalysis.insights.map((insight) => (
+                      <div key={insight.id} className="border rounded-lg p-4">
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
-                            {getInsightIcon(insight.insightType)}
+                            {getInsightIcon(insight.type)}
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium capitalize">{insight.insightType}</span>
+                              <span className="font-medium capitalize">{insight.type}</span>
                               <Badge variant="outline" className="text-xs">
                                 {formatTime(insight.timestamp)}
                               </Badge>
@@ -439,33 +397,41 @@ export const YouTubeAnalyzer: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {analysisResult.structure.map((section) => (
-                      <div key={section.startTime} className="border rounded-lg p-4">
+                    {currentAnalysis.structure.map((phase) => (
+                      <div key={phase.id} className="border rounded-lg p-4">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className={`w-3 h-3 rounded-full ${getPhaseColor(section.sectionType)}`} />
-                          <span className="font-medium capitalize">{section.sectionType}</span>
+                          <div className={`w-3 h-3 rounded-full ${getPhaseColor(phase.phase)}`} />
+                          <span className="font-medium capitalize">{phase.phase}</span>
                           <Badge variant="outline">
-                            {formatTime(section.startTime)} - {formatTime(section.endTime)}
+                            {formatTime(phase.startTime)} - {formatTime(phase.endTime)}
                           </Badge>
                           <div className="ml-auto flex items-center gap-1">
                             <Star className="w-4 h-4 text-yellow-500" />
-                            <span className="text-sm">{Math.round(section.effectiveness * 100)}%</span>
+                            <span className="text-sm">{Math.round(phase.effectiveness * 100)}%</span>
                           </div>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
-                            <h4 className="text-sm font-medium mb-2">Descrição:</h4>
-                            <p className="text-sm">{section.description}</p>
+                            <h4 className="text-sm font-medium mb-2">Elementos Principais:</h4>
+                            <div className="flex flex-wrap gap-1">
+                              {phase.keyElements.map((element, i) => (
+                                <Badge key={i} variant="secondary" className="text-xs">
+                                  {element}
+                                </Badge>
+                              ))}
+                            </div>
                           </div>
 
                           <div>
                             <h4 className="text-sm font-medium mb-2">Melhorias Sugeridas:</h4>
                             <ul className="text-xs space-y-1">
-                              <li className="flex items-start gap-1">
-                                <TrendingUp className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
-                                {section.improvements}
-                              </li>
+                              {phase.improvements.map((improvement, i) => (
+                                <li key={i} className="flex items-start gap-1">
+                                  <TrendingUp className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                                  {improvement}
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         </div>
@@ -492,11 +458,61 @@ export const YouTubeAnalyzer: React.FC = () => {
                       <p className="text-xs">Mostrando engajamento por segmento</p>
                     </div>
                   </div>
+                  
+                  <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-600">
+                        {currentAnalysis.segments.length}
+                      </div>
+                      <div className="text-muted-foreground">Segmentos Analisados</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-600">
+                        {Math.round(
+                          currentAnalysis.segments.reduce((acc, s) => acc + s.engagementScore, 0) / 
+                          currentAnalysis.segments.length * 100
+                        )}%
+                      </div>
+                      <div className="text-muted-foreground">Engajamento Médio</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-purple-600">
+                        {Math.round(
+                          currentAnalysis.segments.reduce((acc, s) => acc + s.technicalQuality.audioQuality, 0) / 
+                          currentAnalysis.segments.length * 100
+                        )}%
+                      </div>
+                      <div className="text-muted-foreground">Qualidade Média</div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </div>
+      )}
+
+      {/* Loading State */}
+      {isAnalyzing && (
+        <Card>
+          <CardContent className="p-8">
+            <div className="text-center space-y-4">
+              <Loader2 className="w-12 h-12 animate-spin mx-auto text-blue-500" />
+              <div>
+                <h3 className="text-lg font-medium">Analisando sua live...</h3>
+                <p className="text-muted-foreground">
+                  Processamento em andamento usando APIs reais de IA. Aguarde alguns momentos.
+                </p>
+              </div>
+              <div className="max-w-md mx-auto">
+                <Progress value={33} className="mb-2" />
+                <p className="text-xs text-muted-foreground">
+                  Análise segundo por segundo em progresso...
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

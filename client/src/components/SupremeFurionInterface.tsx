@@ -191,7 +191,7 @@ export function SupremeFurionInterface() {
       } else {
         throw new Error(data.error || 'Erro na criação do produto');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro:', error);
       toast({
         title: "Erro na criação",
@@ -238,7 +238,7 @@ export function SupremeFurionInterface() {
       } else {
         throw new Error(data.error || 'Erro na análise');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro:', error);
       toast({
         title: "Erro na análise",
@@ -280,23 +280,6 @@ export function SupremeFurionInterface() {
           <p className="text-xl text-purple-200">
             Criação de produtos em 30 minutos com IA suprema
           </p>
-        </div>
-
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex gap-4">
-            <Button
-              onClick={() => window.location.href = '/canvas'}
-              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
-            >
-              🎨 Quadro Infinito
-            </Button>
-            <Button
-              onClick={() => window.location.href = '/board'}
-              variant="outline"
-            >
-              📋 Board Original
-            </Button>
-          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

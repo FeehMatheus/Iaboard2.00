@@ -1,101 +1,3 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Progress } from './ui/progress';
-import { Badge } from './ui/badge';
-import { Brain, Zap, Target, TrendingUp, CheckCircle, Clock, AlertCircle } from 'lucide-react';
-
-interface StepProgress {
-  id: string;
-  title: string;
-  status: 'pending' | 'processing' | 'completed' | 'error';
-  progress: number;
-  description?: string;
-  startTime?: Date;
-  endTime?: Date;
-}
-
-interface AdvancedProgressDashboardProps {
-  currentStep?: string;
-  steps?: StepProgress[];
-  onStepClick?: (stepId: string) => void;
-}
-
-export const AdvancedProgressDashboard: React.FC<AdvancedProgressDashboardProps> = ({
-  currentStep,
-  steps = [],
-  onStepClick
-}) => {
-  const defaultSteps: StepProgress[] = useMemo(() => [
-    {
-      id: 'step-0',
-      title: 'Análise de Mercado',
-      status: 'pending',
-      progress: 0,
-      description: 'Analisando tendências e oportunidades'
-    },
-    {
-      id: 'step-1',
-      title: 'Criação de Conceito',
-      status: 'pending',
-      progress: 0,
-      description: 'Desenvolvendo conceito único'
-    },
-    {
-      id: 'step-2',
-      title: 'Estruturação do Produto',
-      status: 'pending',
-      progress: 0,
-      description: 'Definindo arquitetura e funcionalidades'
-    },
-    {
-      id: 'step-3',
-      title: 'Conteúdo e Copy',
-      status: 'pending',
-      progress: 0,
-      description: 'Gerando textos persuasivos'
-    },
-    {
-      id: 'step-4',
-      title: 'Design e Visual',
-      status: 'pending',
-      progress: 0,
-      description: 'Criando identidade visual'
-    },
-    {
-      id: 'step-5',
-      title: 'Funil de Vendas',
-      status: 'pending',
-      progress: 0,
-      description: 'Estruturando processo de conversão'
-    },
-    {
-      id: 'step-6',
-      title: 'Automações',
-      status: 'pending',
-      progress: 0,
-      description: 'Implementando fluxos automatizados'
-    },
-    {
-      id: 'step-7',
-      title: 'Lançamento',
-      status: 'pending',
-      progress: 0,
-      description: 'Preparando estratégia de lançamento'
-    }
-  ], []);
-
-  const [progressSteps, setProgressSteps] = useState<StepProgress[]>(defaultSteps);
-
-  const overallProgress = useMemo(() => {
-    const completed = progressSteps.filter(step => step.status === 'completed').length;
-    return (completed / progressSteps.length) * 100;
-  }, [progressSteps]);
-
-  useEffect(() => {
-    if (steps.length > 0) {
-      setProgressSteps(steps);
-    }
-  }, [steps]);
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -238,7 +140,7 @@ export function AdvancedProgressDashboard({
                   <p className="text-sm font-semibold">{formatTime(elapsedTime)}</p>
                 </div>
               </div>
-
+              
               <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
                 <Target className="w-4 h-4 text-orange-500" />
                 <div>
@@ -260,7 +162,7 @@ export function AdvancedProgressDashboard({
                 {steps.map((step, index) => {
                   const stepProgressValue = index < currentStep ? 100 : 
                                           index === currentStep ? stepProgress : 0;
-
+                  
                   return (
                     <motion.div
                       key={step.id}
