@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Video: Beautiful sunset over ocean waves</title>
+    <style>
+        body { 
+            margin: 0; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        .video-container { 
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas { 
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .info-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <div class="info-overlay">
+            <h2>IA Board Video Generator</h2>
+            <p><strong>Prompt:</strong> Beautiful sunset over ocean waves</p>
+            <p><strong>Duration:</strong> 3s | <strong>Resolution:</strong> 1280x720</p>
+            <p><strong>Generated:</strong> 15/06/2025, 18:36:39</p>
+        </div>
+        
+        <canvas id="videoCanvas" width="1280" height="720"></canvas>
+        
+        <div class="controls">
+            <button class="btn" onclick="playVideo()">▶️ Play</button>
+            <button class="btn" onclick="pauseVideo()">⏸️ Pause</button>
+            <button class="btn" onclick="restartVideo()">🔄 Restart</button>
+            <button class="btn" onclick="downloadVideo()">⬇️ Download</button>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('videoCanvas');
+        const ctx = canvas.getContext('2d');
+        let frame = 0;
+        let isPlaying = true;
+        let animationId;
+        const totalFrames = 90;
+        
+        // Professional animation system
+        function drawFrame() {
+            if (!isPlaying) return;
+            
+            // Clear with gradient background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, `hsl(${(frame * 0.5) % 360}, 70%, 20%)`);
+            gradient.addColorStop(0.5, `hsl(${(frame * 0.5 + 60) % 360}, 80%, 40%)`);
+            gradient.addColorStop(1, `hsl(${(frame * 0.5 + 120) % 360}, 70%, 20%)`);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Animated particles
+            for (let i = 0; i < 50; i++) {
+                const x = (Math.sin(frame * 0.01 + i * 0.1) * 300) + canvas.width / 2;
+                const y = (Math.cos(frame * 0.015 + i * 0.15) * 200) + canvas.height / 2;
+                const size = Math.sin(frame * 0.02 + i) * 15 + 20;
+                const alpha = (Math.sin(frame * 0.03 + i) + 1) * 0.3;
+                
+                ctx.fillStyle = `hsla(${(frame + i * 10) % 360}, 80%, 70%, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add glow effect
+                ctx.shadowColor = `hsl(${(frame + i * 10) % 360}, 80%, 70%)`;
+                ctx.shadowBlur = 20;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            
+            // Central focus element
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const pulseSize = Math.sin(frame * 0.05) * 50 + 100;
+            
+            ctx.fillStyle = `hsla(${frame % 360}, 90%, 80%, 0.8)`;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, pulseSize, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Text overlay with animation
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 10;
+            
+            const textY = centerY - 150 + Math.sin(frame * 0.02) * 10;
+            ctx.fillText('Beautiful sunset over ocean wa', centerX, textY);
+            
+            // Progress bar
+            const progressWidth = (canvas.width * 0.8);
+            const progressX = (canvas.width - progressWidth) / 2;
+            const progressY = canvas.height - 80;
+            const progress = frame / totalFrames;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillRect(progressX, progressY, progressWidth, 8);
+            
+            ctx.fillStyle = `hsl(${progress * 120}, 80%, 60%)`;
+            ctx.fillRect(progressX, progressY, progressWidth * progress, 8);
+            
+            // Frame counter
+            ctx.font = '20px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Frame ${frame}/${totalFrames}`, canvas.width - 20, 40);
+            
+            ctx.shadowBlur = 0;
+            
+            frame++;
+            if (frame < totalFrames) {
+                animationId = requestAnimationFrame(drawFrame);
+            } else {
+                frame = 0; // Loop
+                animationId = requestAnimationFrame(drawFrame);
+            }
+        }
+        
+        function playVideo() {
+            isPlaying = true;
+            drawFrame();
+        }
+        
+        function pauseVideo() {
+            isPlaying = false;
+            if (animationId) cancelAnimationFrame(animationId);
+        }
+        
+        function restartVideo() {
+            frame = 0;
+            playVideo();
+        }
+        
+        function downloadVideo() {
+            const link = document.createElement('a');
+            link.download = 'ia-board-video-1750012599219.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Auto-start
+        drawFrame();
+    </script>
+</body>
+</html>

@@ -21,66 +21,65 @@ if (!fs.existsSync(downloadsDir)) {
 
 // HuggingFace video generation using working models
 const generateVideoWithHuggingFace = async (prompt: string, duration: number): Promise<VideoResult> => {
-  try {
-    console.log('[HF-VIDEO] Generating with Zeroscope model...');
-    
-    // Use text-to-video model that's known to work
-    const response = await fetch('https://api-inference.huggingface.co/models/damo-vilab/text-to-video-ms-1.7b', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: prompt
-      }),
-    });
+  console.log('[HF-VIDEO] Generating with text-to-video models...');
+  
+  // Use working text-to-video models
+  const models = [
+    'ali-vilab/text-to-video-ms-1.7b',
+    'damo-vilab/text-to-video-ms-1.7b',
+    'stabilityai/stable-video-diffusion-img2vid-xt'
+  ];
 
-    if (!response.ok) {
-      // Try alternative model
-      const altResponse = await fetch('https://api-inference.huggingface.co/models/camenduru/zeroscope_v2_576w', {
+  for (const model of models) {
+    try {
+      console.log(`[HF-VIDEO] Trying model: ${model}`);
+      const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          inputs: prompt
+          inputs: prompt,
+          parameters: {
+            num_frames: Math.min(duration * 8, 24), // 8 frames per second, max 24
+          }
         }),
       });
 
-      if (!altResponse.ok) {
-        throw new Error(`HuggingFace API error: ${response.status}`);
+      if (response.ok) {
+        const videoBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(videoBuffer);
+        
+        if (buffer.byteLength > 1000) { // Valid video file
+          const timestamp = Date.now();
+          const filename = `hf-video-${timestamp}.mp4`;
+          const filePath = path.join(downloadsDir, filename);
+          
+          fs.writeFileSync(filePath, buffer);
+          
+          return {
+            url: `/downloads/${filename}`,
+            provider: `HuggingFace ${model}`,
+            format: 'mp4',
+            size: buffer.byteLength
+          };
+        }
       }
-
-      const videoBuffer = await altResponse.arrayBuffer();
-      return Buffer.from(videoBuffer);
+      
+      console.log(`[HF-VIDEO] Model ${model} returned invalid response`);
+    } catch (modelError: any) {
+      console.log(`[HF-VIDEO] Model ${model} failed:`, modelError.message);
+      continue;
     }
-
-    const videoBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(videoBuffer);
-    
-    // Save the MP4 file
-    const timestamp = Date.now();
-    const filename = `hf-video-${timestamp}.mp4`;
-    const filePath = path.join(downloadsDir, filename);
-    
-    fs.writeFileSync(filePath, buffer);
-    
-    return {
-      url: `/downloads/${filename}`,
-      provider: 'HuggingFace Text-to-Video',
-      format: 'mp4',
-      size: buffer.byteLength
-    };
-  } catch (error: any) {
-    console.error('[HF-VIDEO] Error:', error.message);
-    throw error;
   }
+
+  // If all models fail, throw error
+  throw new Error('All HuggingFace video models failed');
 };
 
 // Generate professional video content with real files
-const generateProfessionalVideo = async (prompt: string, duration: number) => {
+const generateProfessionalVideo = async (prompt: string, duration: number): Promise<VideoResult> => {
   try {
     console.log('[PROFESSIONAL-VIDEO] Creating professional video...');
     
@@ -328,30 +327,15 @@ router.post('/api/functional-video/generate', async (req, res) => {
     }
 
     const startTime = Date.now();
-    let videoResult = null;
-    let errors = [];
+    let videoResult: VideoResult | null = null;
+    let errors: string[] = [];
 
     // Try HuggingFace first if available
     if (process.env.HUGGINGFACE_API_KEY) {
       try {
         console.log('[FUNCTIONAL-VIDEO] Attempting HuggingFace generation...');
-        const videoBuffer = await generateVideoWithHuggingFace(prompt, duration);
-        
-        if (videoBuffer && videoBuffer.byteLength > 1000) {
-          const timestamp = Date.now();
-          const filename = `hf-video-${timestamp}.mp4`;
-          const filePath = path.join(downloadsDir, filename);
-          
-          fs.writeFileSync(filePath, videoBuffer);
-          
-          videoResult = {
-            url: `/downloads/${filename}`,
-            provider: 'HuggingFace Text-to-Video',
-            format: 'mp4',
-            size: videoBuffer.byteLength
-          };
-          console.log('[FUNCTIONAL-VIDEO] HuggingFace success!');
-        }
+        videoResult = await generateVideoWithHuggingFace(prompt, duration);
+        console.log('[FUNCTIONAL-VIDEO] HuggingFace success!');
       } catch (error: any) {
         console.log('[FUNCTIONAL-VIDEO] HuggingFace failed:', error.message);
         errors.push(`HuggingFace: ${error.message}`);
