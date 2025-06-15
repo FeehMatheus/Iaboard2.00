@@ -32,6 +32,8 @@ import { directLLMService } from './direct-llm-service';
 import { realVideoService } from './real-video-service';
 import { authenticContentGenerator } from './authentic-content-generator';
 import { youtubeAnalyzer } from './youtube-analyzer';
+import { simplifiedYouTubeAnalyzer } from './simplified-youtube-analyzer';
+import { webYouTubeAnalyzer } from './web-youtube-analyzer';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1383,7 +1385,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`🎥 Iniciando análise do YouTube: ${url}`);
 
-      const analysis = await youtubeAnalyzer.analyzeVideo(url);
+      try {
+        // Use web-based analyzer for comprehensive analysis
+        const analysis = await webYouTubeAnalyzer.analyzeVideoFromUrl(url);
+        
+        res.json({
+          success: true,
+          analysis,
+          timestamp: new Date().toISOString()
+        });
+        return;
+      } catch (webError) {
+        console.log('Web analyzer failed, trying fallback method...');
+        // Fallback to direct AI analysis
+        const analysis = await performDirectAnalysis(url);
+        
+        res.json({
+          success: true,
+          analysis,
+          timestamp: new Date().toISOString()
+        });
+        return;
+      }
 
       res.json({
         success: true,
