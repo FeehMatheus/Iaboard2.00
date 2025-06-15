@@ -104,7 +104,7 @@ export function YouTubeAnalyzer() {
     setCurrentAnalysis(null);
 
     try {
-      const response = await fetch('/api/youtube/analyze', {
+      const response = await fetch('/api/furion/superior-analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
@@ -175,10 +175,10 @@ export function YouTubeAnalyzer() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Youtube className="w-6 h-6 text-red-500" />
-            <CardTitle>Análise Detalhada do YouTube - Segundo por Segundo</CardTitle>
+            <CardTitle>Sistema Superior ao Furion - Análise Avançada</CardTitle>
           </div>
           <CardDescription>
-            Análise completa da sua live usando APIs reais de IA para insights profundos
+            Análise completa com tecnologias superiores: transcrição em tempo real, gatilhos psicológicos, oportunidades de monetização e inteligência competitiva
           </CardDescription>
         </CardHeader>
         <CardContent>
