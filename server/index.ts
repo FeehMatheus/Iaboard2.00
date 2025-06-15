@@ -17,6 +17,7 @@ import productionVideoAPI from "./production-video-api";
 import functionalVideoSystem from "./functional-video-system";
 import realVideoGenerator from "./real-video-generator";
 import workflowChoreography from "./workflow-choreography";
+import workflowExecutor from "./workflow-executor";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -71,6 +72,9 @@ app.use((req, res, next) => {
   
   // Add workflow choreography system
   app.use(workflowChoreography);
+  
+  // Add workflow executor
+  app.use(workflowExecutor);
   
   // Add high-performance AI routes
   app.use(highPerformanceAI);
