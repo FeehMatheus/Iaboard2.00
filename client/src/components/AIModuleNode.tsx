@@ -407,6 +407,14 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
             automation: parameters.automation || 'moderate',
             outputs: parameters.outputs || []
           }
+        },
+        'ia-pensamento-poderoso': {
+          problema: prompt.trim(),
+          contexto: parameters.contexto || '',
+          objetivo: parameters.objetivo || '',
+          restricoes: parameters.restricoes || [],
+          profundidade: parameters.profundidade || 'moderada',
+          perspectivas: parameters.perspectivas || []
         }
       };
 
