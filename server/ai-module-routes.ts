@@ -1,5 +1,5 @@
 import express from 'express';
-import { freeAIProviders } from './free-ai-providers.js';
+import { smartLLM } from './smart-llm-system.js';
 import { fileGenerationService } from './file-generation-service.js';
 
 const router = express.Router();
@@ -37,9 +37,9 @@ router.post('/api/ia-copy/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await freeAIProviders.generateContent({
-      prompt: `Crie copy persuasivo para: ${prompt}. Nicho: ${niche}, Público: ${targetAudience}, Objetivo: ${objective}`,
-      systemPrompt: 'Você é um copywriter especialista com 20 anos de experiência. Crie copy persuasivo e de alta conversão em português brasileiro.',
+    const aiResult = await smartLLM.smartLLM({
+      prompt: `Crie copy persuasivo completo para: ${prompt}. Nicho: ${niche}, Público: ${targetAudience}, Objetivo: ${objective}`,
+      systemPrompt: 'Você é um copywriter especialista com 20 anos de experiência. Crie copy persuasivo e de alta conversão em português brasileiro com headlines, bullets, prova social e CTAs.',
       maxTokens: 3000
     });
     

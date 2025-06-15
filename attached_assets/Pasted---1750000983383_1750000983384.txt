@@ -1,0 +1,77 @@
+###################################################################################################
+########################  PROMPT “COPIAR-E-COLAR” – MANUTENÇÃO TOTAL IA BOARD  #####################
+# Cole este texto no seu agente (Replit AI, AutoGPT, GPT-Engineer ou CLI interativo).
+# Objetivo: corrigir todos os módulos do IA Board, integrar APIs gratuitas (alto limite),
+# criar sistema híbrido de IAs, consertar UI/fluxo e disponibilizar página de downloads.
+###################################################################################################
+
+1. ║ SCAN INICIAL – DETECTAR INCONSISTÊNCIAS
+   • Liste todos os módulos registrados. Identifique: (a) sem resposta, (b) resposta vazia, (c) duplicados.
+   • Verifique se variáveis .env obrigatórias estão presentes e não vazias.
+
+2. ║ VARIÁVEIS .ENV PADRÃO (gratuitas, limite alto)  ───────────
+   OPENROUTER_API_KEY=❓          # LLM multi-provider (GPT-4o, Claude, Gemini, Mistral)
+   MISTRAL_API_KEY=❓             # fallback LLM
+   GROQ_API_KEY=❓                # LLM ultrarrápido (Llama-3-70B)
+   STABILITY_API_KEY=❓          # Stable Diffusion + Stable Video β
+   ELEVENLABS_API_KEY=❓         # TTS natural (10k caracteres/mês)
+   PIKA_API_KEY=❓               # (opcional) vídeo IA – se a API voltar
+   MAILCHIMP_API_KEY=❓          # e-mail (free 500 contatos)
+   MAILCHIMP_SERVER_PREFIX=us17
+   NOTION_API_KEY=❓
+   MIXPANEL_TOKEN=❓
+   TYPEFORM_API_KEY=❓
+   # Adicione novas keys aqui quando solicitadas pelo sistema.
+
+3. ║ CORREÇÃO DOS MÓDULOS (função única)  ─────────────────────
+   • IA Copy            → gerar copies/headlines (OpenRouter).
+   • IA Produto         → ficha de produto (Claude via OpenRouter).
+   • IA Vídeo           → vídeo: ① Stability Video β ② fallback link Runway Studio.
+   • IA Voz             → áudio ElevenLabs (mp3).
+   • IA Tráfego Pago    → criativos + targeting (Groq – Llama-3).
+   • IA Documento       → salva resultado direto no Notion DB.
+   • IA Automação       → dispara webhook Zapier (`https://ia-board.zapier.app/api/webhook`).
+   → Remova redundantes ou fusione.
+
+4. ║ SISTEMA HÍBRIDO DE IAs
+   • Função `smartLLM(prompt)`:
+     1º tenta OpenRouter (modelo escolhido).  
+     2º on error → Mistral (mistral-large).  
+     3º on timeout → Groq (llama-3-70b).  
+   • Registra provider e latência em `logs/ai.log`.
+
+5. ║ CORREÇÃO DE UI
+   ▸ Zoom wheel ±20 % (10 %–500 %), pan suave com middle-mouse/shift.  
+   ▸ Drawer lateral vira hambúrguer (“☰”), transição `width 0 → 280 px`.  
+   ▸ Quick-menu (botão direito): itens “Renomear / Duplicar / Deletar / Reexecutar IA” devem estar ativos (remova `pointer-events: none`).  
+   ▸ Bordas e highlights internos: #FF1639 (resto do quadro inalterado).  
+
+6. ║ PÁGINA “DOWNLOADS”
+   • Rota `/downloads` (ou popup) listando:
+     – Vídeos gerados (.mp4)  
+     – Áudios (.mp3)  
+     – PDFs / JSON export  
+   • Botão global “Downloads” no header (badge qtd).
+
+7. ║ HEALTHCHECK AUTOMÁTICO (`npm run health`)
+   • Testar cada provider com chamada curta: deve retornar HTTP 200 e payload válido.  
+   • Listar failures no console; se >0, solicitar nova key ao usuário.
+
+8. ║ SOLICITAÇÃO DE NOVAS APIS
+   • Se algum módulo exigir serviço não coberto pelas keys acima, emitir toast:
+     “API do serviço ‹X› ausente. Por favor forneça uma key gratuita com limite razoável.”
+
+9. ║ LOG DE PROGRESSO
+   • Barra global: 10 % prompt enviado → +40 % API responde → +50 % renderiza.  
+   • Reset após 500 ms quando módulo conclui.
+
+10. ║ NOME & BRANDING
+   • Substitua TODO “Curiso” por **“IA Board”** (logo, título, manifest, console).
+
+11. ║ CHECKOUT FINAL
+   • `npm run dev` abre canvas → todos botões funcionam.  
+   • Gera vídeo/áudio real, salva em /downloads.  
+   • `npm run health` retorna “ALL PROVIDERS ✅”.
+
+Se qualquer etapa falhar, pare, solicite a chave correta ou refatore até passar nos testes.
+###################################################################################################

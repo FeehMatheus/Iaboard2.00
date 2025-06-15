@@ -1,0 +1,100 @@
+###################################################################################################
+##############################  PROMPT TÉCNICO – IA BOARD vNEXT  ##################################
+# Cole integralmente no seu executor (Replit AI / AutoGPT / GPT-Engineer).
+# Meta: tornar o IA Board **100 % funcional, fluido e livre de redundâncias**, integrando
+# todas as APIs já fornecidas (gratuitas ou trial) e solicitando novas chaves se necessário.
+###################################################################################################
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+1. 🗂️  INVENTÁRIO + SANITIZAÇÃO DE MÓDULOS
+   • Faça um scan dos blocos atuais → relacione nome, função e provider de cada um.  
+   • Remova ou fusione módulos que dupliquem responsabilidade.  
+   • Rebatize blocos conforme função única:
+       ─ IA Copy            → headlines / copies
+       ─ IA Produto         → ficha técnica, features
+       ─ IA Vídeo           → geração de vídeo (Stability › Pika › Runway fallback)
+       ─ IA Voz             → ElevenLabs TTS
+       ─ IA Tráfego Pago    → criativos + targeting
+       ─ IA Documento       → envia texto ao Notion
+       ─ IA Automação       → dispara Webhook Zapier
+   • Garantir que **cada módulo mantém linha de pensamento independente** (nada redundante).
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+2. 🔐  VARIÁVEIS .ENV – GRATUITAS / LIMITE ALTO  
+   (Copie exatamente; preencha as chaves que faltam ou deixe vazias para solicitar depois.)
+
+OPENROUTER_API_KEY=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
+MISTRAL_API_KEY=7lCXEIqFPbgj7VUb7jAf9OY5Id93lJCH
+GROQ_API_KEY=<opcional>           # uso do Llama-3-70B ultra-rápido
+STABILITY_API_KEY=sk-hElW1SRtTMGE2N8QmHWMQFfc21fRc6qF0wSyAKFdb1ukwJEy
+PIKA_API_KEY=                     # API indisponível – deixe vazio
+ELEVENLABS_API_KEY=sk_add29f66314cc62383b2652cdcfc78552d9e9608ddc4caaa
+MAILCHIMP_API_KEY=1ebe7b6e9a3d69b0389c894b5a495398-us17
+MAILCHIMP_SERVER_PREFIX=us17
+NOTION_API_KEY=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
+MIXPANEL_TOKEN=2b26e5157e13634d0b93b53eb4c04f9a
+TYPEFORM_API_KEY=tfp_AdtBqVmwpmNj7YhHw7DhBEd2Yko3mDQ115dy2xL1B5sV_3pdYcugRXA7TDK
+HEYGEN_API_KEY=ZGY5MGJkOWM0OTE4NGVlODgyNjViNjhjNGUyM2Y2MDItMTc0OTkyMTQwNg==
+
+► Se qualquer serviço não possuir key, exiba toast:  
+  “<Provider> sem key. Forneça chave gratuita ou pule módulo.”
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+3. 🤖  SISTEMA HÍBRIDO DE IAs (Prioridade de fallback)
+   1⃣ OpenRouter (model escolhido)  
+   2⃣ Mistral (mistral-large-2402)  
+   3⃣ Groq (llama-3-70b)  
+   • Função `smartLLM()` roteia conforme disponibilidade; loga provider + latência.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+4. 🎥  VÍDEO IA
+   • Se `PIKA_API_KEY` presente → endpoint `POST https://api.pikapikapika.io/v1/generate`.  
+   • Caso contrário, usar Stability Video β (`/video/generate`).  
+   • Se Stability falhar → abrir prompt no Runway Studio via URL GET.  
+   • Após geração, mostrar `.mp4` em `<video>` + botão Download (salvar em `/downloads`).
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+5. 🔊  TTS (ElevenLabs)
+   • POST `/v1/text-to-speech/SpTO7r4hF4G4xLRJ9Mug`  
+   • Use voz `pt-BR-AntonioNeural`, retorno MP3 no popup.  
+   • Salvar em `/downloads/audio`.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+6. 📬  MAILCHIMP & AUTOMATION
+   • `addSubscriber()` usando `MAILCHIMP_API_KEY` e lista padrão.  
+   • A cada novo lead gerado pela IA, dispare Zapier webhook `https://ia-board.zapier.app/api/webhook`.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+7. 📊  ANALYTICS & STORAGE
+   • Mixpanel → `mixpanel.track(ev,{...})`, eventos “Prompt”, “VideoGenerated”.  
+   • Notion → salvar páginas em DB “IA Board Outputs”.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+8. 🖥️  UI / UX MELHORIA
+   ◽ **Zoom no Scroll**: ±20 %, suavizado 120 ms.  
+   ◽ **Scroll automático**: enquanto módulo `loading`, canvas pan até centro do bloco.  
+   ◽ **Drawer lateral**: botão ☰ mostra/oculta (width 0→280 px).  
+   ◽ **Quick-menu (right-click)**: Renomear ▸ Duplicar ▸ Excluir ▸ Reexecutar IA – ativar JS listeners.  
+   ◽ **Animações**: on-create scale 0.96→1; on-hover translateY-3px; link pulse border-red.  
+   ◽ **Paleta interna**: #FF1639 / #FF355D para bordas/popup; grid canvas permanece neutro.  
+   ◽ **Página `/downloads`**: lista dinâmica de `.mp4`, `.mp3`, `.pdf`, `.json`.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+9. 🛡️  HEALTHCHECK (script)
+   • Verificar cada provider ≥200 OK e payload válido.  
+   • Se algum falhar → exibir toast “<Provider> falhou (status ##), favor nova key”.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+10. 📛  BRANDING
+   • Substituir TODO “Curiso” por **IA Board** (logo, title, manifest, console.log).  
+   • Atualizar favicon (vermelho neon).
+
+─────────────────────────────────────────────────────────────────────────────────────────────────
+11. ✅  CRITÉRIO DE PRONTO
+   • Todos botões funcionam, módulos respondem com dados técnicos ≥50 tokens.  
+   • Fluxo wizard gera Nicho → Nome → Descrição → Vídeo → Download.  
+   • `npm run health` imprime “ALL PROVIDERS ✅”.  
+   • `/downloads` entrega arquivos.  
+
+SE QUALQUER ITEM NÃO CUMPRIR, PARE E SOLICITE CHAVE OU INSTRUÇÃO AO USUÁRIO.
+###################################################################################################
