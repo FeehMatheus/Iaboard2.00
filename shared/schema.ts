@@ -7,7 +7,9 @@ import {
   index,
   integer,
   boolean,
+  real,
 } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -152,3 +154,99 @@ export const selectAnalyticsSchema = createSelectSchema(analytics);
 
 export const insertPaymentSchema = createInsertSchema(payments);
 export const selectPaymentSchema = createSelectSchema(payments);
+
+// YouTube Analysis Tables
+export const youtubeAnalyses = pgTable("youtube_analyses", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  videoId: varchar("video_id").notNull(),
+  url: varchar("url").notNull(),
+  title: varchar("title").notNull(),
+  duration: integer("duration"), // seconds
+  analysisType: varchar("analysis_type").notNull(), // 'live' | 'video' | 'short'
+  status: varchar("status").notNull().default('pending'), // 'pending' | 'processing' | 'completed' | 'failed'
+  metadata: jsonb("metadata"), // video info, thumbnail, etc
+  userId: varchar("user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+export const timeSegments = pgTable("time_segments", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  analysisId: integer("analysis_id").notNull().references(() => youtubeAnalyses.id),
+  startTime: real("start_time").notNull(), // seconds from beginning
+  endTime: real("end_time").notNull(),
+  transcript: text("transcript"),
+  visualDescription: text("visual_description"),
+  audioAnalysis: text("audio_analysis"),
+  emotions: jsonb("emotions"), // detected emotions with confidence
+  keyTopics: varchar("key_topics").array(),
+  engagementScore: real("engagement_score"),
+  technicalQuality: jsonb("technical_quality"), // audio/video quality metrics
+});
+
+export const contentInsights = pgTable("content_insights", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  analysisId: integer("analysis_id").notNull().references(() => youtubeAnalyses.id),
+  insightType: varchar("insight_type").notNull(), // 'hook', 'retention', 'cta', 'storytelling'
+  timestamp: real("timestamp").notNull(),
+  description: text("description").notNull(),
+  confidence: real("confidence").notNull(),
+  actionable: text("actionable"), // actionable recommendation
+  category: varchar("category"), // 'production', 'content', 'engagement', 'monetization'
+});
+
+export const programStructure = pgTable("program_structure", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  analysisId: integer("analysis_id").notNull().references(() => youtubeAnalyses.id),
+  phase: varchar("phase").notNull(), // 'opening', 'hook', 'content', 'interaction', 'closing'
+  startTime: real("start_time").notNull(),
+  endTime: real("end_time").notNull(),
+  effectiveness: real("effectiveness"), // 0-1 score
+  keyElements: varchar("key_elements").array(),
+  improvements: varchar("improvements").array(),
+});
+
+// Relations
+export const youtubeAnalysesRelations = relations(youtubeAnalyses, ({ many }) => ({
+  segments: many(timeSegments),
+  insights: many(contentInsights),
+  structure: many(programStructure),
+}));
+
+export const timeSegmentsRelations = relations(timeSegments, ({ one }) => ({
+  analysis: one(youtubeAnalyses, {
+    fields: [timeSegments.analysisId],
+    references: [youtubeAnalyses.id],
+  }),
+}));
+
+export const contentInsightsRelations = relations(contentInsights, ({ one }) => ({
+  analysis: one(youtubeAnalyses, {
+    fields: [contentInsights.analysisId],
+    references: [youtubeAnalyses.id],
+  }),
+}));
+
+export const programStructureRelations = relations(programStructure, ({ one }) => ({
+  analysis: one(youtubeAnalyses, {
+    fields: [programStructure.analysisId],
+    references: [youtubeAnalyses.id],
+  }),
+}));
+
+// YouTube Analysis Types
+export type YoutubeAnalysis = typeof youtubeAnalyses.$inferSelect;
+export type InsertYoutubeAnalysis = typeof youtubeAnalyses.$inferInsert;
+export type TimeSegment = typeof timeSegments.$inferSelect;
+export type InsertTimeSegment = typeof timeSegments.$inferInsert;
+export type ContentInsight = typeof contentInsights.$inferSelect;
+export type InsertContentInsight = typeof contentInsights.$inferInsert;
+export type ProgramStructure = typeof programStructure.$inferSelect;
+export type InsertProgramStructure = typeof programStructure.$inferInsert;
+
+// YouTube Analysis Schemas
+export const insertYoutubeAnalysisSchema = createInsertSchema(youtubeAnalyses);
+export const selectYoutubeAnalysisSchema = createSelectSchema(youtubeAnalyses);
+export const insertTimeSegmentSchema = createInsertSchema(timeSegments);
+export const insertContentInsightSchema = createInsertSchema(contentInsights);
+export const insertProgramStructureSchema = createInsertSchema(programStructure);

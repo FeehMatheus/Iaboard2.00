@@ -19,12 +19,25 @@ export interface IStorage {
   // AI Generation operations
   createAIGeneration(insertGeneration: any): Promise<any>;
   getAIGenerations(userId: string): Promise<any[]>;
+
+  // YouTube Analysis operations
+  createYouTubeAnalysis(insertAnalysis: any): Promise<any>;
+  getYouTubeAnalysis(id: number): Promise<any>;
+  updateYouTubeAnalysis(id: number, data: any): Promise<any>;
+  createTimeSegment(insertSegment: any): Promise<any>;
+  createContentInsight(insertInsight: any): Promise<any>;
+  createProgramStructure(insertStructure: any): Promise<any>;
+  getAnalysisWithDetails(id: number): Promise<any>;
 }
 
 export class MemoryStorage implements IStorage {
   private memoryUsers: Map<string, any> = new Map();
   private memoryProjects: Map<string, any> = new Map();
   private memoryGenerations: Map<string, any> = new Map();
+  private memoryAnalyses: Map<number, any> = new Map();
+  private memorySegments: Map<number, any> = new Map();
+  private memoryInsights: Map<number, any> = new Map();
+  private memoryStructure: Map<number, any> = new Map();
 
   constructor() {
     // Initialize with demo data
