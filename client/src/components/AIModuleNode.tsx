@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/select';
 
 interface AIModuleData {
-  moduleType: 'ia-copy' | 'ia-video' | 'ia-produto' | 'ia-trafego' | 'ia-analytics' | 'workflow-choreography';
+  moduleType: 'ia-copy' | 'ia-video' | 'ia-produto' | 'ia-trafego' | 'ia-analytics' | 'workflow-choreography' | 'ia-pensamento-poderoso';
   prompt?: string;
   parameters?: any;
   result?: string;
@@ -45,6 +45,10 @@ interface AIModuleData {
   choreographyData?: {
     goal?: string;
     preferences?: any;
+  };
+  thinkingData?: {
+    problema?: string;
+    profundidade?: string;
   };
 }
 
@@ -84,6 +88,12 @@ const moduleConfigs = {
     icon: Sparkles,
     color: 'from-purple-500 to-pink-600',
     description: 'Intelligent workflow orchestration and optimization'
+  },
+  'ia-pensamento-poderoso': {
+    name: 'IA Pensamento Poderoso',
+    icon: Brain,
+    color: 'from-indigo-500 to-purple-600',
+    description: 'Análise cognitiva multi-camadas para resolução de problemas complexos'
   }
 };
 
@@ -348,7 +358,8 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
         'ia-produto': '/api/ia-produto/generate',
         'ia-trafego': '/api/ia-trafego/generate',
         'ia-analytics': '/api/ia-analytics/generate',
-        'workflow-choreography': '/api/workflow-choreography/generate'
+        'workflow-choreography': '/api/workflow-choreography/generate',
+        'ia-pensamento-poderoso': '/api/ia-pensamento-poderoso/processar'
       };
 
       const endpoint = endpoints[moduleType];
