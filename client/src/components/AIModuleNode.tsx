@@ -78,6 +78,12 @@ const moduleConfigs = {
     icon: BarChart3,
     color: 'from-red-500 to-red-600',
     description: 'Análise de dados e métricas'
+  },
+  'workflow-choreography': {
+    name: 'Workflow Choreography',
+    icon: Sparkles,
+    color: 'from-purple-500 to-pink-600',
+    description: 'Intelligent workflow orchestration and optimization'
   }
 };
 
@@ -341,7 +347,8 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
         'ia-video': '/api/ia-video/generate',
         'ia-produto': '/api/ia-produto/generate',
         'ia-trafego': '/api/ia-trafego/generate',
-        'ia-analytics': '/api/ia-analytics/generate'
+        'ia-analytics': '/api/ia-analytics/generate',
+        'workflow-choreography': '/api/workflow-choreography/generate'
       };
 
       const endpoint = endpoints[moduleType];
@@ -377,6 +384,18 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
           metrics: parameters.metrics || 'conversões, ROI, CAC',
           goals: parameters.goals || 'otimizar performance',
           platforms: parameters.platforms || 'Google Analytics, Facebook Pixel'
+        },
+        'workflow-choreography': {
+          goal: prompt.trim(),
+          industry: parameters.industry || '',
+          targetAudience: parameters.targetAudience || '',
+          budget: parameters.budget || 'medium',
+          timeline: parameters.timeline || 'normal',
+          preferences: {
+            complexity: parameters.complexity || 'intermediate',
+            automation: parameters.automation || 'moderate',
+            outputs: parameters.outputs || []
+          }
         }
       };
 

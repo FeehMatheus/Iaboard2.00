@@ -1,0 +1,360 @@
+{
+  "id": "workflow-1750013164169",
+  "goal": "Launch a new SaaS product for small businesses",
+  "createdAt": "2025-06-15T18:46:04.169Z",
+  "nodes": [
+    {
+      "id": "node-market-research-1750013164166-0",
+      "type": "ia-analytics",
+      "position": {
+        "x": 22.00545726505205,
+        "y": -24.704504327650113
+      },
+      "data": {
+        "prompt": "Conduct comprehensive market research for Launch a new SaaS product for small businesses targeting Small business owners",
+        "parameters": {
+          "estimatedTime": 300,
+          "moduleType": "market-research",
+          "priority": 10,
+          "outputs": [
+            "market-analysis",
+            "competitor-data",
+            "opportunity-insights"
+          ]
+        },
+        "dependencies": [],
+        "outputs": [
+          "market-analysis",
+          "competitor-data",
+          "opportunity-insights"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-audience-analysis-1750013164166-1",
+      "type": "ia-analytics",
+      "position": {
+        "x": 283.07722118799495,
+        "y": -3.4186883212283026
+      },
+      "data": {
+        "prompt": "Analyze target audience for Launch a new SaaS product for small businesses in saas sector",
+        "parameters": {
+          "estimatedTime": 240,
+          "moduleType": "audience-analysis",
+          "priority": 9,
+          "outputs": [
+            "audience-personas",
+            "behavior-insights",
+            "preferences"
+          ]
+        },
+        "dependencies": [
+          "market-research"
+        ],
+        "outputs": [
+          "audience-personas",
+          "behavior-insights",
+          "preferences"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-content-strategy-1750013164166-2",
+      "type": "ia-copy",
+      "position": {
+        "x": 589.2971161307573,
+        "y": -8.668813369784168
+      },
+      "data": {
+        "prompt": "Create content strategy based on market research and audience analysis",
+        "parameters": {
+          "estimatedTime": 360,
+          "moduleType": "content-strategy",
+          "priority": 7,
+          "outputs": [
+            "content-plan",
+            "messaging-framework",
+            "content-calendar"
+          ]
+        },
+        "dependencies": [
+          "audience-analysis"
+        ],
+        "outputs": [
+          "content-plan",
+          "messaging-framework",
+          "content-calendar"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-sales-copy-1750013164166-3",
+      "type": "ia-copy",
+      "position": {
+        "x": -2.832320802413557,
+        "y": 292.64543933624395
+      },
+      "data": {
+        "prompt": "Generate high-converting sales copy for Launch a new SaaS product for small businesses",
+        "parameters": {
+          "estimatedTime": 480,
+          "moduleType": "sales-copy",
+          "priority": 8,
+          "outputs": [
+            "sales-letter",
+            "headlines",
+            "call-to-actions"
+          ]
+        },
+        "dependencies": [
+          "audience-analysis",
+          "content-strategy"
+        ],
+        "outputs": [
+          "sales-letter",
+          "headlines",
+          "call-to-actions"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-video-content-1750013164166-4",
+      "type": "ia-video",
+      "position": {
+        "x": 288.9152432814901,
+        "y": 300.867513406397
+      },
+      "data": {
+        "prompt": "Create engaging video content for Launch a new SaaS product for small businesses",
+        "parameters": {
+          "estimatedTime": 900,
+          "moduleType": "video-content",
+          "priority": 8,
+          "outputs": [
+            "promotional-video",
+            "tutorial-content",
+            "social-media-clips"
+          ]
+        },
+        "dependencies": [
+          "content-strategy"
+        ],
+        "outputs": [
+          "promotional-video",
+          "tutorial-content",
+          "social-media-clips"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-funnel-design-1750013164166-5",
+      "type": "ia-produto",
+      "position": {
+        "x": 581.2144330847267,
+        "y": 301.4163560438019
+      },
+      "data": {
+        "prompt": "Design complete sales funnel for Launch a new SaaS product for small businesses",
+        "parameters": {
+          "estimatedTime": 600,
+          "moduleType": "funnel-design",
+          "priority": 6,
+          "outputs": [
+            "landing-pages",
+            "email-sequences",
+            "upsell-offers"
+          ]
+        },
+        "dependencies": [
+          "sales-copy"
+        ],
+        "outputs": [
+          "landing-pages",
+          "email-sequences",
+          "upsell-offers"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-traffic-strategy-1750013164167-6",
+      "type": "ia-trafego",
+      "position": {
+        "x": -17.19300301250877,
+        "y": 578.9399606311024
+      },
+      "data": {
+        "prompt": "Develop traffic generation strategy for Launch a new SaaS product for small businesses",
+        "parameters": {
+          "estimatedTime": 420,
+          "moduleType": "traffic-strategy",
+          "priority": 4,
+          "outputs": [
+            "ad-campaigns",
+            "seo-strategy",
+            "social-media-plan"
+          ]
+        },
+        "dependencies": [
+          "content-strategy",
+          "funnel-design"
+        ],
+        "outputs": [
+          "ad-campaigns",
+          "seo-strategy",
+          "social-media-plan"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    },
+    {
+      "id": "node-analytics-setup-1750013164167-7",
+      "type": "ia-analytics",
+      "position": {
+        "x": 293.50211279087586,
+        "y": 576.3646382005122
+      },
+      "data": {
+        "prompt": "Setup analytics and tracking for Launch a new SaaS product for small businesses",
+        "parameters": {
+          "estimatedTime": 180,
+          "moduleType": "analytics-setup",
+          "priority": 3,
+          "outputs": [
+            "tracking-setup",
+            "kpi-dashboard",
+            "reporting-system"
+          ]
+        },
+        "dependencies": [],
+        "outputs": [
+          "tracking-setup",
+          "kpi-dashboard",
+          "reporting-system"
+        ],
+        "executionOrder": 0,
+        "status": "pending"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "connection-node-market-research-1750013164166-0-node-audience-analysis-1750013164166-1",
+      "source": "node-market-research-1750013164166-0",
+      "target": "node-audience-analysis-1750013164166-1",
+      "type": "smoothstep"
+    },
+    {
+      "id": "connection-node-audience-analysis-1750013164166-1-node-content-strategy-1750013164166-2",
+      "source": "node-audience-analysis-1750013164166-1",
+      "target": "node-content-strategy-1750013164166-2",
+      "type": "smoothstep"
+    },
+    {
+      "id": "connection-node-audience-analysis-1750013164166-1-node-sales-copy-1750013164166-3",
+      "source": "node-audience-analysis-1750013164166-1",
+      "target": "node-sales-copy-1750013164166-3",
+      "type": "smoothstep"
+    },
+    {
+      "id": "connection-node-content-strategy-1750013164166-2-node-sales-copy-1750013164166-3",
+      "source": "node-content-strategy-1750013164166-2",
+      "target": "node-sales-copy-1750013164166-3",
+      "type": "smoothstep"
+    },
+    {
+      "id": "connection-node-content-strategy-1750013164166-2-node-video-content-1750013164166-4",
+      "source": "node-content-strategy-1750013164166-2",
+      "target": "node-video-content-1750013164166-4",
+      "type": "smoothstep"
+    },
+    {
+      "id": "connection-node-sales-copy-1750013164166-3-node-funnel-design-1750013164166-5",
+      "source": "node-sales-copy-1750013164166-3",
+      "target": "node-funnel-design-1750013164166-5",
+      "type": "smoothstep"
+    },
+    {
+      "id": "connection-node-content-strategy-1750013164166-2-node-traffic-strategy-1750013164167-6",
+      "source": "node-content-strategy-1750013164166-2",
+      "target": "node-traffic-strategy-1750013164167-6",
+      "type": "smoothstep"
+    },
+    {
+      "id": "connection-node-funnel-design-1750013164166-5-node-traffic-strategy-1750013164167-6",
+      "source": "node-funnel-design-1750013164166-5",
+      "target": "node-traffic-strategy-1750013164167-6",
+      "type": "smoothstep"
+    }
+  ],
+  "executionPlan": {
+    "phases": [
+      {
+        "phase": 1,
+        "name": "Research & Analysis",
+        "description": "Comprehensive market and audience research to understand the landscape",
+        "nodes": [
+          "node-traffic-strategy-1750013164167-6",
+          "node-funnel-design-1750013164166-5"
+        ],
+        "estimatedTime": 600
+      },
+      {
+        "phase": 2,
+        "name": "Strategy Development",
+        "description": "Strategic planning and content framework development",
+        "nodes": [
+          "node-sales-copy-1750013164166-3",
+          "node-video-content-1750013164166-4"
+        ],
+        "estimatedTime": 900
+      },
+      {
+        "phase": 3,
+        "name": "Content Creation",
+        "description": "Creative content and copy generation",
+        "nodes": [
+          "node-content-strategy-1750013164166-2",
+          "node-audience-analysis-1750013164166-1"
+        ],
+        "estimatedTime": 360
+      },
+      {
+        "phase": 4,
+        "name": "Implementation",
+        "description": "Funnel and traffic system implementation",
+        "nodes": [
+          "node-market-research-1750013164166-0",
+          "node-analytics-setup-1750013164167-7"
+        ],
+        "estimatedTime": 300
+      }
+    ],
+    "totalEstimatedTime": 2160,
+    "criticalPath": [
+      "node-market-research-1750013164166-0",
+      "node-audience-analysis-1750013164166-1",
+      "node-content-strategy-1750013164166-2",
+      "node-sales-copy-1750013164166-3",
+      "node-funnel-design-1750013164166-5",
+      "node-traffic-strategy-1750013164167-6"
+    ]
+  },
+  "recommendations": [
+    "Implement advanced analytics tracking from the start",
+    "Consider A/B testing multiple approaches simultaneously"
+  ]
+}
