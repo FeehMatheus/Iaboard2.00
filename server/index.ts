@@ -6,6 +6,8 @@ import enhancedRoutes from "./enhanced-routes";
 import aiModuleRoutes from "./ai-module-routes";
 import iaBoardModules from "./ia-board-modules";
 import fastAIRoutes from "./fast-ai-routes";
+import downloadsManager from "./downloads-manager";
+import highPerformanceAI from "./high-performance-ai";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -46,7 +48,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Add fast AI routes (highest priority for performance)
+  // Add downloads manager (highest priority)
+  app.use(downloadsManager);
+  
+  // Add fast AI routes
   app.use(fastAIRoutes);
   
   // Add IA Board specialized modules
