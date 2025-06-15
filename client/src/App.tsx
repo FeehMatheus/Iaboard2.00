@@ -6,6 +6,7 @@ import SmartGuidance from '@/components/SmartGuidance';
 import IABoard from '@/pages/CurisoOriginal';
 import ProgressDemo from '@/pages/ProgressDemo';
 import { IABoardProductionDashboard } from '@/components/IABoardProductionDashboard';
+import { FixedSystemTester } from '@/components/FixedSystemTester';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="/" component={IABoard} />
             <Route path="/progress" component={ProgressDemo} />
             <Route path="/production" component={IABoardProductionDashboard} />
+            <Route path="/tests" component={FixedSystemTester} />
             <Route>
               <IABoard />
             </Route>

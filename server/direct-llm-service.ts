@@ -45,21 +45,15 @@ export class DirectLLMService {
       // Determine best available model
       const model = request.model || this.getBestAvailableModel();
       
-      if (model === 'gpt-4o' && this.openai) {
+      if (model === 'mistral-large') {
+        return await this.generateWithMistral(request);
+      } else if (model === 'gpt-4o' && this.openai) {
         return await this.generateWithOpenAI(request);
       } else if (model === 'claude-sonnet-4' && this.anthropic) {
         return await this.generateWithClaude(request);
-      } else if (model === 'mistral-large') {
-        return await this.generateWithMistral(request);
       } else {
-        // Fallback to any available service
-        if (this.anthropic) {
-          return await this.generateWithClaude({ ...request, model: 'claude-sonnet-4' });
-        } else if (this.openai) {
-          return await this.generateWithOpenAI({ ...request, model: 'gpt-4o' });
-        } else {
-          return await this.generateWithMistral({ ...request, model: 'mistral-large' });
-        }
+        // Fallback prioritizing working services
+        return await this.generateWithMistral({ ...request, model: 'mistral-large' });
       }
     } catch (error) {
       console.error('Direct LLM generation error:', error);
@@ -157,13 +151,13 @@ export class DirectLLMService {
   }
 
   private getBestAvailableModel(): 'gpt-4o' | 'claude-sonnet-4' | 'mistral-large' {
-    // Priority: Claude > OpenAI > Mistral (based on capability)
-    if (this.anthropic && process.env.ANTHROPIC_API_KEY) {
-      return 'claude-sonnet-4';
+    // Priority: Mistral > OpenAI > Claude (based on availability)
+    if (process.env.MISTRAL_API_KEY) {
+      return 'mistral-large';
     } else if (this.openai && process.env.OPENAI_API_KEY) {
       return 'gpt-4o';
     } else {
-      return 'mistral-large';
+      return 'claude-sonnet-4';
     }
   }
 
