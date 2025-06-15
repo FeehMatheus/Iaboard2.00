@@ -104,6 +104,30 @@ const AIModuleNode = ({ data, id }: { data: any, id: string }) => {
         </div>
       </CardHeader>
       
+      {/* ReactFlow Handles */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="target"
+        style={{
+          background: '#555',
+          width: 8,
+          height: 8,
+          border: '2px solid #fff'
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="source"
+        style={{
+          background: '#555',
+          width: 8,
+          height: 8,
+          border: '2px solid #fff'
+        }}
+      />
+      
       {isExpanded && (
         <CardContent className="pt-0">
           <div className="space-y-3">
@@ -225,8 +249,22 @@ const initialNodes: Node[] = [
 ];
 
 const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2', animated: true },
-  { id: 'e1-3', source: '1', target: '3', animated: true }
+  { 
+    id: 'e1-2', 
+    source: '1', 
+    target: '2', 
+    sourceHandle: 'source',
+    targetHandle: 'target',
+    animated: true 
+  },
+  { 
+    id: 'e1-3', 
+    source: '1', 
+    target: '3', 
+    sourceHandle: 'source',
+    targetHandle: 'target',
+    animated: true 
+  }
 ];
 
 interface CanvasControlsProps {
