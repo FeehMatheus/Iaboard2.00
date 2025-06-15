@@ -121,7 +121,7 @@ router.post('/api/ia-produto/generate', async (req, res) => {
       
       Inclua: análise de mercado, especificações técnicas, diferenciais competitivos, estratégia de preços, plano de lançamento, projeções financeiras.`,
       systemPrompt: 'Você é um consultor de produtos digitais com 15 anos de experiência em lançamentos de sucesso. Crie estratégias detalhadas e implementáveis.',
-      maxTokens: 3000
+      maxTokens: 1500
     });
 
     if (!aiResult.success) {
@@ -187,7 +187,7 @@ router.post('/api/ia-video/generate', async (req, res) => {
       
       Inclua: hook inicial, desenvolvimento, call-to-action, descrições visuais, timing.`,
       systemPrompt: 'Você é um roteirista especialista em vídeos virais e de conversão. Crie roteiros envolventes e detalhados.',
-      maxTokens: 2000
+      maxTokens: 1500
     });
 
     let videoUrl = null;
