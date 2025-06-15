@@ -283,7 +283,7 @@ const CanvasControls = ({ onAddNode, onSaveCanvas, onLoadCanvas, onExecuteAll }:
   );
 };
 
-export function InfiniteCanvasSupreme() {
+function InfiniteCanvasSupreme() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNodeType, setSelectedNodeType] = useState('ai-content');
@@ -520,6 +520,8 @@ export function InfiniteCanvasSupreme() {
     </div>
   );
 }
+
+export { InfiniteCanvasSupreme };
 
 export default function WrappedInfiniteCanvasSupreme() {
   return (
