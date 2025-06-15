@@ -12,7 +12,9 @@ import ReactFlow, {
   ReactFlowProvider,
   Panel,
   MiniMap,
-  useReactFlow
+  useReactFlow,
+  Handle,
+  Position
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

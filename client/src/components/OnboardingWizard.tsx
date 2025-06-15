@@ -22,7 +22,7 @@ import {
   Rocket,
   Lightbulb
 } from 'lucide-react';
-import { useReactFlow } from 'reactflow';
+
 
 interface OnboardingWizardProps {
   isOpen: boolean;
@@ -101,7 +101,7 @@ export const OnboardingWizard = ({ isOpen, onClose, onComplete }: OnboardingWiza
   });
   const [isCreating, setIsCreating] = useState(false);
 
-  const { addNodes, addEdges } = useReactFlow();
+  // Remove useReactFlow hook - not needed for onboarding
 
   const currentStepData = ONBOARDING_STEPS[currentStep];
   const progress = ((currentStep + 1) / ONBOARDING_STEPS.length) * 100;
@@ -155,16 +155,14 @@ export const OnboardingWizard = ({ isOpen, onClose, onComplete }: OnboardingWiza
         style: { stroke: '#667eea' }
       }));
 
-      // Add nodes and edges to the canvas
-      addNodes(nodes);
-      addEdges(edges);
-
       // Complete onboarding
       onComplete({
         goal: selectedGoal,
         projectData,
         workflowNodes: nodes.length,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        generatedNodes: nodes,
+        generatedEdges: edges
       });
 
       setTimeout(handleNext, 1000);
@@ -173,7 +171,7 @@ export const OnboardingWizard = ({ isOpen, onClose, onComplete }: OnboardingWiza
     } finally {
       setIsCreating(false);
     }
-  }, [selectedGoal, projectData, addNodes, addEdges, onComplete, handleNext]);
+  }, [selectedGoal, projectData, onComplete, handleNext]);
 
   const renderWelcomeStep = () => (
     <div className="text-center space-y-6">
