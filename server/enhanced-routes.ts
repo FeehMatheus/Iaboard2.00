@@ -4,7 +4,6 @@ import { youTubeRealTimeAnalyzer } from './youtube-real-time-analyzer';
 import { aiEngineSupreme } from './ai-engine-supreme';
 import { aiModuleExecutor } from './ai-module-executor';
 import { advancedAIService } from './advanced-ai-service';
-import { realTimeDemoSystem } from './real-time-demo-system';
 
 const router = express.Router();
 
@@ -469,127 +468,6 @@ router.post('/api/optimize/prompt', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Erro na otimização do prompt',
-      details: error.message
-    });
-  }
-});
-
-// Real-time Demo System
-router.post('/api/demo/execute', async (req, res) => {
-  try {
-    const { demoType, parameters } = req.body;
-
-    if (!demoType) {
-      return res.status(400).json({
-        success: false,
-        error: 'Demo type is required'
-      });
-    }
-
-    const result = await realTimeDemoSystem.executeRealTimeDemo({
-      demoType,
-      parameters: parameters || {}
-    });
-
-    res.json({
-      success: true,
-      data: result,
-      message: `Demo ${demoType} executed successfully!`
-    });
-  } catch (error) {
-    console.error('Demo execution error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Demo execution failed',
-      details: error.message
-    });
-  }
-});
-
-// System Health and Performance Monitoring
-router.get('/api/system/health', async (req, res) => {
-  try {
-    const health = {
-      status: 'operational',
-      timestamp: new Date().toISOString(),
-      services: {
-        supremeFurionSystem: 'active',
-        youtubeAnalyzer: 'active',
-        aiEngineSupreme: 'active',
-        aiModuleExecutor: 'active',
-        realTimeDemoSystem: 'active'
-      },
-      performance: {
-        averageResponseTime: '1.2s',
-        successRate: '98.5%',
-        totalRequests: 1547,
-        activeUsers: 23
-      },
-      aiModels: {
-        'gpt-4o': process.env.OPENAI_API_KEY ? 'available' : 'no-key',
-        'claude-3-sonnet': process.env.ANTHROPIC_API_KEY ? 'available' : 'no-key'
-      }
-    };
-
-    res.json({
-      success: true,
-      data: health,
-      message: 'System health check completed'
-    });
-  } catch (error) {
-    console.error('Health check error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Health check failed',
-      details: error.message
-    });
-  }
-});
-
-// Live Performance Metrics
-router.get('/api/metrics/live', async (req, res) => {
-  try {
-    const metrics = {
-      realTimeStats: {
-        productsCreated: 847,
-        averageCreationTime: '8.5 minutes',
-        successRate: '94.3%',
-        totalRevenue: 'R$ 2,847,593',
-        activeUsers: 156
-      },
-      aiPerformance: {
-        totalTokensProcessed: 15847293,
-        averageTokensPerRequest: 1250,
-        modelDistribution: {
-          'gpt-4o': '45%',
-          'claude-3-sonnet': '35%',
-          'fallback': '20%'
-        }
-      },
-      systemLoad: {
-        cpu: '23%',
-        memory: '45%',
-        storage: '12%',
-        network: '5.2 Mbps'
-      },
-      userEngagement: {
-        averageSessionTime: '24 minutes',
-        pagesPerSession: 8.3,
-        conversionRate: '12.8%',
-        returnUserRate: '67%'
-      }
-    };
-
-    res.json({
-      success: true,
-      data: metrics,
-      message: 'Live metrics retrieved'
-    });
-  } catch (error) {
-    console.error('Metrics error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Metrics retrieval failed',
       details: error.message
     });
   }

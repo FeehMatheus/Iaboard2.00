@@ -8,7 +8,6 @@ import ProgressDemo from '@/pages/ProgressDemo';
 import { IABoardProductionDashboard } from '@/components/IABoardProductionDashboard';
 import { FixedSystemTester } from '@/components/FixedSystemTester';
 import { YouTubeAnalyzer } from '@/components/YouTubeAnalyzer';
-import SupremeFurionDashboard from '@/pages/SupremeFurionDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,15 +38,13 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-background">
           <Switch>
-            <Route path="/" component={SupremeFurionDashboard} />
-            <Route path="/furion" component={SupremeFurionDashboard} />
-            <Route path="/board" component={IABoard} />
+            <Route path="/" component={IABoard} />
             <Route path="/progress" component={ProgressDemo} />
             <Route path="/production" component={IABoardProductionDashboard} />
             <Route path="/tests" component={FixedSystemTester} />
             <Route path="/youtube" component={YouTubeAnalyzer} />
             <Route>
-              <SupremeFurionDashboard />
+              <IABoard />
             </Route>
           </Switch>
           <SmartGuidance 

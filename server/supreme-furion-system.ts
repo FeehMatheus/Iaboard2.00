@@ -487,7 +487,7 @@ Foque em conversão e retenção.
           messages: [{ role: 'user', content: prompt }],
           system: 'Você é um especialista em criação de produtos digitais e marketing. Forneça respostas detalhadas, práticas e executáveis.'
         });
-        return Array.isArray(response.content) ? response.content[0].text : response.content;
+        return response.content[0].text;
       } else if (this.openai) {
         const response = await this.openai.chat.completions.create({
           model: 'gpt-4o',
