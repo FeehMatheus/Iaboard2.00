@@ -32,7 +32,7 @@ router.post('/api/ia-copy/generate', async (req, res) => {
       
       Inclua: headlines magnéticos, bullets irresistíveis, prova social, CTAs poderosos, ofertas irresistíveis com urgência e escassez.`,
       systemPrompt: 'Você é um copywriter mundial especialista em vendas com 20 anos de experiência. Crie copy persuasivo de alta conversão em português brasileiro.',
-      maxTokens: 3000
+      maxTokens: 1500
     });
 
     if (!aiResult.success) {

@@ -2,6 +2,10 @@ import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import fs from 'fs';
 import path from 'path';
+import { config } from 'dotenv';
+
+// Load environment variables
+config();
 
 interface SmartLLMRequest {
   prompt: string;
@@ -50,32 +54,39 @@ class SmartLLMSystem {
   }
 
   private initializeProviders() {
-    // 1. OpenRouter (multi-provider with high limits)
-    if (process.env.OPENROUTER_API_KEY) {
-      this.providers.push({
-        name: 'openrouter',
-        priority: 1,
-        enabled: true,
-        baseUrl: 'https://openrouter.ai/api/v1',
-        models: ['openai/gpt-4o', 'anthropic/claude-3-sonnet', 'google/gemini-pro-1.5'],
-        dailyLimit: 1000,
-        currentUsage: 0,
-        resetTime: this.getNextMidnight()
-      });
-    }
-
-    // 2. Mistral (high performance, generous free tier)
+    console.log('[SmartLLM] Checking environment variables...');
+    console.log('[SmartLLM] OPENROUTER_API_KEY:', process.env.OPENROUTER_API_KEY ? 'present' : 'missing');
+    console.log('[SmartLLM] MISTRAL_API_KEY:', process.env.MISTRAL_API_KEY ? 'present' : 'missing');
+    console.log('[SmartLLM] GROQ_API_KEY:', process.env.GROQ_API_KEY ? 'present' : 'missing');
+    
+    // 1. Mistral (high performance, verified working)
     if (process.env.MISTRAL_API_KEY) {
       this.providers.push({
         name: 'mistral',
-        priority: 2,
+        priority: 1,
         enabled: true,
         baseUrl: 'https://api.mistral.ai/v1',
-        models: ['mistral-large-2402'],
+        models: ['mistral-small'],
         dailyLimit: 500,
         currentUsage: 0,
         resetTime: this.getNextMidnight()
       });
+      console.log('[SmartLLM] Added Mistral provider');
+    }
+
+    // 2. OpenRouter (multi-provider with credit limits)
+    if (process.env.OPENROUTER_API_KEY) {
+      this.providers.push({
+        name: 'openrouter',
+        priority: 2,
+        enabled: true,
+        baseUrl: 'https://openrouter.ai/api/v1',
+        models: ['openai/gpt-4o-mini'],
+        dailyLimit: 100,
+        currentUsage: 0,
+        resetTime: this.getNextMidnight()
+      });
+      console.log('[SmartLLM] Added OpenRouter provider');
     }
 
     // 3. Groq (ultra-fast Llama)
