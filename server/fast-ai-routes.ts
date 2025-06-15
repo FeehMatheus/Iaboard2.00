@@ -27,7 +27,7 @@ router.post('/api/fast/copy', async (req, res) => {
     const aiResult = await smartLLM.smartLLM({
       prompt: `Copy para: ${prompt}. Nicho: ${niche}. Público: ${targetAudience}. Objetivo: ${objective}`,
       systemPrompt: 'Crie copy persuasivo conciso em português.',
-      maxTokens: 300,
+      maxTokens: 150,
       temperature: 0.7
     });
 
