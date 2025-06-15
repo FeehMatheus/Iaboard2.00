@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 import { realYouTubeAnalyzer } from './real-youtube-analyzer';
-import { liveStreamAnalyzer } from './live-stream-analyzer';
 import { storage } from './storage';
 
 interface FurionTechnology {
@@ -181,53 +180,18 @@ export class FurionSuperiorSystem {
   async analyzeVideoComprehensively(url: string): Promise<ContentAnalysis> {
     console.log(`🚀 Iniciando análise superior ao Furion: ${url}`);
 
-    // Usar análise avançada para live streams
-    const liveStreamAnalysis = await liveStreamAnalyzer.analyzeLiveStreamComprehensively(url);
-    
-    // Converter para formato compatível
-    const transcriptSegments = liveStreamAnalysis.realTimeTranscript.map(segment => ({
-      timestamp: segment.timestamp,
-      text: segment.spokenText,
-      confidence: 0.9,
-      speaker: 'presenter',
-      emotion: segment.emotionalTone,
-      persuasionLevel: segment.persuasionLevel,
-      callToActionPresent: segment.callToActionStrength > 0.5,
-      keywordDensity: segment.keywordDensity
-    }));
+    // Primeiro, obter análise básica do YouTube
+    const baseAnalysis = await realYouTubeAnalyzer.analyzeVideo(url);
 
-    // Extrair insights avançados
-    const marketingInsights = liveStreamAnalysis.persuasionMap.map(point => ({
-      type: point.technique as any,
-      timestamp: point.timestamp,
-      description: point.implementation,
-      effectiveness: point.effectiveness,
-      improvement: point.improvement,
-      conversionImpact: point.effectiveness
-    }));
-
-    const copywritingElements = this.extractCopyElementsFromTranscript(transcriptSegments);
-    const psychologicalTriggers = liveStreamAnalysis.psychologyTriggers.map(trigger => ({
-      trigger: trigger.trigger as any,
-      timestamp: trigger.timestamp,
-      implementation: trigger.neuralResponse,
-      strength: trigger.conversionImpact,
-      audience_response: `Impacto neural: ${trigger.optimization}`,
-      enhancement: trigger.optimization
-    }));
-
-    const monetizationOpportunities = liveStreamAnalysis.monetizationMoments.map(moment => ({
-      type: 'course_promo' as const,
-      timestamp: moment.timestamp,
-      opportunity: moment.opportunity,
-      revenue_potential: moment.revenueEsimate,
-      implementation_strategy: moment.implementation,
-      conversion_probability: moment.conversionProbability
-    }));
-
-    const competitorAnalysis = this.createCompetitorAnalysis(liveStreamAnalysis.competitiveAdvantages);
-    const audienceProfile = await this.createAdvancedAudienceProfile(transcriptSegments);
-    const performanceMetrics = this.convertEngagementMetrics(liveStreamAnalysis.audienceEngagement);
+    // Aplicar todas as tecnologias Furion
+    const transcriptSegments = await this.generateDetailedTranscript(baseAnalysis);
+    const marketingInsights = await this.extractMarketingInsights(transcriptSegments);
+    const copywritingElements = await this.identifyCopywritingElements(transcriptSegments);
+    const psychologicalTriggers = await this.detectPsychologicalTriggers(transcriptSegments);
+    const monetizationOpportunities = await this.scanMonetizationOpportunities(transcriptSegments);
+    const competitorAnalysis = await this.performCompetitorAnalysis(baseAnalysis.videoInfo);
+    const audienceProfile = await this.createAudienceProfile(transcriptSegments, marketingInsights);
+    const performanceMetrics = await this.calculatePerformanceMetrics(baseAnalysis, marketingInsights);
 
     return {
       transcriptSegments,
@@ -238,92 +202,6 @@ export class FurionSuperiorSystem {
       competitorAnalysis,
       audienceProfile,
       performanceMetrics
-    };
-  }
-
-  private extractCopyElementsFromTranscript(segments: any[]): CopywritingElement[] {
-    return segments
-      .filter(s => s.persuasionLevel > 0.6)
-      .map(segment => ({
-        element: segment.callToActionPresent ? 'cta' : 'bullet_point' as const,
-        content: segment.text,
-        timestamp: segment.timestamp,
-        persuasionScore: segment.persuasionLevel,
-        emotionalTrigger: segment.emotion,
-        optimization: `Intensificar ${segment.emotion} para maior impacto emocional`
-      }));
-  }
-
-  private createCompetitorAnalysis(advantages: string[]): CompetitorAnalysis {
-    return {
-      competitor_strengths: [
-        "Base de usuários estabelecida",
-        "Reconhecimento de marca",
-        "Recursos financeiros"
-      ],
-      our_advantages: advantages,
-      market_gaps: [
-        "Análise em tempo real detalhada",
-        "Psicologia aplicada ao marketing",
-        "Integração completa de tecnologias"
-      ],
-      differentiation_strategy: "Oferecer análise palavra por palavra com IA superior e insights psicológicos profundos",
-      positioning_recommendations: [
-        "Posicionar como tecnologia de próxima geração",
-        "Enfatizar precisão e profundidade da análise",
-        "Destacar ROI mensurável e resultados imediatos"
-      ]
-    };
-  }
-
-  private async createAdvancedAudienceProfile(segments: any[]): Promise<AudienceProfile> {
-    return {
-      demographics: {
-        age_range: "25-45 anos",
-        income_level: "Classe B/C",
-        education: "Superior completo/incompleto",
-        profession: "Empreendedores, marketers, criadores de conteúdo"
-      },
-      psychographics: {
-        pain_points: [
-          "Dificuldade em converter audiência",
-          "Falta de estratégia estruturada",
-          "Competição acirrada no mercado"
-        ],
-        desires: [
-          "Aumentar vendas rapidamente",
-          "Construir autoridade no mercado",
-          "Automatizar processos"
-        ],
-        objections: [
-          "Preço elevado",
-          "Complexidade técnica",
-          "Tempo de implementação"
-        ],
-        buying_triggers: [
-          "Urgência/escassez",
-          "Prova social",
-          "Garantia de resultado"
-        ]
-      },
-      behavior_patterns: {
-        content_consumption: "Consome muito conteúdo educacional online",
-        decision_making: "Pesquisa bastante antes de comprar",
-        social_media_usage: "Ativo no Instagram, YouTube, LinkedIn",
-        purchasing_behavior: "Prefere produtos com garantia e suporte"
-      }
-    };
-  }
-
-  private convertEngagementMetrics(engagement: any): PerformanceMetrics {
-    return {
-      engagement_rate: engagement.overallScore,
-      retention_rate: engagement.overallScore * 0.9,
-      conversion_potential: engagement.overallScore * 0.8,
-      viral_coefficient: engagement.overallScore * 0.7,
-      monetization_readiness: engagement.overallScore * 0.85,
-      brand_authority_score: engagement.overallScore * 0.9,
-      content_quality_score: engagement.overallScore * 0.95
     };
   }
 
