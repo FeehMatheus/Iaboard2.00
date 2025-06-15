@@ -32,7 +32,7 @@ export function VideoHybridModule({ data, isConnectable }: VideoHybridModuleProp
 
   const generateVideoMutation = useMutation({
     mutationFn: async (params: { prompt: string; duration: number; style: string }) => {
-      const response = await fetch('/api/production-video/generate', {
+      const response = await fetch('/api/functional-video/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
