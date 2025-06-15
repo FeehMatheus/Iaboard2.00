@@ -1,0 +1,77 @@
+{
+  "workflow_id": "workflow_1750014212281_9wyox9ttu",
+  "project_name": "Product Demo Video Series",
+  "current_stage": "concept_research",
+  "stages": [
+    {
+      "stage_id": "concept_research",
+      "name": "Video Concept Research",
+      "type": "research",
+      "status": "pending",
+      "dependencies": [],
+      "estimated_duration": 600,
+      "execution_priority": 1,
+      "assigned_ai_provider": "perplexity"
+    },
+    {
+      "stage_id": "script_structure",
+      "name": "Script Structure & Flow",
+      "type": "ideation",
+      "status": "pending",
+      "dependencies": [
+        "concept_research"
+      ],
+      "estimated_duration": 480,
+      "execution_priority": 2,
+      "assigned_ai_provider": "anthropic"
+    },
+    {
+      "stage_id": "script_writing",
+      "name": "Script Writing",
+      "type": "creation",
+      "status": "pending",
+      "dependencies": [
+        "script_structure"
+      ],
+      "estimated_duration": 900,
+      "execution_priority": 3,
+      "assigned_ai_provider": "openai"
+    },
+    {
+      "stage_id": "visual_directions",
+      "name": "Visual Directions & Scene Descriptions",
+      "type": "creation",
+      "status": "pending",
+      "dependencies": [
+        "script_writing"
+      ],
+      "estimated_duration": 600,
+      "execution_priority": 4,
+      "assigned_ai_provider": "anthropic"
+    },
+    {
+      "stage_id": "timing_optimization",
+      "name": "Timing & Pacing Optimization",
+      "type": "optimization",
+      "status": "pending",
+      "dependencies": [
+        "visual_directions"
+      ],
+      "estimated_duration": 360,
+      "execution_priority": 5,
+      "assigned_ai_provider": "groq"
+    }
+  ],
+  "assets": [],
+  "status": "planning",
+  "progress_percentage": 0,
+  "created_at": "2025-06-15T19:03:32.281Z",
+  "estimated_completion": "2025-06-15T19:52:32.281Z",
+  "quality_metrics": {
+    "overall_score": 0,
+    "content_quality": 0,
+    "seo_optimization": 0,
+    "brand_alignment": 0,
+    "audience_relevance": 0
+  }
+}

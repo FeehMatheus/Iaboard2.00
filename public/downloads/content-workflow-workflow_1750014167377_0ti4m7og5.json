@@ -1,0 +1,114 @@
+{
+  "workflow_id": "workflow_1750014167377_0ti4m7og5",
+  "project_name": "SaaS Growth Strategy 2025",
+  "current_stage": "research",
+  "stages": [
+    {
+      "stage_id": "research",
+      "name": "Market Research & Topic Analysis",
+      "type": "research",
+      "status": "pending",
+      "dependencies": [],
+      "estimated_duration": 900,
+      "execution_priority": 1,
+      "assigned_ai_provider": "perplexity"
+    },
+    {
+      "stage_id": "keyword_research",
+      "name": "SEO Keyword Research",
+      "type": "research",
+      "status": "pending",
+      "dependencies": [
+        "research"
+      ],
+      "estimated_duration": 600,
+      "execution_priority": 2,
+      "assigned_ai_provider": "groq"
+    },
+    {
+      "stage_id": "outline_creation",
+      "name": "Content Outline & Structure",
+      "type": "ideation",
+      "status": "pending",
+      "dependencies": [
+        "research",
+        "keyword_research"
+      ],
+      "estimated_duration": 480,
+      "execution_priority": 3,
+      "assigned_ai_provider": "anthropic"
+    },
+    {
+      "stage_id": "draft_writing",
+      "name": "First Draft Creation",
+      "type": "creation",
+      "status": "pending",
+      "dependencies": [
+        "outline_creation"
+      ],
+      "estimated_duration": 1200,
+      "execution_priority": 4,
+      "assigned_ai_provider": "openai"
+    },
+    {
+      "stage_id": "content_enhancement",
+      "name": "Content Enhancement & Refinement",
+      "type": "optimization",
+      "status": "pending",
+      "dependencies": [
+        "draft_writing"
+      ],
+      "estimated_duration": 720,
+      "execution_priority": 5,
+      "assigned_ai_provider": "anthropic"
+    },
+    {
+      "stage_id": "seo_optimization",
+      "name": "SEO Optimization",
+      "type": "optimization",
+      "status": "pending",
+      "dependencies": [
+        "content_enhancement"
+      ],
+      "estimated_duration": 600,
+      "execution_priority": 6,
+      "assigned_ai_provider": "groq"
+    },
+    {
+      "stage_id": "quality_review",
+      "name": "Quality Review & Fact-checking",
+      "type": "review",
+      "status": "pending",
+      "dependencies": [
+        "seo_optimization"
+      ],
+      "estimated_duration": 480,
+      "execution_priority": 7,
+      "assigned_ai_provider": "anthropic"
+    },
+    {
+      "stage_id": "final_approval",
+      "name": "Final Content Approval",
+      "type": "approval",
+      "status": "pending",
+      "dependencies": [
+        "quality_review"
+      ],
+      "estimated_duration": 300,
+      "execution_priority": 8,
+      "assigned_ai_provider": "human_review"
+    }
+  ],
+  "assets": [],
+  "status": "planning",
+  "progress_percentage": 0,
+  "created_at": "2025-06-15T19:02:47.378Z",
+  "estimated_completion": "2025-06-15T20:30:47.377Z",
+  "quality_metrics": {
+    "overall_score": 0,
+    "content_quality": 0,
+    "seo_optimization": 0,
+    "brand_alignment": 0,
+    "audience_relevance": 0
+  }
+}
