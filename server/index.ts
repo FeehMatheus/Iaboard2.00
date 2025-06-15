@@ -19,6 +19,7 @@ import realVideoGenerator from "./real-video-generator";
 import workflowChoreography from "./workflow-choreography";
 import workflowExecutor from "./workflow-executor";
 import powerfulThinkingAI from "./powerful-thinking-ai";
+import intelligentContentWorkflow from "./intelligent-content-workflow";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -79,6 +80,9 @@ app.use((req, res, next) => {
   
   // Add powerful thinking AI
   app.use(powerfulThinkingAI);
+  
+  // Add intelligent content workflow system
+  app.use(intelligentContentWorkflow);
   
   // Add high-performance AI routes
   app.use(highPerformanceAI);
