@@ -5,6 +5,7 @@ import youtubeRoutes from "./routes";
 import enhancedRoutes from "./enhanced-routes";
 import aiModuleRoutes from "./ai-module-routes";
 import iaBoardModules from "./ia-board-modules";
+import fastAIRoutes from "./fast-ai-routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -45,7 +46,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Add IA Board specialized modules (highest priority)
+  // Add fast AI routes (highest priority for performance)
+  app.use(fastAIRoutes);
+  
+  // Add IA Board specialized modules
   app.use(iaBoardModules);
   
   // Add hybrid AI module routes

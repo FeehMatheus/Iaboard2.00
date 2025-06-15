@@ -377,29 +377,48 @@ class SmartLLMSystem {
   }
 
   private async executeMistral(provider: ProviderConfig, request: SmartLLMRequest): Promise<SmartLLMResponse> {
-    const openai = new OpenAI({
-      apiKey: process.env.MISTRAL_API_KEY,
-      baseURL: provider.baseUrl,
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
-    const response = await openai.chat.completions.create({
-      model: provider.models[0],
-      messages: [
-        ...(request.systemPrompt ? [{ role: 'system' as const, content: request.systemPrompt }] : []),
-        { role: 'user' as const, content: request.prompt }
-      ],
-      max_tokens: request.maxTokens || 3000,
-      temperature: request.temperature || 0.7,
-    });
+    try {
+      const response = await fetch(`${provider.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.MISTRAL_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: provider.models[0],
+          messages: [
+            ...(request.systemPrompt ? [{ role: 'system', content: request.systemPrompt }] : []),
+            { role: 'user', content: request.prompt }
+          ],
+          max_tokens: Math.min(request.maxTokens || 600, 600),
+          temperature: request.temperature || 0.7
+        }),
+        signal: controller.signal
+      });
 
-    return {
-      success: true,
-      content: response.choices[0].message.content || '',
-      provider: 'mistral',
-      model: provider.models[0],
-      latency: 0,
-      tokensUsed: response.usage?.total_tokens || 0
-    };
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Mistral API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return {
+        success: true,
+        content: data.choices[0].message.content || '',
+        provider: 'mistral',
+        model: provider.models[0],
+        latency: 0,
+        tokensUsed: data.usage?.total_tokens || 0
+      };
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
   }
 
   private async executeAnthropic(provider: ProviderConfig, request: SmartLLMRequest): Promise<SmartLLMResponse> {
