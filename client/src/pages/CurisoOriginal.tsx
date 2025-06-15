@@ -22,6 +22,7 @@ import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, P
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
+import FurionCanvasNode from '@/components/FurionCanvasNode';
 import { nanoid } from 'nanoid';
 import { useDebouncedCallback } from 'use-debounce';
 import { useLocation } from 'wouter';
@@ -30,6 +31,7 @@ const nodeTypes = {
   chat: CurisoChatNodeOriginal,
   aiModule: AIModuleNode,
   video: PikaVideoNode,
+  furion: FurionCanvasNode,
 };
 
 function Flow() {
@@ -223,6 +225,40 @@ function Flow() {
     });
   };
 
+  const addFurionNode = () => {
+    const id = nanoid();
+
+    const position = screenToFlowPosition({
+      x: window.innerWidth / 2 + Math.random() * 100 - 50,
+      y: window.innerHeight / 2 + Math.random() * 100 - 50,
+    });
+
+    const newNode = {
+      id,
+      type: 'furion',
+      position,
+      resizable: true,
+      data: {
+        label: 'Furion AI',
+        productIdea: '',
+        status: 'idle',
+        progress: 0,
+        currentTask: '',
+        results: null,
+        showInterface: false,
+      },
+    };
+
+    setSettings({
+      ...settings,
+      boards: settings.boards.map(board =>
+        board.id === settings.currentBoardId
+          ? { ...board, nodes: [...board.nodes, newNode] }
+          : board
+      ),
+    });
+  };
+
   const delNode = () => {
     const selectedNodes = currentBoard.nodes.filter(node => node.selected);
     if (selectedNodes.length === 0) return;
@@ -366,6 +402,10 @@ function Flow() {
               <Button onClick={addVideoNode} size="sm" className="bg-pink-600 hover:bg-pink-700 text-xs">
                 <Video className="h-3 w-3 mr-1" />
                 Vídeo
+              </Button>
+              <Button onClick={addFurionNode} size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-xs">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Furion AI
               </Button>
             </div>
 
