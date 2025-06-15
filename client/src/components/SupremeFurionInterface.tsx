@@ -191,7 +191,7 @@ export function SupremeFurionInterface() {
       } else {
         throw new Error(data.error || 'Erro na criação do produto');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro:', error);
       toast({
         title: "Erro na criação",
@@ -238,7 +238,7 @@ export function SupremeFurionInterface() {
       } else {
         throw new Error(data.error || 'Erro na análise');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro:', error);
       toast({
         title: "Erro na análise",

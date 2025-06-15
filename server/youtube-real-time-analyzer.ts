@@ -335,7 +335,7 @@ Foque em oportunidades viáveis e lucrativas.
           messages: [{ role: 'user', content: prompt }],
           system: 'Você é um especialista em análise de conteúdo, estratégia de negócios e marketing digital. Forneça análises detalhadas e insights acionáveis.'
         });
-        return response.content[0].text;
+        return response.content[0].type === 'text' ? response.content[0].text : '';
       } else if (this.openai) {
         const response = await this.openai.chat.completions.create({
           model: 'gpt-4o',

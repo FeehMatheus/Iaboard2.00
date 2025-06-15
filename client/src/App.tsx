@@ -5,6 +5,7 @@ import "./index.css";
 import Landing from "./pages/Landing";
 import Board from "./pages/Board";
 import AdvancedBoard from "./pages/AdvancedBoard";
+import SupremeFurionDashboard from "./pages/SupremeFurionDashboard";
 
 function App() {
   return (
@@ -29,9 +30,11 @@ function App() {
 
         <div className="relative z-10">
           <Switch>
-            <Route path="/" component={Landing} />
+            <Route path="/" component={SupremeFurionDashboard} />
+            <Route path="/landing" component={Landing} />
             <Route path="/board" component={Board} />
             <Route path="/advanced-board" component={AdvancedBoard} />
+            <Route path="/supreme" component={SupremeFurionDashboard} />
             <Route>
               <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center bg-black/40 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
