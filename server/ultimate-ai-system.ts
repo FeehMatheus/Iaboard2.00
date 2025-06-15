@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { nanoid } from 'nanoid';
-import { realVideoGenerator } from './real-video-generator';
+import realVideoGenerator from './real-video-generator';
 
 interface UltimateAIRequest {
   prompt: string;
