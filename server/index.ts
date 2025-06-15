@@ -11,6 +11,7 @@ import highPerformanceAI from "./high-performance-ai";
 import realVideoHybrid from "./real-video-hybrid";
 import failureDetection from "./failure-detection";
 import authenticVideoAPIs from "./authentic-video-apis";
+import workingVideoGenerator from "./working-video-generator";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -57,7 +58,10 @@ app.use((req, res, next) => {
   // Add failure detection system
   app.use(failureDetection);
   
-  // Add authentic video APIs (priority)
+  // Add working video generator (primary)
+  app.use(workingVideoGenerator);
+  
+  // Add authentic video APIs (secondary)
   app.use(authenticVideoAPIs);
   
   // Add real video hybrid system

@@ -43,6 +43,7 @@ const generateWithLuma = async (prompt: string, duration: number) => {
       headers: {
         'Authorization': `Bearer ${process.env.LUMA_API_KEY}`,
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         prompt: prompt,
