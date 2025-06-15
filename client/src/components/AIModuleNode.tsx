@@ -545,18 +545,18 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
           )}
 
           <div>
-            <label className="text-xs text-muted-foreground mb-1 block">
-              {progressMode ? "Prompt Principal:" : "Prompt / Parâmetros:"}
+            <label className="text-xs font-medium text-muted-foreground mb-2 block">
+              {progressMode ? "💡 Ideia Principal:" : "🚀 Prompt/Instrução:"}
             </label>
             <Textarea
               ref={textareaRef}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               placeholder={progressMode 
-                ? "Descreva o produto/serviço para gerar conteúdo completo..."
-                : `Digite o que deseja executar com ${config.name}...`
+                ? "Descreva detalhadamente o produto/serviço para gerar conteúdo completo..."
+                : `Digite sua instrução para ${config.name} processar com IA...`
               }
-              className="min-h-[80px] text-sm"
+              className="min-h-[90px] text-sm bg-gradient-to-br from-background/50 to-muted/30 border-border/50 focus:border-violet-400/50 focus:ring-2 focus:ring-violet-400/20 transition-all duration-200 rounded-lg"
               disabled={isExecuting}
             />
           </div>
@@ -604,12 +604,12 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
           )}
 
           {result && (
-            <div className="space-y-2">
-              <label className="text-xs text-muted-foreground block">
-                Resultado Executado:
+            <div className="space-y-3">
+              <label className="text-xs font-medium text-muted-foreground flex items-center gap-2">
+                ✨ Resultado Gerado:
               </label>
-              <div className="bg-muted p-3 rounded-lg text-sm max-h-48 overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-xs">{result}</pre>
+              <div className="bg-gradient-to-br from-emerald-500/5 via-blue-500/5 to-purple-500/5 border border-emerald-500/20 p-4 rounded-xl text-sm max-h-48 overflow-y-auto backdrop-blur-sm">
+                <pre className="whitespace-pre-wrap text-xs leading-relaxed text-foreground/90">{result}</pre>
               </div>
             </div>
           )}
@@ -638,16 +638,16 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
           )}
         </CardContent>
 
-        <CardFooter className="p-4 pt-0">
+        <CardFooter className="p-4 pt-0 bg-gradient-to-r from-background/50 to-muted/30 rounded-b-lg border-t border-border/30">
           <Button
             onClick={executeModule}
             disabled={!prompt.trim() || isExecuting}
-            className={`w-full bg-gradient-to-r ${config.color} hover:opacity-90 transition-opacity`}
+            className={`w-full bg-gradient-to-r ${config.color} hover:shadow-lg hover:shadow-violet-500/25 hover:-translate-y-0.5 transition-all duration-200 text-white font-medium`}
           >
             {isExecuting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                {progressMode ? "Executando Workflow..." : `Executando ${config.name}...`}
+                {progressMode ? "🚀 Executando Workflow..." : `⚡ Executando ${config.name}...`}
               </>
             ) : (
               <>
