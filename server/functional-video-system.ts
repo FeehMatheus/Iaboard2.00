@@ -4,6 +4,15 @@ import path from 'path';
 
 const router = express.Router();
 
+interface VideoResult {
+  url: string;
+  provider: string;
+  format: 'mp4' | 'html5';
+  size: number;
+  metadata?: any;
+  interactive?: boolean;
+}
+
 // Ensure downloads directory exists
 const downloadsDir = path.join(process.cwd(), 'public', 'downloads');
 if (!fs.existsSync(downloadsDir)) {
@@ -11,7 +20,7 @@ if (!fs.existsSync(downloadsDir)) {
 }
 
 // HuggingFace video generation using working models
-const generateVideoWithHuggingFace = async (prompt: string, duration: number) => {
+const generateVideoWithHuggingFace = async (prompt: string, duration: number): Promise<VideoResult> => {
   try {
     console.log('[HF-VIDEO] Generating with Zeroscope model...');
     
@@ -49,7 +58,21 @@ const generateVideoWithHuggingFace = async (prompt: string, duration: number) =>
     }
 
     const videoBuffer = await response.arrayBuffer();
-    return Buffer.from(videoBuffer);
+    const buffer = Buffer.from(videoBuffer);
+    
+    // Save the MP4 file
+    const timestamp = Date.now();
+    const filename = `hf-video-${timestamp}.mp4`;
+    const filePath = path.join(downloadsDir, filename);
+    
+    fs.writeFileSync(filePath, buffer);
+    
+    return {
+      url: `/downloads/${filename}`,
+      provider: 'HuggingFace Text-to-Video',
+      format: 'mp4',
+      size: buffer.byteLength
+    };
   } catch (error: any) {
     console.error('[HF-VIDEO] Error:', error.message);
     throw error;
@@ -282,7 +305,9 @@ const generateProfessionalVideo = async (prompt: string, duration: number) => {
       url: `/downloads/${filename}`,
       provider: 'IA Board Professional Engine',
       metadata,
-      interactive: true
+      interactive: true,
+      format: 'html5',
+      size: Buffer.byteLength(videoHTML, 'utf8')
     };
   } catch (error: any) {
     console.error('[PROFESSIONAL-VIDEO] Error:', error.message);
@@ -352,12 +377,12 @@ router.post('/api/functional-video/generate', async (req, res) => {
       file: {
         filename: path.basename(videoResult.url),
         path: videoResult.url,
-        size: (videoResult as any).size || 0,
+        size: videoResult.size || 0,
         type: 'video'
       },
       processingTime,
-      isRealVideo: (videoResult as any).format === 'mp4',
-      message: (videoResult as any).format === 'mp4' 
+      isRealVideo: videoResult.format === 'mp4',
+      message: videoResult.format === 'mp4' 
         ? `Video real gerado com ${videoResult.provider}` 
         : `Video profissional interativo gerado`,
       errors: errors.length > 0 ? errors : undefined
