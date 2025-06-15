@@ -4,6 +4,7 @@ import { registerRoutes } from "./routes-clean";
 import youtubeRoutes from "./routes";
 import enhancedRoutes from "./enhanced-routes";
 import aiModuleRoutes from "./ai-module-routes";
+import iaBoardModules from "./ia-board-modules";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -50,7 +51,10 @@ app.use((req, res, next) => {
   // Add enhanced AI routes
   app.use(enhancedRoutes);
   
-  // Add hybrid AI module routes (priority)
+  // Add IA Board specialized modules (priority)
+  app.use(iaBoardModules);
+  
+  // Add hybrid AI module routes
   app.use(aiModuleRoutes);
   
   const server = await registerRoutes(app);

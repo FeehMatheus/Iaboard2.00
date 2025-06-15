@@ -84,7 +84,7 @@ router.post('/api/ia-produto/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await freeAIProviders.generateContent({
+    const aiResult = await smartLLM.smartLLM({
       prompt: `Crie estratégia completa de produto para: ${idea}. Mercado: ${market}, Orçamento: ${budget}, Prazo: ${timeline}`,
       systemPrompt: 'Você é um consultor de negócios especialista com 15 anos de experiência em lançamento de produtos digitais. Crie estratégias detalhadas e implementáveis.',
       maxTokens: 3000
@@ -136,7 +136,7 @@ router.post('/api/ia-trafego/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await freeAIProviders.generateContent({
+    const aiResult = await smartLLM.smartLLM({
       prompt: `Crie estratégia completa de tráfego para: ${business}. Orçamento: ${budget}, Objetivos: ${goals}, Plataformas: ${platforms}`,
       systemPrompt: 'Você é um especialista em tráfego pago e orgânico com 20 anos de experiência. Crie estratégias de tráfego detalhadas e implementáveis com foco em ROI.',
       maxTokens: 3000
@@ -188,7 +188,7 @@ router.post('/api/ia-video/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await freeAIProviders.generateContent({
+    const aiResult = await smartLLM.smartLLM({
       prompt: `Crie roteiro completo de vídeo para: ${concept}. Duração: ${duration}, Estilo: ${style}, Objetivo: ${objective}`,
       systemPrompt: 'Você é um roteirista especialista em vídeos de conversão com 15 anos de experiência. Crie roteiros envolventes e persuasivos com estrutura clara.',
       maxTokens: 3000
@@ -240,7 +240,7 @@ router.post('/api/ia-analytics/generate', async (req, res) => {
       });
     }
 
-    const aiResult = await freeAIProviders.generateContent({
+    const aiResult = await smartLLM.smartLLM({
       prompt: `Crie estratégia completa de analytics para: ${business}. Métricas: ${metrics}, Objetivos: ${goals}, Plataformas: ${platforms}`,
       systemPrompt: 'Você é um especialista em analytics e mensuração digital com 15 anos de experiência. Crie estratégias detalhadas de tracking e otimização.',
       maxTokens: 3000
@@ -278,12 +278,11 @@ router.post('/api/ia-analytics/generate', async (req, res) => {
 // Health check endpoint
 router.get('/api/ai/health', async (req, res) => {
   try {
-    const providers = freeAIProviders.getProviderStatus();
+    const healthCheck = await smartLLM.healthCheck();
     res.json({
-      success: true,
-      providers,
-      totalProviders: providers.length,
-      activeProviders: providers.filter((p: any) => p.enabled).length
+      success: healthCheck.success,
+      providers: healthCheck.results,
+      status: healthCheck.success ? 'ALL PROVIDERS ✅' : 'SOME PROVIDERS FAILED'
     });
   } catch (error) {
     console.error('Erro no health check:', error);
@@ -294,19 +293,19 @@ router.get('/api/ai/health', async (req, res) => {
   }
 });
 
-// Reset usage endpoint (for development)
-router.post('/api/ai/reset-usage', async (req, res) => {
+// Provider status endpoint
+router.get('/api/ai/status', async (req, res) => {
   try {
-    freeAIProviders.resetUsage();
+    const status = smartLLM.getProviderStatus();
     res.json({
       success: true,
-      message: 'Uso dos provedores resetado com sucesso'
+      providers: status
     });
   } catch (error) {
-    console.error('Erro ao resetar uso:', error);
+    console.error('Erro ao obter status:', error);
     res.status(500).json({
       success: false,
-      error: 'Erro ao resetar uso dos provedores'
+      error: 'Erro ao obter status dos provedores'
     });
   }
 });
