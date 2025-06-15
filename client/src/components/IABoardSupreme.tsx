@@ -175,7 +175,11 @@ export default function IABoardSupreme() {
   }, [toast]);
 
   const executeNode = useCallback(async (nodeId: string) => {
-    setExecutingNodes(prev => new Set(Array.from(prev).concat([nodeId])));
+    setExecutingNodes(prev => {
+      const newSet = new Set(prev);
+      newSet.add(nodeId);
+      return newSet;
+    });
     
     setCanvasState(prev => ({
       ...prev,
