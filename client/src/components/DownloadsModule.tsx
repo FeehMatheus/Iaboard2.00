@@ -72,7 +72,7 @@ export function DownloadsModule({ data, isConnectable }: DownloadsModuleProps) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
-  const downloadFiles: DownloadFile[] = Array.isArray(downloads?.files) ? downloads.files : [];
+  const downloadFiles: DownloadFile[] = Array.isArray((downloads as any)?.files) ? (downloads as any).files : [];
   const totalFiles = downloadFiles.length;
   const totalSize = downloadFiles.reduce((sum, file) => sum + file.size, 0);
 

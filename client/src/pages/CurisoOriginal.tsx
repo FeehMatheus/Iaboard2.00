@@ -263,6 +263,65 @@ function Flow() {
     });
   };
 
+  const addDownloadsNode = () => {
+    const id = nanoid();
+
+    const position = screenToFlowPosition({
+      x: window.innerWidth / 2 + Math.random() * 100 - 50,
+      y: window.innerHeight / 2 + Math.random() * 100 - 50,
+    });
+
+    const newNode = {
+      id,
+      type: 'downloads',
+      position,
+      resizable: true,
+      data: {
+        title: 'Central de Downloads',
+        files: [],
+      },
+    };
+
+    setSettings({
+      ...settings,
+      boards: settings.boards.map(board =>
+        board.id === settings.currentBoardId
+          ? { ...board, nodes: [...board.nodes, newNode] }
+          : board
+      ),
+    });
+  };
+
+  const addVideoHybridNode = () => {
+    const id = nanoid();
+
+    const position = screenToFlowPosition({
+      x: window.innerWidth / 2 + Math.random() * 100 - 50,
+      y: window.innerHeight / 2 + Math.random() * 100 - 50,
+    });
+
+    const newNode = {
+      id,
+      type: 'videoHybrid',
+      position,
+      resizable: true,
+      data: {
+        prompt: '',
+        duration: 5,
+        style: 'realistic',
+      },
+    };
+
+    setSettings({
+      ...settings,
+      boards: settings.boards.map(board =>
+        board.id === settings.currentBoardId
+          ? { ...board, nodes: [...board.nodes, newNode] }
+          : board
+      ),
+    });
+  };
+
   const delNode = () => {
     const selectedNodes = currentBoard.nodes.filter(node => node.selected);
     if (selectedNodes.length === 0) return;
@@ -423,12 +482,28 @@ function Flow() {
                 Chat
               </Button>
               <Button 
+                onClick={addVideoHybridNode} 
+                size="sm" 
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-xs shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Video className="h-3 w-3 mr-1" />
+                Vídeo IA
+              </Button>
+              <Button 
+                onClick={addDownloadsNode} 
+                size="sm" 
+                className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-xs shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <Package className="h-3 w-3 mr-1" />
+                Downloads
+              </Button>
+              <Button 
                 onClick={addVideoNode} 
                 size="sm" 
                 className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-xs shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 <Video className="h-3 w-3 mr-1" />
-                Vídeo
+                Pika
               </Button>
             </div>
             <Button 

@@ -9,6 +9,7 @@ import fastAIRoutes from "./fast-ai-routes";
 import downloadsManager from "./downloads-manager";
 import highPerformanceAI from "./high-performance-ai";
 import realVideoHybrid from "./real-video-hybrid";
+import failureDetection from "./failure-detection";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -51,6 +52,9 @@ app.use((req, res, next) => {
 (async () => {
   // Add downloads manager (highest priority)
   app.use(downloadsManager);
+  
+  // Add failure detection system
+  app.use(failureDetection);
   
   // Add real video hybrid system
   app.use(realVideoHybrid);

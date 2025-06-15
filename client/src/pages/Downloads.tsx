@@ -83,7 +83,7 @@ export default function Downloads() {
     );
   }
 
-  const downloadFiles: DownloadFile[] = Array.isArray(files?.files) ? files.files : [];
+  const downloadFiles: DownloadFile[] = Array.isArray((files as any)?.files) ? (files as any).files : [];
 
   return (
     <div className="container mx-auto p-6 space-y-6">

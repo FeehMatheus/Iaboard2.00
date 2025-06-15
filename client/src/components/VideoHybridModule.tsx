@@ -64,7 +64,7 @@ export function VideoHybridModule({ data, isConnectable }: VideoHybridModuleProp
     },
   });
 
-  const activeProviders = providerStatus?.activeProviders || 0;
+  const activeProviders = (providerStatus as any)?.activeProviders || 0;
   const hasRealProviders = activeProviders > 1; // More than just local fallback
 
   return (
@@ -213,7 +213,7 @@ export function VideoHybridModule({ data, isConnectable }: VideoHybridModuleProp
           {/* Provider Status */}
           <div className="text-xs text-white/60 space-y-1">
             <p className="font-medium">Provedores Disponíveis:</p>
-            {providerStatus?.providers?.map((provider: any) => (
+            {(providerStatus as any)?.providers?.map((provider: any) => (
               <div key={provider.name} className="flex items-center justify-between">
                 <span>{provider.name}</span>
                 <span className={provider.available ? 'text-green-300' : 'text-red-300'}>
