@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { config } from "dotenv";
 import { registerRoutes } from "./routes-clean";
+import youtubeRoutes from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -41,6 +42,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Add YouTube analysis routes
+  app.use(youtubeRoutes);
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

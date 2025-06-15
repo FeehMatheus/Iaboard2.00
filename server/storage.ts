@@ -304,6 +304,69 @@ export class MemoryStorage implements IStorage {
       return Array.from(this.memoryGenerations.values()).filter(gen => gen.userId === userId);
     }
   }
+
+  async createYouTubeAnalysis(insertAnalysis: any): Promise<any> {
+    const id = Date.now();
+    const analysis = {
+      id,
+      ...insertAnalysis,
+      createdAt: new Date(),
+      completedAt: null
+    };
+    this.memoryAnalyses.set(id, analysis);
+    return analysis;
+  }
+
+  async getYouTubeAnalysis(id: number): Promise<any> {
+    return this.memoryAnalyses.get(id);
+  }
+
+  async updateYouTubeAnalysis(id: number, data: any): Promise<any> {
+    const existing = this.memoryAnalyses.get(id);
+    if (existing) {
+      const updated = { ...existing, ...data };
+      this.memoryAnalyses.set(id, updated);
+      return updated;
+    }
+    throw new Error('Analysis not found');
+  }
+
+  async createTimeSegment(insertSegment: any): Promise<any> {
+    const id = Date.now();
+    const segment = { id, ...insertSegment };
+    this.memorySegments.set(id, segment);
+    return segment;
+  }
+
+  async createContentInsight(insertInsight: any): Promise<any> {
+    const id = Date.now();
+    const insight = { id, ...insertInsight };
+    this.memoryInsights.set(id, insight);
+    return insight;
+  }
+
+  async createProgramStructure(insertStructure: any): Promise<any> {
+    const id = Date.now();
+    const structure = { id, ...insertStructure };
+    this.memoryStructure.set(id, structure);
+    return structure;
+  }
+
+  async getAnalysisWithDetails(id: number): Promise<any> {
+    const analysis = this.memoryAnalyses.get(id);
+    if (!analysis) return null;
+
+    const segments = Array.from(this.memorySegments.values()).filter(s => s.analysisId === id);
+    const insights = Array.from(this.memoryInsights.values()).filter(i => i.analysisId === id);
+    const structure = Array.from(this.memoryStructure.values()).filter(s => s.analysisId === id);
+
+    return {
+      ...analysis,
+      segments,
+      insights,
+      structure
+    };
+  }
 }
 
 export const storage = new MemoryStorage();

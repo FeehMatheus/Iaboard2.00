@@ -349,7 +349,7 @@ Respond in JSON format:
       
       if (phaseSegments.length > 0) {
         const effectiveness = phaseSegments.reduce((acc, s) => acc + s.engagementScore, 0) / phaseSegments.length;
-        const keyElements = [...new Set(phaseSegments.flatMap(s => s.keyTopics))].slice(0, 5);
+        const keyElements = Array.from(new Set(phaseSegments.flatMap(s => s.keyTopics))).slice(0, 5);
         
         structure.push({
           phase: phase.phase,
