@@ -7,6 +7,7 @@ import IABoard from '@/pages/CurisoOriginal';
 import ProgressDemo from '@/pages/ProgressDemo';
 import { IABoardProductionDashboard } from '@/components/IABoardProductionDashboard';
 import { FixedSystemTester } from '@/components/FixedSystemTester';
+import { YouTubeAnalyzer } from '@/components/YouTubeAnalyzer';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/progress" component={ProgressDemo} />
             <Route path="/production" component={IABoardProductionDashboard} />
             <Route path="/tests" component={FixedSystemTester} />
+            <Route path="/youtube" component={YouTubeAnalyzer} />
             <Route>
               <IABoard />
             </Route>

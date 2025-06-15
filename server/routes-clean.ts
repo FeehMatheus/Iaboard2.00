@@ -31,6 +31,7 @@ import { healthCheckService } from './health-check-service';
 import { directLLMService } from './direct-llm-service';
 import { realVideoService } from './real-video-service';
 import { authenticContentGenerator } from './authentic-content-generator';
+import { youtubeAnalyzer } from './youtube-analyzer';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1364,6 +1365,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Erro no módulo IA'
+      });
+    }
+  });
+
+  // Análise detalhada de vídeos do YouTube
+  app.post('/api/youtube/analyze', async (req, res) => {
+    try {
+      const { url } = req.body;
+
+      if (!url) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'URL do YouTube é obrigatória' 
+        });
+      }
+
+      console.log(`🎥 Iniciando análise do YouTube: ${url}`);
+
+      const analysis = await youtubeAnalyzer.analyzeVideo(url);
+
+      res.json({
+        success: true,
+        analysis,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('YouTube analysis error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro na análise do YouTube'
       });
     }
   });
