@@ -315,7 +315,7 @@ router.post('/api/ia-voz/generate', async (req, res) => {
     console.error('Erro no módulo IA Voz:', error);
     res.status(500).json({
       success: false,
-      error: error.message || 'Erro interno do servidor'
+      error: error instanceof Error ? error.message : 'Erro interno do servidor'
     });
   }
 });
@@ -399,7 +399,7 @@ router.post('/api/ia-documento/save', async (req, res) => {
       title,
       type,
       content,
-      userId: req.headers['x-user-id'] || 'anonymous'
+      userId: String(req.headers['x-user-id'] || 'anonymous')
     });
 
     res.json({
@@ -412,7 +412,7 @@ router.post('/api/ia-documento/save', async (req, res) => {
     console.error('Erro no módulo IA Documento:', error);
     res.status(500).json({
       success: false,
-      error: error.message || 'Erro interno do servidor'
+      error: error instanceof Error ? error.message : 'Erro interno do servidor'
     });
   }
 });
@@ -434,7 +434,7 @@ router.post('/api/ia-automacao/trigger', async (req, res) => {
       data,
       timestamp: new Date().toISOString(),
       source: 'IA Board',
-      user_id: req.headers['x-user-id'] || 'anonymous'
+      user_id: String(req.headers['x-user-id'] || 'anonymous')
     };
 
     // Send to Zapier webhook
@@ -509,7 +509,7 @@ async function saveToNotion(data: { title: string; type: string; content: string
           select: { name: data.type } 
         },
         'Usuário': { 
-          rich_text: [{ text: { content: data.userId } }] 
+          rich_text: [{ text: { content: String(data.userId) } }] 
         },
         'Data': { 
           date: { start: new Date().toISOString() } 
