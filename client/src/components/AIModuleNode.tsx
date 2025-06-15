@@ -141,8 +141,8 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
     resetProgress
   } = useProgressTracking();
 
-  const config = moduleConfigs[moduleType];
-  const IconComponent = config.icon;
+  const config = moduleConfigs[moduleType] || moduleConfigs['ia-copy']; // Default fallback
+  const IconComponent = config?.icon || Brain;
 
   // Update node data when state changes
   useEffect(() => {

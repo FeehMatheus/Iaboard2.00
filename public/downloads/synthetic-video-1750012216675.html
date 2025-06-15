@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video: A peaceful mountain landscape with flowing water</title>
+    <style>
+        body { margin: 0; background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); }
+        canvas { display: block; margin: 0 auto; border-radius: 10px; }
+        .info { color: white; text-align: center; padding: 20px; font-family: Arial; }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>IA Board - Vídeo Gerado</h1>
+        <h2>"A peaceful mountain landscape with flowing water"</h2>
+        <p>Duração: 3s | Resolução: 1280x720 | FPS: 30</p>
+        <p>Gerado em: 15/06/2025, 18:30:16</p>
+    </div>
+    <canvas id="videoCanvas" width="1280" height="720"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('videoCanvas');
+        const ctx = canvas.getContext('2d');
+        let frame = 0;
+        const totalFrames = 90;
+        
+        function drawFrame() {
+            // Clear canvas
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Create dynamic background
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, `hsl(${(frame * 2) % 360}, 70%, 50%)`);
+            gradient.addColorStop(1, `hsl(${(frame * 2 + 180) % 360}, 70%, 30%)`);
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add animated elements
+            for (let i = 0; i < 20; i++) {
+                const x = (Math.sin(frame * 0.02 + i) * 200) + canvas.width / 2;
+                const y = (Math.cos(frame * 0.03 + i) * 100) + canvas.height / 2;
+                const size = Math.sin(frame * 0.01 + i) * 20 + 30;
+                
+                ctx.fillStyle = `hsla(${(frame + i * 20) % 360}, 80%, 70%, 0.7)`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Add text overlay
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('A peaceful mountain landscape with flowing water', canvas.width / 2, 100);
+            
+            ctx.font = '24px Arial';
+            ctx.fillText(`Frame ${frame} / ${totalFrames}`, canvas.width / 2, canvas.height - 50);
+            
+            frame++;
+            if (frame < totalFrames) {
+                requestAnimationFrame(drawFrame);
+            }
+        }
+        
+        drawFrame();
+    </script>
+</body>
+</html>

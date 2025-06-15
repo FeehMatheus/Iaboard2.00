@@ -13,6 +13,7 @@ import failureDetection from "./failure-detection";
 import authenticVideoAPIs from "./authentic-video-apis";
 import workingVideoGenerator from "./working-video-generator";
 import realWorkingVideo from "./real-working-video";
+import productionVideoAPI from "./production-video-api";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -59,11 +60,8 @@ app.use((req, res, next) => {
   // Add failure detection system
   app.use(failureDetection);
   
-  // Add real working video system (primary)
-  app.use(realWorkingVideo);
-  
-  // Add authentic video APIs (secondary)
-  app.use(authenticVideoAPIs);
+  // Add production video API (primary)
+  app.use(productionVideoAPI);
   
   // Add high-performance AI routes
   app.use(highPerformanceAI);
