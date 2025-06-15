@@ -282,6 +282,23 @@ export function SupremeFurionInterface() {
           </p>
         </div>
 
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex gap-4">
+            <Button
+              onClick={() => window.location.href = '/canvas'}
+              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+            >
+              🎨 Quadro Infinito
+            </Button>
+            <Button
+              onClick={() => window.location.href = '/board'}
+              variant="outline"
+            >
+              📋 Board Original
+            </Button>
+          </div>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="create-product" className="flex items-center gap-2">

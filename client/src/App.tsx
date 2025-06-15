@@ -6,6 +6,7 @@ import Landing from "./pages/Landing";
 import Board from "./pages/Board";
 import AdvancedBoard from "./pages/AdvancedBoard";
 import SupremeFurionDashboard from "./pages/SupremeFurionDashboard";
+import InfiniteCanvasPage from "./pages/InfiniteCanvasPage";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             <Route path="/board" component={Board} />
             <Route path="/advanced-board" component={AdvancedBoard} />
             <Route path="/supreme" component={SupremeFurionDashboard} />
+            <Route path="/canvas" component={InfiniteCanvasPage} />
             <Route>
               <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center bg-black/40 backdrop-blur-lg rounded-2xl p-8 border border-white/10">
