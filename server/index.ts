@@ -21,6 +21,8 @@ import workflowExecutor from "./workflow-executor";
 import powerfulThinkingAI from "./powerful-thinking-ai";
 import intelligentContentWorkflow from "./intelligent-content-workflow";
 import apiConnectionFix from "./api-connection-fix";
+import realApiValidator from "./real-api-validator";
+import authenticVideoGenerator from "./authentic-video-generator";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -87,6 +89,12 @@ app.use((req, res, next) => {
   
   // Add API connection fixes (highest priority)
   app.use(apiConnectionFix);
+  
+  // Add real API validator (critical priority)
+  app.use(realApiValidator);
+  
+  // Add authentic video generator (top priority)
+  app.use(authenticVideoGenerator);
   
   // Add high-performance AI routes
   app.use(highPerformanceAI);
