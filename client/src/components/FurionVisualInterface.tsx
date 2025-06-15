@@ -62,67 +62,195 @@ export function FurionVisualInterface({ onNodeAdd, position }: FurionVisualInter
     setCompletedTasks([]);
     setGeneratedFiles([]);
 
-    for (let i = 0; i < furionTasks.length; i++) {
-      const task = furionTasks[i];
+    try {
+      // Execute the real Supreme Furion system
+      const response = await fetch('/api/supreme/create-product', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productType: 'Produto Digital',
+          niche: productIdea,
+          targetAudience: targetAudience,
+          timeframe: timeframe,
+          marketingGoals: ['Aumentar vendas', 'Gerar leads'],
+          brandVoice: 'profissional'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro na criação do produto');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Convert the result to our task format
+        const realTasks: FurionTask[] = [
+          {
+            id: 'market-analysis',
+            title: 'Análise de Mercado',
+            description: 'Análise completa do mercado',
+            progress: 100,
+            status: 'completed',
+            result: data.data.marketAnalysis
+          },
+          {
+            id: 'product-concept',
+            title: 'Conceito do Produto',
+            description: 'Desenvolvimento do conceito',
+            progress: 100,
+            status: 'completed',
+            result: data.data.productConcept
+          },
+          {
+            id: 'content-strategy',
+            title: 'Estratégia de Conteúdo',
+            description: 'Criação da estratégia completa',
+            progress: 100,
+            status: 'completed',
+            result: data.data.contentStrategy
+          },
+          {
+            id: 'funnel-architecture',
+            title: 'Arquitetura do Funil',
+            description: 'Design do funil de vendas',
+            progress: 100,
+            status: 'completed',
+            result: data.data.funnelArchitecture
+          },
+          {
+            id: 'implementation',
+            title: 'Plano de Implementação',
+            description: 'Plano detalhado de execução',
+            progress: 100,
+            status: 'completed',
+            result: data.data.implementationPlan
+          },
+          {
+            id: 'automation',
+            title: 'Configuração de Automação',
+            description: 'Setup de automações',
+            progress: 100,
+            status: 'completed',
+            result: data.data.automationSetup
+          }
+        ];
+
+        setCompletedTasks(realTasks);
+        setGeneratedFiles(data.data.files || []);
+
+        // Add result node to canvas if callback provided
+        if (onNodeAdd) {
+          onNodeAdd({
+            type: 'furion-result',
+            position: position || { x: 300, y: 300 },
+            data: {
+              productIdea,
+              targetAudience,
+              timeframe,
+              tasks: realTasks,
+              files: data.data.files || [],
+              productResult: data.data
+            }
+          });
+        }
+      } else {
+        throw new Error(data.error || 'Erro desconhecido');
+      }
+    } catch (error) {
+      console.error('Erro na criação do produto:', error);
+      // Fallback to individual AI calls
+      await executeIndividualTasks();
+    } finally {
+      setCurrentTask(null);
+      setIsCreating(false);
+    }
+  }, [productIdea, targetAudience, timeframe, onNodeAdd, position]);
+
+  const executeIndividualTasks = async () => {
+    const tasks = [
+      { title: 'Análise de Mercado', endpoint: '/api/ai/execute-advanced', prompt: `Analise o mercado para o produto: ${productIdea}, público-alvo: ${targetAudience}` },
+      { title: 'Criação do Conceito', endpoint: '/api/ai/execute-advanced', prompt: `Crie um conceito completo para o produto: ${productIdea}, direcionado para: ${targetAudience}` },
+      { title: 'Copy Persuasivo', endpoint: '/api/ai/execute-advanced', prompt: `Crie copy persuasivo para o produto: ${productIdea}, público: ${targetAudience}` },
+      { title: 'Funil de Vendas', endpoint: '/api/ai/execute-advanced', prompt: `Projete um funil de vendas para: ${productIdea}, audiência: ${targetAudience}` },
+      { title: 'Landing Pages', endpoint: '/api/ai/execute-advanced', prompt: `Crie landing pages para: ${productIdea}, público: ${targetAudience}` },
+      { title: 'Automação', endpoint: '/api/ai/execute-advanced', prompt: `Configure automações para: ${productIdea}, audiência: ${targetAudience}` }
+    ];
+
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i];
       const taskId = `task-${i}`;
       
       setCurrentTask({
         id: taskId,
         title: task.title,
-        description: task.description,
+        description: `Executando ${task.title.toLowerCase()}...`,
         progress: 0,
-        status: 'running',
-        timeRemaining: task.duration * 60
+        status: 'running'
       });
 
-      // Simulate task execution with real progress
-      for (let progress = 0; progress <= 100; progress += 5) {
-        await new Promise(resolve => setTimeout(resolve, (task.duration * 600) / 20)); // 20 steps total
+      try {
+        const startTime = Date.now();
         
-        setCurrentTask(prev => prev ? {
-          ...prev,
-          progress,
-          timeRemaining: prev.timeRemaining ? prev.timeRemaining - (task.duration * 60) / 20 : 0
-        } : null);
-      }
+        // Call real AI endpoint
+        const response = await fetch(task.endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o',
+            prompt: task.prompt,
+            systemPrompt: `Você é um especialista em ${task.title.toLowerCase()}. Forneça respostas detalhadas e práticas.`
+          }),
+        });
 
-      // Complete task
-      const completedTask: FurionTask = {
-        id: taskId,
-        title: task.title,
-        description: task.description,
-        progress: 100,
-        status: 'completed',
-        result: await simulateTaskResult(task.title)
-      };
+        const data = await response.json();
+        const endTime = Date.now();
+        const executionTime = (endTime - startTime) / 1000;
 
-      setCompletedTasks(prev => [...prev, completedTask]);
-      
-      // Generate files for certain tasks
-      if (['Copy Persuasivo', 'Landing Pages', 'Funil de Vendas'].includes(task.title)) {
-        const files = generateTaskFiles(task.title, productIdea);
-        setGeneratedFiles(prev => [...prev, ...files]);
-      }
-    }
+        // Update progress during execution
+        setCurrentTask(prev => prev ? { ...prev, progress: 50 } : null);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        setCurrentTask(prev => prev ? { ...prev, progress: 100 } : null);
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-    setCurrentTask(null);
-    setIsCreating(false);
+        const completedTask: FurionTask = {
+          id: taskId,
+          title: task.title,
+          description: `Concluído em ${executionTime.toFixed(1)}s`,
+          progress: 100,
+          status: 'completed',
+          result: data.success ? data.data : { error: data.error, content: 'Erro na execução' }
+        };
 
-    // Add result node to canvas if callback provided
-    if (onNodeAdd) {
-      onNodeAdd({
-        type: 'furion-result',
-        position: position || { x: 300, y: 300 },
-        data: {
-          productIdea,
-          targetAudience,
-          timeframe,
-          tasks: completedTasks,
-          files: generatedFiles
+        setCompletedTasks(prev => [...prev, completedTask]);
+        
+        // Generate files for certain tasks
+        if (['Copy Persuasivo', 'Landing Pages', 'Funil de Vendas'].includes(task.title)) {
+          const files = generateTaskFiles(task.title, productIdea);
+          setGeneratedFiles(prev => [...prev, ...files]);
         }
-      });
+        
+      } catch (error) {
+        console.error(`Erro na tarefa ${task.title}:`, error);
+        
+        const failedTask: FurionTask = {
+          id: taskId,
+          title: task.title,
+          description: 'Erro na execução',
+          progress: 100,
+          status: 'error',
+          result: { error: error.message }
+        };
+
+        setCompletedTasks(prev => [...prev, failedTask]);
+      }
     }
-  }, [productIdea, targetAudience, timeframe, onNodeAdd, position, completedTasks, generatedFiles]);
+  };
 
   const simulateTaskResult = async (taskTitle: string) => {
     const results = {
@@ -216,7 +344,7 @@ export function FurionVisualInterface({ onNodeAdd, position }: FurionVisualInter
           </div>
           <div>
             <h2 className="text-2xl font-bold">Furion AI</h2>
-            <p className="text-purple-100">Criação de produtos em 30 minutos</p>
+            <p className="text-purple-100">Criação de produtos com IA real</p>
           </div>
         </div>
       </div>
@@ -252,25 +380,7 @@ export function FurionVisualInterface({ onNodeAdd, position }: FurionVisualInter
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Tempo de Criação: {timeframe} minutos
-              </label>
-              <input
-                type="range"
-                min="15"
-                max="60"
-                step="5"
-                value={timeframe}
-                onChange={(e) => setTimeframe(parseInt(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>15min (Rápido)</span>
-                <span>30min (Padrão)</span>
-                <span>60min (Completo)</span>
-              </div>
-            </div>
+
 
             <Button
               onClick={handleCreateProduct}
@@ -286,7 +396,7 @@ export function FurionVisualInterface({ onNodeAdd, position }: FurionVisualInter
               ) : (
                 <>
                   <Play className="w-4 h-4 mr-2" />
-                  Criar Produto em {timeframe} Minutos
+                  Criar Produto com IA Real
                 </>
               )}
             </Button>
@@ -303,7 +413,7 @@ export function FurionVisualInterface({ onNodeAdd, position }: FurionVisualInter
                     </div>
                     <Badge variant="secondary">
                       <Clock className="w-3 h-3 mr-1" />
-                      {Math.ceil(currentTask.timeRemaining / 60)}min
+                      Executando...
                     </Badge>
                   </CardTitle>
                 </CardHeader>
