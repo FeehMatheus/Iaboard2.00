@@ -1,0 +1,41 @@
+🔧 PROMPT TÉCNICO — AJUSTES CRÍTICOS IA BOARD (MÓDULO DE VÍDEO, DOWNLOADS E FLUXO DE EXECUÇÃO)
+
+1. 🔴 MÓDULO DE DOWNLOADS (NOVA ESTRUTURA FUNCIONAL COM CTAS E APIS REAIS, PASSANDO PELO DETECTOR DE FUNCIONALIDADE
+   - A área de downloads deve ser implementada como um **bloco/módulo visual dentro do quadro infinito**.
+   - Esse módulo deve:
+     • Receber e listar automaticamente todos os conteúdos gerados por outros módulos (PDFs, vídeos, áudios, imagens, etc.).
+     • Permitir o **download real** dos arquivos gerados.
+     • Mostrar status, nome do arquivo, tipo, tamanho e botão "Download".
+   - O módulo deve se conectar aos demais por linhas animadas como os outros blocos.
+
+2. 🎥 IA DE VÍDEO — AJUSTES CRÍTICOS
+   - A IA de vídeo atualmente está **gerando apenas prompts de texto**, mas **não está retornando o vídeo real (ex: vídeo.mp4)**.
+   - Corrigir imediatamente esse comportamento: o módulo de vídeo deve gerar e exibir o **arquivo de vídeo real gerado (downloadável)**.
+   - Exibir o player dentro do módulo, com botão para baixar.
+
+3. 🧠 VIDEO IA → MODO HÍBRIDO INTELIGENTE
+   - Atualmente há dois módulos: "PIKA" e "IA de Vídeo". Nenhum deles gera vídeo real.
+   - Substituir ambos por **um único módulo de vídeo híbrido real**, com fallback inteligente entre os  provedores ADCIONADOS
+   
+     - Outros provedores de vídeo compatíveis (ex: Luma, Pika, D-ID), usando o que estiver funcionando.
+   - O sistema deve tentar o provedor com chave válida e cota disponível. Se falhar, exibir toast de erro: `"Falha ao gerar vídeo com provedor X"`.
+
+4. 🧪 DETECÇÃO DE FALHA AUTOMÁTICA
+   - Se o provedor de vídeo (ou qualquer outro módulo) **não retornar o conteúdo real**, marcar o módulo com status “⚠️ FALHA” e registrar no histórico.
+
+5. ⚙️ LÓGICA GERAL
+   - Todos os blocos (copy, PDF, vídeo, voz, etc.) devem **enviar automaticamente seus conteúdos para o Módulo de Downloads** assim que finalizados.
+   - A IA deve verificar constantemente se o conteúdo gerado corresponde ao esperado:
+     - Se `prompt de vídeo` ≠ `vídeo real`, tentar fallback ou exibir erro.
+     - Se `áudio` estiver ausente, verificar se TTS está ativo.
+     - Se `PDF` estiver vazio, reexecutar o módulo automaticamente.
+
+6. 🎨 OBSERVAÇÕES DE UX/UI
+   - O Módulo de Downloads deve ter design moderno, leve, com cores vibrantes vermelhas (sem alterar o tema base do quadro).
+   - Deve ser redimensionável, scrollável, e com animações suaves.
+
+7. 📌 FINAL
+   - Nome do sistema agora é **IA Board** (remover qualquer menção a "Curioso").
+   - Garantir que **todas as tecnologias usadas estejam realmente ativadas e retornando dados válidos**.
+   - Se qualquer API estiver inativa ou com erro, o sistema deve:
+     SOLICITAR A API PARA QUE FUNCION

@@ -8,6 +8,7 @@ import iaBoardModules from "./ia-board-modules";
 import fastAIRoutes from "./fast-ai-routes";
 import downloadsManager from "./downloads-manager";
 import highPerformanceAI from "./high-performance-ai";
+import realVideoHybrid from "./real-video-hybrid";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -50,6 +51,9 @@ app.use((req, res, next) => {
 (async () => {
   // Add downloads manager (highest priority)
   app.use(downloadsManager);
+  
+  // Add real video hybrid system
+  app.use(realVideoHybrid);
   
   // Add high-performance AI routes
   app.use(highPerformanceAI);

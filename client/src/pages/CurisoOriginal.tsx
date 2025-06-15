@@ -23,6 +23,8 @@ import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
 import FurionCanvasNode from '@/components/FurionCanvasNode';
+import { DownloadsModule } from '@/components/DownloadsModule';
+import { VideoHybridModule } from '@/components/VideoHybridModule';
 import { nanoid } from 'nanoid';
 import { useDebouncedCallback } from 'use-debounce';
 import { useLocation } from 'wouter';
@@ -32,6 +34,8 @@ const nodeTypes = {
   aiModule: AIModuleNode,
   video: PikaVideoNode,
   furion: FurionCanvasNode,
+  downloads: DownloadsModule,
+  videoHybrid: VideoHybridModule,
 };
 
 function Flow() {
