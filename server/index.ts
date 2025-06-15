@@ -10,6 +10,7 @@ import downloadsManager from "./downloads-manager";
 import highPerformanceAI from "./high-performance-ai";
 import realVideoHybrid from "./real-video-hybrid";
 import failureDetection from "./failure-detection";
+import authenticVideoAPIs from "./authentic-video-apis";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -55,6 +56,9 @@ app.use((req, res, next) => {
   
   // Add failure detection system
   app.use(failureDetection);
+  
+  // Add authentic video APIs (priority)
+  app.use(authenticVideoAPIs);
   
   // Add real video hybrid system
   app.use(realVideoHybrid);
