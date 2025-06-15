@@ -6,6 +6,7 @@ import SmartGuidance from '@/components/SmartGuidance';
 import IABoard from '@/pages/CurisoOriginal';
 import ProgressDemo from '@/pages/ProgressDemo';
 import Downloads from '@/pages/Downloads';
+import HighPerformanceAI from '@/pages/HighPerformanceAI';
 import { IABoardProductionDashboard } from '@/components/IABoardProductionDashboard';
 import { FixedSystemTester } from '@/components/FixedSystemTester';
 import { YouTubeAnalyzer } from '@/components/YouTubeAnalyzer';
@@ -42,6 +43,7 @@ export default function App() {
           <Switch>
             <Route path="/" component={IABoard} />
             <Route path="/downloads" component={Downloads} />
+            <Route path="/high-performance" component={HighPerformanceAI} />
             <Route path="/progress" component={ProgressDemo} />
             <Route path="/production" component={IABoardProductionDashboard} />
             <Route path="/tests" component={FixedSystemTester} />

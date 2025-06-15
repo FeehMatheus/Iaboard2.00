@@ -80,12 +80,12 @@ IMPORTANTE: Gere conteúdo profissional e prático de alta qualidade. Seja espec
       file: savedFile
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro GROQ:', error);
     res.status(500).json({
       success: false,
       error: 'Erro na geração com GROQ',
-      details: error.message
+      details: error?.message || 'Erro desconhecido'
     });
   }
 });
@@ -133,12 +133,12 @@ router.post('/api/perplexity/research', async (req, res) => {
       file: savedFile
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro Perplexity:', error);
     res.status(500).json({
       success: false,
       error: 'Erro na pesquisa com Perplexity',
-      details: error.message
+      details: error?.message || 'Erro desconhecido'
     });
   }
 });
@@ -192,12 +192,12 @@ router.post('/api/huggingface/generate', async (req, res) => {
       file: savedFile
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro HuggingFace:', error);
     res.status(500).json({
       success: false,
       error: 'Erro na geração com HuggingFace',
-      details: error.message
+      details: error?.message || 'Erro desconhecido'
     });
   }
 });
@@ -328,12 +328,12 @@ ${salesCopy}
       file: savedFile
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro Smart Business:', error);
     res.status(500).json({
       success: false,
       error: 'Erro na geração do pacote completo',
-      details: error.message
+      details: error?.message || 'Erro desconhecido'
     });
   }
 });

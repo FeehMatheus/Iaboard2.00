@@ -51,6 +51,9 @@ app.use((req, res, next) => {
   // Add downloads manager (highest priority)
   app.use(downloadsManager);
   
+  // Add high-performance AI routes
+  app.use(highPerformanceAI);
+  
   // Add fast AI routes
   app.use(fastAIRoutes);
   

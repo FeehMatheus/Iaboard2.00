@@ -83,7 +83,7 @@ export default function Downloads() {
     );
   }
 
-  const downloadFiles: DownloadFile[] = files?.files || [];
+  const downloadFiles: DownloadFile[] = Array.isArray(files?.files) ? files.files : [];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -194,7 +194,7 @@ export default function Downloads() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-red-600">
-                  {[...new Set(downloadFiles.map(f => f.module))].length}
+                  {Array.from(new Set(downloadFiles.map(f => f.module))).length}
                 </div>
                 <div className="text-sm text-gray-600">Módulos Utilizados</div>
               </div>
