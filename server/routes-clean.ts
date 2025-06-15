@@ -28,6 +28,9 @@ import { mailchimpService } from './mailchimp-service';
 import { mixpanelService } from './mixpanel-service';
 import { notionService } from './notion-service';
 import { healthCheckService } from './health-check-service';
+import { directLLMService } from './direct-llm-service';
+import { realVideoService } from './real-video-service';
+import { authenticContentGenerator } from './authentic-content-generator';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -1222,6 +1225,222 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Quick health check failed'
+      });
+    }
+  });
+
+  // NOVAS ROTAS CORRIGIDAS - PROBLEMA 1: Alternativa ao OpenRouter
+  app.post('/api/direct-llm/generate', async (req, res) => {
+    try {
+      const { prompt, model, systemPrompt, temperature, maxTokens } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt é obrigatório' });
+      }
+
+      const result = await directLLMService.generateContent({
+        prompt,
+        model,
+        systemPrompt,
+        temperature,
+        maxTokens
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Direct LLM error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro interno do servidor'
+      });
+    }
+  });
+
+  // PROBLEMA 2: Geração de vídeo real corrigida
+  app.post('/api/video/generate-real', async (req, res) => {
+    try {
+      const { prompt, aspectRatio, duration, style } = req.body;
+
+      if (!prompt) {
+        return res.status(400).json({ success: false, error: 'Prompt é obrigatório para gerar vídeo' });
+      }
+
+      const result = await realVideoService.generateVideo({
+        prompt,
+        aspectRatio: aspectRatio || '16:9',
+        duration: duration || 5,
+        style: style || 'realistic'
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Video generation error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro na geração de vídeo'
+      });
+    }
+  });
+
+  // PROBLEMA 3: Conteúdo autêntico baseado na ideia do usuário
+  app.post('/api/content/authentic', async (req, res) => {
+    try {
+      const { userIdea, contentType, targetAudience, businessType, goals, specificRequirements } = req.body;
+
+      if (!userIdea) {
+        return res.status(400).json({ success: false, error: 'Ideia do usuário é obrigatória' });
+      }
+
+      if (!contentType) {
+        return res.status(400).json({ success: false, error: 'Tipo de conteúdo é obrigatório' });
+      }
+
+      const result = await authenticContentGenerator.generateRealContent({
+        userIdea,
+        contentType,
+        targetAudience,
+        businessType,
+        goals,
+        specificRequirements
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Authentic content error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro na geração de conteúdo autêntico'
+      });
+    }
+  });
+
+  // Módulos IA com conteúdo autêntico
+  app.post('/api/ia-modules-authentic/:moduleType', async (req, res) => {
+    try {
+      const { moduleType } = req.params;
+      const { userIdea, prompt, parameters } = req.body;
+
+      if (!userIdea) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Ideia do usuário é obrigatória para gerar conteúdo autêntico' 
+        });
+      }
+
+      const moduleContentMap: Record<string, any> = {
+        'ia-copy': 'copy',
+        'ia-produto': 'product',
+        'ia-trafego': 'strategy',
+        'ia-video': 'video-script',
+        'ia-total': 'funnel'
+      };
+
+      const contentType = moduleContentMap[moduleType] || 'strategy';
+
+      const result = await authenticContentGenerator.generateRealContent({
+        userIdea,
+        contentType,
+        targetAudience: parameters?.audience,
+        businessType: parameters?.businessType,
+        goals: parameters?.goals,
+        specificRequirements: prompt
+      });
+
+      res.json({
+        success: result.success,
+        result: result.content,
+        moduleType,
+        basedOnIdea: result.basedOnUserIdea,
+        suggestions: result.suggestions,
+        nextSteps: result.nextSteps,
+        metadata: {
+          contentType,
+          authentic: true,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('IA Module error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro no módulo IA'
+      });
+    }
+  });
+
+  // Teste de todos os serviços corrigidos
+  app.post('/api/test/fixed-services', async (req, res) => {
+    try {
+      const results = [];
+
+      // Teste Direct LLM
+      try {
+        const llmTest = await directLLMService.generateContent({
+          prompt: 'Teste de funcionalidade do sistema IA Board corrigido',
+          maxTokens: 50
+        });
+        results.push({
+          service: 'Direct LLM',
+          success: llmTest.success,
+          provider: llmTest.provider,
+          tokens: llmTest.tokensUsed
+        });
+      } catch (error) {
+        results.push({
+          service: 'Direct LLM',
+          success: false,
+          error: error instanceof Error ? error.message : 'Erro desconhecido'
+        });
+      }
+
+      // Teste Real Video
+      try {
+        const videoHealth = await realVideoService.healthCheck();
+        results.push({
+          service: 'Real Video',
+          success: videoHealth.success,
+          message: videoHealth.message
+        });
+      } catch (error) {
+        results.push({
+          service: 'Real Video',
+          success: false,
+          error: error instanceof Error ? error.message : 'Erro desconhecido'
+        });
+      }
+
+      // Teste Authentic Content
+      try {
+        const contentTest = await authenticContentGenerator.generateRealContent({
+          userIdea: 'Venda de cursos online de programação',
+          contentType: 'copy'
+        });
+        results.push({
+          service: 'Authentic Content',
+          success: contentTest.success,
+          contentLength: contentTest.content.length
+        });
+      } catch (error) {
+        results.push({
+          service: 'Authentic Content',
+          success: false,
+          error: error instanceof Error ? error.message : 'Erro desconhecido'
+        });
+      }
+
+      const successCount = results.filter(r => r.success).length;
+
+      res.json({
+        success: true,
+        summary: `${successCount}/${results.length} serviços corrigidos operacionais`,
+        results,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Test fixed services error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro no teste dos serviços corrigidos'
       });
     }
   });
