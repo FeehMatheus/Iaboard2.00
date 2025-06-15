@@ -42,10 +42,10 @@ interface ContentWorkflowRequest {
   target_audience: string;
   primary_goal: string;
   brand_guidelines?: {
-    tone: string;
-    voice: string;
-    key_messages: string[];
-    avoid_topics: string[];
+    tone?: string;
+    voice?: string;
+    key_messages?: string[];
+    avoid_topics?: string[];
   };
   distribution_channels: string[];
   deadline?: string;
@@ -122,7 +122,10 @@ const statusColors = {
   in_progress: 'bg-blue-500',
   completed: 'bg-green-500',
   failed: 'bg-red-500',
-  requires_input: 'bg-yellow-500'
+  requires_input: 'bg-yellow-500',
+  planning: 'bg-purple-500',
+  executing: 'bg-blue-600',
+  review: 'bg-orange-500'
 };
 
 export default function IntelligentContentWorkflow() {

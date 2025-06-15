@@ -20,6 +20,7 @@ import workflowChoreography from "./workflow-choreography";
 import workflowExecutor from "./workflow-executor";
 import powerfulThinkingAI from "./powerful-thinking-ai";
 import intelligentContentWorkflow from "./intelligent-content-workflow";
+import apiConnectionFix from "./api-connection-fix";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -83,6 +84,9 @@ app.use((req, res, next) => {
   
   // Add intelligent content workflow system
   app.use(intelligentContentWorkflow);
+  
+  // Add API connection fixes (highest priority)
+  app.use(apiConnectionFix);
   
   // Add high-performance AI routes
   app.use(highPerformanceAI);

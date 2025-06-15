@@ -59,7 +59,7 @@ export function AdvancedProgressDashboard({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isActive, startTime, overallProgress]);
+  }, [isActive, startTime]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
