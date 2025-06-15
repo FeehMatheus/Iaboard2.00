@@ -45,17 +45,17 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Add YouTube analysis routes
-  app.use(youtubeRoutes);
-  
-  // Add enhanced AI routes
-  app.use(enhancedRoutes);
-  
-  // Add IA Board specialized modules (priority)
+  // Add IA Board specialized modules (highest priority)
   app.use(iaBoardModules);
   
   // Add hybrid AI module routes
   app.use(aiModuleRoutes);
+  
+  // Add YouTube analysis routes
+  app.use(youtubeRoutes);
+  
+  // Add enhanced AI routes (lowest priority)
+  app.use(enhancedRoutes);
   
   const server = await registerRoutes(app);
 

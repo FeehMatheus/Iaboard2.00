@@ -59,61 +59,7 @@ async function executeRealAI(prompt: string, systemPrompt?: string): Promise<{ c
   }
 }
 
-// Copywriting module
-router.post('/api/ia-copy/generate', async (req, res) => {
-  try {
-    const { prompt, niche, targetAudience, objective } = req.body;
-
-    const systemPrompt = `Você é um copywriter especialista com 20 anos de experiência. Crie copy persuasivo e de alta conversão em português brasileiro.`;
-    
-    const fullPrompt = `
-Crie um copy completo para:
-- Nicho: ${niche}
-- Público-alvo: ${targetAudience}
-- Objetivo: ${objective}
-- Prompt específico: ${prompt}
-
-Inclua:
-1. Headlines poderosos (5 variações)
-2. Subheadlines explicativos
-3. Bullets de benefícios
-4. Prova social
-5. Oferta irresistível
-6. Calls-to-action (CTAs)
-7. Senso de urgência/escassez
-8. Garantia
-9. FAQ antecipando objeções
-10. Copy para email marketing (3 emails)
-
-Use técnicas como AIDA, PAS, Before/After/Bridge, e storytelling.
-`;
-
-    const aiResult = await executeRealAI(fullPrompt, systemPrompt);
-    
-    // Generate downloadable files
-    const files = await fileGenerationService.generateFiles({
-      moduleType: 'ia-copy',
-      prompt: fullPrompt,
-      aiResponse: aiResult.content,
-      format: 'html',
-      purpose: 'Copy persuasivo completo'
-    });
-
-    res.json({
-      success: true,
-      data: {
-        content: aiResult.content,
-        model: aiResult.model,
-        tokensUsed: aiResult.tokensUsed,
-        files: files.map(f => ({ id: f.id, name: f.name, type: f.type, purpose: f.purpose, size: f.size })),
-        executionTime: Date.now()
-      }
-    });
-  } catch (error) {
-    console.error('Erro no módulo de copy:', error);
-    res.status(500).json({ success: false, error: 'Erro ao gerar copy' });
-  }
-});
+// OLD ROUTE REMOVED - Using IA Board modules with Smart LLM system instead
 
 // Product creation module
 router.post('/api/ia-produto/generate', async (req, res) => {
