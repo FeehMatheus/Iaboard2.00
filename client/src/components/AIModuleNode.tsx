@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/select';
 
 interface AIModuleData {
-  moduleType: 'ia-copy' | 'ia-video' | 'ia-produto' | 'ia-trafego' | 'ia-analytics';
+  moduleType: 'ia-copy' | 'ia-video' | 'ia-produto' | 'ia-trafego' | 'ia-analytics' | 'workflow-choreography';
   prompt?: string;
   parameters?: any;
   result?: string;
@@ -42,6 +42,10 @@ interface AIModuleData {
   files?: Array<{name: string, content: string, type: string}>;
   progressMode?: boolean;
   workflowTemplate?: 'complete-marketing' | 'video-suite' | 'copy-mastery' | 'custom';
+  choreographyData?: {
+    goal?: string;
+    preferences?: any;
+  };
 }
 
 const moduleConfigs = {
