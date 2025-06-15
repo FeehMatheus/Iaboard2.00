@@ -25,6 +25,33 @@ interface SmartLLMResponse {
   error?: string;
 }
 
+interface VideoRequest {
+  prompt: string;
+  duration?: number;
+  aspectRatio?: string;
+  style?: string;
+}
+
+interface VideoResponse {
+  success: boolean;
+  videoUrl?: string;
+  provider?: string;
+  error?: string;
+}
+
+interface TTSRequest {
+  text: string;
+  language?: string;
+  voice?: string;
+}
+
+interface TTSResponse {
+  success: boolean;
+  audioUrl?: string;
+  provider?: string;
+  error?: string;
+}
+
 interface ProviderConfig {
   name: string;
   priority: number;
@@ -34,6 +61,7 @@ interface ProviderConfig {
   dailyLimit: number;
   currentUsage: number;
   resetTime: Date;
+  category: 'chat' | 'video' | 'tts' | 'automation' | 'storage';
 }
 
 class SmartLLMSystem {
@@ -55,11 +83,8 @@ class SmartLLMSystem {
 
   private initializeProviders() {
     console.log('[SmartLLM] Checking environment variables...');
-    console.log('[SmartLLM] OPENROUTER_API_KEY:', process.env.OPENROUTER_API_KEY ? 'present' : 'missing');
-    console.log('[SmartLLM] MISTRAL_API_KEY:', process.env.MISTRAL_API_KEY ? 'present' : 'missing');
-    console.log('[SmartLLM] GROQ_API_KEY:', process.env.GROQ_API_KEY ? 'present' : 'missing');
     
-    // 1. Mistral (high performance, verified working)
+    // CHAT PROVIDERS (LLM)
     if (process.env.MISTRAL_API_KEY) {
       this.providers.push({
         name: 'mistral',
@@ -69,12 +94,12 @@ class SmartLLMSystem {
         models: ['mistral-small'],
         dailyLimit: 500,
         currentUsage: 0,
-        resetTime: this.getNextMidnight()
+        resetTime: this.getNextMidnight(),
+        category: 'chat'
       });
-      console.log('[SmartLLM] Added Mistral provider');
+      console.log('[SmartLLM] Added chat provider: mistral');
     }
 
-    // 2. OpenRouter (multi-provider with credit limits)
     if (process.env.OPENROUTER_API_KEY) {
       this.providers.push({
         name: 'openrouter',
@@ -84,26 +109,108 @@ class SmartLLMSystem {
         models: ['openai/gpt-4o-mini'],
         dailyLimit: 100,
         currentUsage: 0,
-        resetTime: this.getNextMidnight()
+        resetTime: this.getNextMidnight(),
+        category: 'chat'
       });
-      console.log('[SmartLLM] Added OpenRouter provider');
+      console.log('[SmartLLM] Added chat provider: openrouter');
     }
 
-    // 3. Groq (ultra-fast Llama)
-    if (process.env.GROQ_API_KEY) {
+    if (process.env.ANTHROPIC_API_KEY) {
       this.providers.push({
-        name: 'groq',
+        name: 'anthropic',
         priority: 3,
         enabled: true,
-        baseUrl: 'https://api.groq.com/openai/v1',
-        models: ['llama-3-70b-8192'],
-        dailyLimit: 300,
+        baseUrl: 'https://api.anthropic.com',
+        models: ['claude-3-sonnet-20240229'],
+        dailyLimit: 200,
         currentUsage: 0,
-        resetTime: this.getNextMidnight()
+        resetTime: this.getNextMidnight(),
+        category: 'chat'
       });
+      console.log('[SmartLLM] Added chat provider: anthropic');
     }
 
-    this.log(`Initialized ${this.providers.length} AI providers`);
+    // VIDEO PROVIDERS
+    if (process.env.STABILITY_API_KEY) {
+      this.providers.push({
+        name: 'stability',
+        priority: 1,
+        enabled: true,
+        baseUrl: 'https://api.stability.ai/v2beta',
+        models: ['stable-video-diffusion-1-1'],
+        dailyLimit: 50,
+        currentUsage: 0,
+        resetTime: this.getNextMidnight(),
+        category: 'video'
+      });
+      console.log('[SmartLLM] Added video provider: stability');
+    }
+
+    if (process.env.PIKA_API_KEY) {
+      this.providers.push({
+        name: 'pika',
+        priority: 2,
+        enabled: true,
+        baseUrl: 'https://api.pika.art/v1',
+        models: ['pika-1.0'],
+        dailyLimit: 30,
+        currentUsage: 0,
+        resetTime: this.getNextMidnight(),
+        category: 'video'
+      });
+      console.log('[SmartLLM] Added video provider: pika');
+    }
+
+    // TTS PROVIDERS
+    if (process.env.ELEVENLABS_API_KEY) {
+      this.providers.push({
+        name: 'elevenlabs',
+        priority: 1,
+        enabled: true,
+        baseUrl: 'https://api.elevenlabs.io/v1',
+        models: ['eleven_monolingual_v1'],
+        dailyLimit: 100,
+        currentUsage: 0,
+        resetTime: this.getNextMidnight(),
+        category: 'tts'
+      });
+      console.log('[SmartLLM] Added TTS provider: elevenlabs');
+    }
+
+    // AUTOMATION PROVIDERS
+    if (process.env.ZAPIER_WEBHOOK_URL) {
+      this.providers.push({
+        name: 'zapier',
+        priority: 1,
+        enabled: true,
+        baseUrl: process.env.ZAPIER_WEBHOOK_URL,
+        models: ['webhook'],
+        dailyLimit: 1000,
+        currentUsage: 0,
+        resetTime: this.getNextMidnight(),
+        category: 'automation'
+      });
+      console.log('[SmartLLM] Added automation provider: zapier');
+    }
+
+    // STORAGE PROVIDERS
+    if (process.env.NOTION_API_KEY) {
+      this.providers.push({
+        name: 'notion',
+        priority: 1,
+        enabled: true,
+        baseUrl: 'https://api.notion.com/v1',
+        models: ['pages'],
+        dailyLimit: 500,
+        currentUsage: 0,
+        resetTime: this.getNextMidnight(),
+        category: 'storage'
+      });
+      console.log('[SmartLLM] Added storage provider: notion');
+    }
+
+    this.log(`Initialized ${this.providers.length} AI providers across all categories`);
+    console.log(`[SmartLLM] Initialized ${this.providers.length} AI providers across all categories`);
   }
 
   private getNextMidnight(): Date {
@@ -113,11 +220,71 @@ class SmartLLMSystem {
     return tomorrow;
   }
 
+  async chat(request: SmartLLMRequest): Promise<SmartLLMResponse> {
+    return this.executeByCategory('chat', request);
+  }
+
   async smartLLM(request: SmartLLMRequest): Promise<SmartLLMResponse> {
+    return this.executeByCategory('chat', request);
+  }
+
+  async generateVideo(request: VideoRequest): Promise<VideoResponse> {
     this.resetUsageIfNeeded();
 
     const availableProviders = this.providers
-      .filter(p => p.enabled && p.currentUsage < p.dailyLimit)
+      .filter(p => p.category === 'video' && p.enabled && p.currentUsage < p.dailyLimit)
+      .sort((a, b) => a.priority - b.priority);
+
+    if (availableProviders.length === 0) {
+      return { success: false, error: 'Vídeo indisponível' };
+    }
+
+    for (const provider of availableProviders) {
+      try {
+        const result = await this.executeVideoProvider(provider, request);
+        provider.currentUsage++;
+        this.log(`SUCCESS: video-${provider.name}`);
+        return { ...result, provider: provider.name };
+      } catch (error) {
+        this.log(`ERROR: video-${provider.name} - ${error}`);
+        continue;
+      }
+    }
+
+    return { success: false, error: 'Vídeo indisponível' };
+  }
+
+  async tts(request: TTSRequest): Promise<TTSResponse> {
+    this.resetUsageIfNeeded();
+
+    const availableProviders = this.providers
+      .filter(p => p.category === 'tts' && p.enabled && p.currentUsage < p.dailyLimit)
+      .sort((a, b) => a.priority - b.priority);
+
+    if (availableProviders.length === 0) {
+      return { success: false, error: 'Áudio indisponível' };
+    }
+
+    for (const provider of availableProviders) {
+      try {
+        const result = await this.executeTTSProvider(provider, request);
+        provider.currentUsage++;
+        this.log(`SUCCESS: tts-${provider.name}`);
+        return { ...result, provider: provider.name };
+      } catch (error) {
+        this.log(`ERROR: tts-${provider.name} - ${error}`);
+        continue;
+      }
+    }
+
+    return { success: false, error: 'Áudio indisponível' };
+  }
+
+  private async executeByCategory(category: string, request: SmartLLMRequest): Promise<SmartLLMResponse> {
+    this.resetUsageIfNeeded();
+
+    const availableProviders = this.providers
+      .filter(p => p.category === category && p.enabled && p.currentUsage < p.dailyLimit)
       .sort((a, b) => a.priority - b.priority);
 
     if (availableProviders.length === 0) {
@@ -154,10 +321,30 @@ class SmartLLMSystem {
         return this.executeOpenRouter(provider, request);
       case 'mistral':
         return this.executeMistral(provider, request);
-      case 'groq':
-        return this.executeGroq(provider, request);
+      case 'anthropic':
+        return this.executeAnthropic(provider, request);
       default:
         throw new Error(`Unknown provider: ${provider.name}`);
+    }
+  }
+
+  private async executeVideoProvider(provider: ProviderConfig, request: VideoRequest): Promise<VideoResponse> {
+    switch (provider.name) {
+      case 'stability':
+        return this.executeStabilityVideo(provider, request);
+      case 'pika':
+        return this.executePikaVideo(provider, request);
+      default:
+        throw new Error(`Unknown video provider: ${provider.name}`);
+    }
+  }
+
+  private async executeTTSProvider(provider: ProviderConfig, request: TTSRequest): Promise<TTSResponse> {
+    switch (provider.name) {
+      case 'elevenlabs':
+        return this.executeElevenLabsTTS(provider, request);
+      default:
+        throw new Error(`Unknown TTS provider: ${provider.name}`);
     }
   }
 

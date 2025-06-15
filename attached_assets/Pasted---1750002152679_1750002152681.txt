@@ -1,0 +1,58 @@
+#########################################################################################
+###########  PROMPT TÉCNICO — SMART LLM SEM NOMES EXPLÍCITOS E COM FALLBACK DINÂMICO ####
+# Objetivo: Integrar todas as APIs do IA Board via Smart LLM. Não exibir nomes
+# de serviços; escolher automaticamente a melhor opção GRATUITA disponível.
+#########################################################################################
+
+1. • VARIÁVEIS .ENV
+   Carregue todas as chaves presentes no .env (chat, vídeo, voz, automação, storage).
+
+2. • ORDEM DE PRIORIDADE (DINÂMICA)
+   Para cada categoria (Chat-LLM, Vídeo, TTS):
+   ─ Crie uma lista ordenada de provedores **com chave presente e cota disponível**.
+   ─ O Smart LLM seleciona o primeiro da lista.  
+   ─ Se falhar (401/403/quota/timeout), tenta o próximo automaticamente.
+
+3. • CHAT FUNCTION
+   SmartLLM.chat(prompt, modelHint)
+   ─ Percorre provedores chat ordenados.
+   ─ Retorna a primeira resposta ≥ 50 tokens válidos.
+   ─ Registra provedor, latência e custo no log.
+
+4. • VIDEO FUNCTION
+   SmartLLM.generateVideo(prompt)
+   ─ Percorre provedores de vídeo.
+   ─ Se nenhum vídeo provider disponível, retornar erro “Vídeo indisponível”.
+
+5. • TTS FUNCTION
+   SmartLLM.tts(text, lang)
+   ─ Percorre provedores TTS.
+   ─ Retorna buffer MP3 válido; salva em `/downloads/audio`.
+
+6. • SERVIÇOS EXTERNOS
+   Lead → automação (webhook).  
+   Página → storage de documentos.  
+   Métricas → analytics.  
+   Assegure que cada chamada utilize chave presente. Caso ausente, ignore silenciosamente.
+
+7. • VINCULAÇÃO DOS MÓDULOS
+   Cada bloco do canvas deve usar Smart LLM:
+   ─ Copy, Produto, Tráfego, Documento → SmartLLM.chat  
+   ─ Vídeo → SmartLLM.generateVideo  
+   ─ Voz  → SmartLLM.tts
+
+8. • HEALTHCHECK
+   Script `npm run health`:
+   ─ Para cada categoria, ping primeiro provedor da lista.
+   ─ Se falhar, marca toast “Sem provedores gratuitos disponíveis”.
+
+9. • UI / UX
+   ─ Zoom scroll, drawer lateral, quick-menu funcional (como já definido).  
+   ─ Paleta vermelha aplicada internamente.
+
+10. • CRITÉRIO PRONTO
+   ─ Todos módulos respondem com dados técnicos reais.  
+   ─ Vídeo e Áudio gerados e baixáveis.  
+   ─ healthcheck retorna “OK” para cada categoria ou aviso de ausência de provedor.
+
+#########################################################################################
