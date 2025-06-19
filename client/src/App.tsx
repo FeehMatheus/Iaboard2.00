@@ -47,7 +47,15 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-background">
           <Switch>
-            <Route path="/" component={IABoard} />
+            {/* Landing and Auth Routes */}
+            <Route path="/landing" component={Landing} />
+            <Route path="/login" component={Login} />
+            <Route path="/register" component={Register} />
+            <Route path="/checkout" component={Checkout} />
+            <Route path="/success" component={Success} />
+            
+            {/* Main Application Routes */}
+            <Route path="/board" component={IABoard} />
             <Route path="/downloads" component={Downloads} />
             <Route path="/high-performance" component={HighPerformanceAI} />
             <Route path="/progress" component={ProgressDemo} />
@@ -55,9 +63,12 @@ export default function App() {
             <Route path="/tests" component={FixedSystemTester} />
             <Route path="/youtube" component={YouTubeAnalyzer} />
             <Route path="/ai-modules" component={RealAIModuleInterface} />
-            <Route>
-              <IABoard />
-            </Route>
+            
+            {/* Default route - redirect to landing */}
+            <Route path="/" component={Landing} />
+            
+            {/* 404 Handler */}
+            <Route component={NotFound} />
           </Switch>
           <SmartGuidance 
             currentContext={getCurrentContext()}
