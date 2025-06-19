@@ -1,0 +1,110 @@
+# ROTEIRO DE VÍDEO PROFISSIONAL
+
+## INFORMAÇÕES GERAIS
+- **Conceito**: Startup founder apresentando produto revolucionário em evento tech
+- **Duração**: 30 segundos
+- **Estilo**: cinematic
+- **Data de Criação**: 19/06/2025
+
+## ESTRUTURA NARRATIVA
+
+### ABERTURA (0-6s)
+**VISUAL**: Fade in suave revelando a cena principal
+**ÁUDIO**: Música ambiente sutil, crescendo gradualmente
+**NARRAÇÃO**: [Hook inicial que captura atenção]
+
+**DESCRIÇÃO DETALHADA**:
+A cena se abre com startup founder apresentando produto revolucionário em evento tech, estabelecendo imediatamente o contexto visual. A composição segue os princípios do cinematic, com enquadramento cuidadoso que direciona o olhar do espectador para os elementos-chave.
+
+### DESENVOLVIMENTO (6-24s)
+**VISUAL**: Sequência principal com movimentação dinâmica
+**ÁUDIO**: Pico musical, efeitos sonoros ambientais
+**NARRAÇÃO**: [Desenvolvimento da narrativa principal]
+
+**DESCRIÇÃO DETALHADA**:
+O desenvolvimento visual explora as nuances de startup founder apresentando produto revolucionário em evento tech, utilizando movimento de câmera Dolly, jib, steadicam para movimentos complexos para criar dinamismo. A narrativa visual se aprofunda nos detalhes específicos da cena.
+
+### FECHAMENTO (24-30s)
+**VISUAL**: Transição para finalização impactante
+**ÁUDIO**: Resolução musical, fade out gradual
+**NARRAÇÃO**: [Conclusão memorável]
+
+**DESCRIÇÃO DETALHADA**:
+A finalização consolida a narrativa visual de startup founder apresentando produto revolucionário em evento tech, criando um fechamento impactante que ressoa com o estilo cinematic estabelecido desde o início.
+
+## ESPECIFICAÇÕES TÉCNICAS DE FILMAGEM
+
+### CÂMERA
+- **Tipo**: Cinema Camera (RED, ARRI, BlackMagic)
+- **Lentes**: 35mm f/1.4, 50mm f/1.2, 85mm f/1.4 cine lenses
+- **Movimento**: Dolly, jib, steadicam para movimentos complexos
+
+### ILUMINAÇÃO
+- **Setup**: Three-point lighting + practical lights, controle total
+- **Temperatura de Cor**: 5600K base com ajustes criativos 2800K-6500K
+- **Intensidade**: Dramática com contraste controlado
+
+### ÁUDIO
+- **Microfones**: Rode VideoMic Pro Plus, Zoom H5 para backup, monitoramento com fones profissionais
+- **Ambiente**: Áudio ambiente específico para startup founder apresentando produto revolucionário em evento tech, captação de room tone, efeitos sonoros naturais
+- **Música**: Orquestração completa, música épica e emocional
+
+## DIREÇÃO DE ARTE
+
+### CENÁRIO
+Cenário desenvolvido especificamente para Startup founder apresentando produto revolucionário em evento tech, seguindo estética cinematic. Elementos visuais cuidadosamente selecionados para apoiar narrativa principal.
+
+### FIGURINO
+Figurino alinhado com conceito de Startup founder apresentando produto revolucionário em evento tech, respeitando paleta de cores e estilo cinematic. Escolhas que complementam sem competir com elementos principais.
+
+### PROPS
+Props funcionais e estéticos para Startup founder apresentando produto revolucionário em evento tech, cada elemento com propósito narrativo específico. Objetos que enriquecem a história sem sobrecarregar a cena.
+
+## PÓS-PRODUÇÃO
+
+### EDIÇÃO
+- **Software Recomendado**: Adobe Premiere Pro / DaVinci Resolve
+- **Estilo de Corte**: Montagem cinematográfica clássica
+- **Transições**: Fade, dissolve, match cuts
+
+### COLORIZAÇÃO
+- **LUT Recomendada**: LUT cinematográfica, look dramático
+- **Contraste**: Contraste dramático controlado
+- **Saturação**: Saturação seletiva por cor
+
+### EFEITOS VISUAIS
+VFX sutis que amplificam realidade
+
+## CRONOGRAMA DE PRODUÇÃO
+
+1. **Pré-produção** (1-2 dias)
+   - Finalização do roteiro
+   - Casting e locações
+   - Preparação de equipamentos
+
+2. **Produção** (1 dia)
+   - Setup e filmagem
+   - Captação de áudio
+   - Material adicional (B-roll)
+
+3. **Pós-produção** (2-3 dias)
+   - Edição e montagem
+   - Colorização e efeitos
+   - Finalização e entrega
+
+## ORÇAMENTO ESTIMADO
+
+### EQUIPAMENTOS
+- Câmera e lentes: R$ 500-1000/dia
+- Iluminação: R$ 300-600/dia
+- Áudio: R$ 200-400/dia
+
+### EQUIPE
+- Diretor: R$ 800-1500/dia
+- Cinegrafista: R$ 600-1200/dia
+- Editor: R$ 400-800/dia
+
+### TOTAL ESTIMADO: R$ 2.800-5.500
+
+---
+*Roteiro gerado pelo Sistema Híbrido IA Board - Pronto para produção profissional*

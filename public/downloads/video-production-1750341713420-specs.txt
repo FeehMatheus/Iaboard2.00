@@ -1,0 +1,29 @@
+# ESPECIFICAÇÕES TÉCNICAS COMPLETAS
+
+## RESOLUÇÃO E FORMATO
+- **Resolução**: 4K (3840x2160) / 1080p para entrega
+- **Frame Rate**: 24fps (padrão cinema)
+- **Aspect Ratio**: 16:9 (pode ser adaptado para 9:16, 1:1)
+- **Codec**: H.264/H.265 para entrega, ProRes para edição
+
+## CONFIGURAÇÕES DE CÂMERA
+- **ISO**: Base 100-400, máximo 1600 para baixa luz
+- **Shutter Speed**: 1/48 (motion blur cinematográfico)
+- **Abertura**: f/2.8-f/5.6 dependendo da profundidade desejada
+- **White Balance**: Manual conforme temperatura de cor
+
+## ÁUDIO
+- **Sample Rate**: 48kHz
+- **Bit Depth**: 24-bit
+- **Formato**: WAV para gravação, AAC para entrega
+- **Níveis**: -12dB peak, -18dB average
+
+## PÓS-PRODUÇÃO
+- **Timeline**: 30 segundos exatos
+- **Color Space**: Rec.709 para entrega web
+- **Export Settings**: Múltiplos formatos (web, TV, cinema)
+
+## ENTREGA
+- **Formatos**: MP4 (web), MOV (broadcast), diversos tamanhos
+- **Qualidade**: Múltiplas versões (alta, média, baixa qualidade)
+- **Metadados**: Completos com informações de produção

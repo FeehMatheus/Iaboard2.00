@@ -1,0 +1,28 @@
+# STORYBOARD DETALHADO
+
+## PLANO 1 - ESTABLISHING SHOT
+**Descrição**: Startup founder apresentando produto revolucionário em evento tech - Plano geral estabelecendo contexto
+**Duração**: 2-3 segundos
+**Movimento**: Static/Slow push in
+**Estilo**: cinematic
+
+## PLANO 2 - MEDIUM SHOT
+**Descrição**: Aproximação dos elementos principais
+**Duração**: 3-4 segundos
+**Movimento**: Dolly lateral suave
+**Foco**: Elementos centrais da narrativa
+
+## PLANO 3 - CLOSE-UP
+**Descrição**: Detalhes específicos, momento de impacto
+**Duração**: 2-3 segundos
+**Movimento**: Zoom in controlado
+**Emoção**: Pico dramático
+
+## PLANO 4 - WIDE SHOT
+**Descrição**: Contextualização final
+**Duração**: 2-3 segundos
+**Movimento**: Pull back revelando conjunto
+**Finalização**: Fade out elegante
+
+---
+*Cada plano foi pensado para maximizar o impacto visual dentro do estilo cinematic*

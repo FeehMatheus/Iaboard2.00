@@ -60,10 +60,10 @@ const moduleConfigs = {
     description: 'Geração exclusiva de headlines e textos persuasivos'
   },
   'ia-video': {
-    name: 'IA Vídeo',
+    name: 'IA Vídeo Profissional',
     icon: Video,
-    color: 'from-red-500 to-red-600',
-    description: 'Geração de vídeos reais com IA'
+    color: 'from-purple-500 to-blue-600',
+    description: 'Pacotes completos de produção com roteiros, storyboards e especificações'
   },
   'ia-produto': {
     name: 'IA Produto',
@@ -193,7 +193,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
       updateStepProgress(step.id, 10);
       
       // Use the correct real API endpoints
-      const endpoint = step.type === 'video' ? '/api/ia-video/generate' : 
+      const endpoint = step.type === 'video' ? '/api/video-enhanced/generate' : 
                      step.type === 'copy' ? '/api/ia-copy/generate' :
                      step.type === 'product' ? '/api/ia-produto/generate' :
                      step.type === 'traffic' ? '/api/ia-trafego/generate' :
@@ -354,7 +354,7 @@ export const AIModuleNode = memo(({ id, data }: NodeProps<AIModuleData>) => {
       // Use specific endpoints for each module type
       const endpoints = {
         'ia-copy': '/api/ia-copy/generate',
-        'ia-video': '/api/ia-video/generate',
+        'ia-video': '/api/video-enhanced/generate',
         'ia-produto': '/api/ia-produto/generate',
         'ia-trafego': '/api/ia-trafego/generate',
         'ia-analytics': '/api/ia-analytics/generate',
