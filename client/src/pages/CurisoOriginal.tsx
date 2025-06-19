@@ -635,12 +635,17 @@ function Flow() {
         showInteractive={true}
       />
       {/* Hamburger Menu Button */}
-      <Panel position="top-left" className="z-50">
+      <Panel 
+        position="top-left" 
+        className={`z-50 transition-all duration-300 ${
+          sidebarOpen ? 'ml-80' : 'ml-0'
+        }`}
+      >
         <Button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           size="sm"
           variant="secondary"
-          className="bg-background/80 backdrop-blur-sm border"
+          className="bg-background/80 backdrop-blur-sm border hover:bg-background/90 transition-all duration-200"
         >
           <Menu className="h-4 w-4" />
         </Button>
