@@ -11,6 +11,12 @@ import { IABoardProductionDashboard } from '@/components/IABoardProductionDashbo
 import { FixedSystemTester } from '@/components/FixedSystemTester';
 import { YouTubeAnalyzer } from '@/components/YouTubeAnalyzer';
 import RealAIModuleInterface from '@/components/RealAIModuleInterface';
+import { Landing } from '@/pages/Landing';
+import { Login } from '@/pages/Login';
+import { Register } from '@/pages/Register';
+import { Checkout } from '@/pages/Checkout';
+import { Success } from '@/pages/Success';
+import { NotFound } from '@/pages/NotFound';
 
 const queryClient = new QueryClient({
   defaultOptions: {
