@@ -23,6 +23,20 @@ export interface Board {
   nodes: any[];
   edges: any[];
   viewport: { x: number; y: number; zoom: number };
+  createdAt: number;
+  updatedAt: number;
+  description?: string;
+  folderId?: string;
+  tags?: string[];
+  color?: string;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: number;
+  parentId?: string;
 }
 
 export interface CustomModel {
@@ -36,6 +50,7 @@ export interface CustomModel {
 export interface GlobalSettings {
   currentBoardId: string;
   boards: Board[];
+  folders: Folder[];
   customModels: CustomModel[];
   primaryColor: string;
   apiKeys: {

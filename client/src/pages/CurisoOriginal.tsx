@@ -18,14 +18,19 @@ import { useStore } from '@/lib/store';
 import 'reactflow/dist/style.css';
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles, Menu, X } from 'lucide-react';
+import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles, Menu, X, Folder, FolderOpen, Edit3, Copy, Star, Archive, ChevronDown, ChevronRight, MoreVertical } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
 import FurionCanvasNode from '@/components/FurionCanvasNode';
 import { DownloadsModule } from '@/components/DownloadsModule';
 import { VideoHybridModule } from '@/components/VideoHybridModule';
+import { FunnelSidebar } from '@/components/FunnelSidebar';
 import { nanoid } from 'nanoid';
 import { useDebouncedCallback } from 'use-debounce';
 import { useLocation } from 'wouter';
@@ -544,6 +549,10 @@ function Flow() {
 
   const [contextMenu, setContextMenu] = useState<{x: number, y: number, nodeId?: string} | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['default-folder']));
+  const [editingItem, setEditingItem] = useState<{type: 'board' | 'folder', id: string} | null>(null);
+  const [newItemDialog, setNewItemDialog] = useState<{type: 'board' | 'folder', parentId?: string} | null>(null);
+  const [newItemForm, setNewItemForm] = useState({name: '', description: '', color: '#3b82f6'});
 
   const handleContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
