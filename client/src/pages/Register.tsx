@@ -1,356 +1,239 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'wouter';
-import { Eye, EyeOff, Mail, Lock, User, Brain, ArrowLeft, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Brain, Mail, Lock, User, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-export default function Register() {
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
+export function Register() {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    plan: 'starter'
+    confirmPassword: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const plans = [
-    {
-      id: 'starter',
-      name: 'Starter',
-      price: '47',
-      description: 'Perfeito para começar',
-      features: ['10 projetos/mês', 'Copy básicas', 'Suporte email'],
-      popular: false
-    },
-    {
-      id: 'professional',
-      name: 'Professional',
-      price: '97',
-      description: 'Para profissionais',
-      features: ['50 projetos/mês', 'Todos recursos', 'Suporte prioritário'],
-      popular: true
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: '197',
-      description: 'Para empresas',
-      features: ['Projetos ilimitados', 'IA personalizada', 'Suporte dedicado'],
-      popular: false
-    }
-  ];
+  const [loading, setLoading] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
+    
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Erro na confirmação",
-        description: "As senhas não coincidem",
-        variant: "destructive"
+        description: "As senhas não coincidem.",
+        variant: "destructive",
       });
-      setIsLoading(false);
       return;
     }
 
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password,
-          plan: formData.plan
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        toast({
-          title: "Conta criada com sucesso!",
-          description: "Redirecionando para a plataforma..."
-        });
-        
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        setTimeout(() => {
-          setLocation('/dashboard');
-        }, 1000);
-      } else {
-        const error = await response.json();
-        toast({
-          title: "Erro no cadastro",
-          description: error.message || "Erro ao criar conta",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
+    if (!acceptTerms) {
       toast({
-        title: "Erro de conexão",
-        description: "Tente novamente em alguns momentos",
-        variant: "destructive"
+        title: "Termos obrigatórios",
+        description: "Você deve aceitar os termos de uso.",
+        variant: "destructive",
       });
+      return;
     }
 
-    setIsLoading(false);
+    setLoading(true);
+
+    try {
+      // Simular API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Bem-vindo à IA Board! Redirecionando...",
+      });
+      
+      // Redirect to main app
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+      
+    } catch (error) {
+      toast({
+        title: "Erro no cadastro",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-4">
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-8 pt-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white mb-4">
+            <Button variant="ghost" className="text-white hover:bg-white/10 mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar ao início
             </Button>
           </Link>
           
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-              <Brain className="w-7 h-7 text-white" />
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+              <Brain className="w-8 h-8 text-white" />
             </div>
-            <span className="text-white font-bold text-2xl">AI Marketing Pro</span>
+            <span className="text-2xl font-bold text-white">IA Board by Filippe</span>
           </div>
           
-          <h1 className="text-4xl font-bold text-white mb-2">Comece sua jornada</h1>
-          <p className="text-gray-400">Crie sua conta e transforme seu marketing digital</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Crie sua conta</h1>
+          <p className="text-gray-400">Junte-se a mais de 50.000 empreendedores</p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Registration Form */}
-          <div>
-            <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-700/50">
-              <CardHeader>
-                <CardTitle className="text-center text-white">Criar Conta</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName" className="text-gray-300">Nome</Label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <Input
-                          id="firstName"
-                          value={formData.firstName}
-                          onChange={(e) => handleInputChange('firstName', e.target.value)}
-                          className="bg-gray-800/50 border-gray-600 text-white pl-10 focus:border-blue-500"
-                          placeholder="Seu nome"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName" className="text-gray-300">Sobrenome</Label>
-                      <Input
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        className="bg-gray-800/50 border-gray-600 text-white focus:border-blue-500"
-                        placeholder="Seu sobrenome"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-300">E-mail</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        className="bg-gray-800/50 border-gray-600 text-white pl-10 focus:border-blue-500"
-                        placeholder="seu@email.com"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-gray-300">Senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
-                        className="bg-gray-800/50 border-gray-600 text-white pl-10 pr-10 focus:border-blue-500"
-                        placeholder="Mínimo 8 caracteres"
-                        minLength={8}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                      >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-gray-300">Confirmar Senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        value={formData.confirmPassword}
-                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                        className="bg-gray-800/50 border-gray-600 text-white pl-10 pr-10 focus:border-blue-500"
-                        placeholder="Confirme sua senha"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2 pt-2">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      className="rounded border-gray-600 bg-gray-800"
-                      required
-                    />
-                    <Label htmlFor="terms" className="text-sm text-gray-400">
-                      Aceito os{' '}
-                      <Link href="/terms" className="text-blue-400 hover:underline">
-                        Termos de Serviço
-                      </Link>{' '}
-                      e{' '}
-                      <Link href="/privacy" className="text-blue-400 hover:underline">
-                        Política de Privacidade
-                      </Link>
-                    </Label>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3"
-                  >
-                    {isLoading ? 'Criando conta...' : 'Criar Conta'}
-                  </Button>
-                </form>
-
-                <div className="mt-6 text-center">
-                  <p className="text-gray-400">
-                    Já tem uma conta?{' '}
-                    <Link href="/login">
-                      <Button variant="link" className="text-blue-400 hover:text-blue-300 p-0 h-auto">
-                        Faça login
-                      </Button>
-                    </Link>
-                  </p>
+        <Card className="bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-center text-white">Cadastro Gratuito</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Nome completo</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Seu nome completo"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className="pl-10 bg-gray-700 border-gray-600 text-white"
+                    required
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
 
-          {/* Plans Selection */}
-          <div>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Escolha seu plano</h2>
-              <p className="text-gray-400">Comece com 7 dias grátis em qualquer plano</p>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="pl-10 bg-gray-700 border-gray-600 text-white"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Senha</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="password"
+                    placeholder="Crie uma senha forte"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    className="pl-10 bg-gray-700 border-gray-600 text-white"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Confirmar senha</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="password"
+                    placeholder="Confirme sua senha"
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className="pl-10 bg-gray-700 border-gray-600 text-white"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="flex items-start space-x-3 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    className="rounded bg-gray-700 border-gray-600 mt-1" 
+                  />
+                  <span className="text-sm text-gray-300 leading-relaxed">
+                    Eu aceito os{' '}
+                    <Link href="/terms">
+                      <span className="text-orange-400 hover:text-orange-300">termos de uso</span>
+                    </Link>
+                    {' '}e{' '}
+                    <Link href="/privacy">
+                      <span className="text-orange-400 hover:text-orange-300">política de privacidade</span>
+                    </Link>
+                  </span>
+                </label>
+
+                <label className="flex items-start space-x-3 cursor-pointer">
+                  <input type="checkbox" className="rounded bg-gray-700 border-gray-600 mt-1" />
+                  <span className="text-sm text-gray-300 leading-relaxed">
+                    Quero receber emails com dicas exclusivas e novidades da IA Board
+                  </span>
+                </label>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
+                disabled={loading}
+              >
+                {loading ? "Criando conta..." : "Criar conta gratuita"}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-400">
+                Já tem uma conta?{' '}
+                <Link href="/login">
+                  <span className="text-orange-400 hover:text-orange-300 cursor-pointer font-semibold">
+                    Faça login
+                  </span>
+                </Link>
+              </p>
             </div>
 
-            <div className="space-y-4">
-              {plans.map(plan => (
-                <div
-                  key={plan.id}
-                  onClick={() => handleInputChange('plan', plan.id)}
-                  className={`relative cursor-pointer rounded-lg border-2 p-6 transition-all ${
-                    formData.plan === plan.id
-                      ? 'border-blue-500 bg-blue-500/10'
-                      : 'border-gray-700 bg-gray-900/30 hover:border-gray-600'
-                  }`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-4">
-                      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                        Mais Popular
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                            formData.plan === plan.id
-                              ? 'border-blue-500 bg-blue-500'
-                              : 'border-gray-600'
-                          }`}
-                        >
-                          {formData.plan === plan.id && (
-                            <CheckCircle className="w-3 h-3 text-white" fill="currentColor" />
-                          )}
-                        </div>
-                        <h3 className="text-xl font-bold text-white">{plan.name}</h3>
-                      </div>
-                      
-                      <p className="text-gray-400 mb-3">{plan.description}</p>
-                      
-                      <ul className="space-y-1">
-                        {plan.features.map((feature, index) => (
-                          <li key={index} className="text-sm text-gray-300 flex items-center space-x-2">
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="text-right ml-4">
-                      <div className="text-3xl font-bold text-white">R$ {plan.price}</div>
-                      <div className="text-gray-400 text-sm">/mês</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="mt-6 pt-6 border-t border-gray-700">
+              <p className="text-center text-sm text-gray-400 mb-4">Ou cadastre-se com</p>
+              <div className="space-y-2">
+                <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-700">
+                  🔐 Continuar com Google
+                </Button>
+                <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-700">
+                  📘 Continuar com Facebook
+                </Button>
+              </div>
             </div>
 
             <div className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-              <div className="flex items-center space-x-2 text-green-400 mb-2">
+              <div className="flex items-center gap-2 text-green-400 mb-2">
                 <CheckCircle className="w-5 h-5" />
-                <span className="font-semibold">7 dias grátis</span>
+                <span className="font-semibold">Garantias incluídas:</span>
               </div>
-              <p className="text-sm text-gray-300">
-                Teste todos os recursos sem compromisso. Cancele a qualquer momento durante o período de teste.
-              </p>
+              <ul className="text-sm text-gray-300 space-y-1">
+                <li>• Acesso imediato após cadastro</li>
+                <li>• 30 dias de garantia total</li>
+                <li>• Suporte premium incluído</li>
+                <li>• Sem taxas escondidas</li>
+              </ul>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -1,0 +1,110 @@
+# ROTEIRO DE VÍDEO PROFISSIONAL
+
+## INFORMAÇÕES GERAIS
+- **Conceito**: Uma pessoa caminhando no sol
+- **Duração**: 5 segundos
+- **Estilo**: realistic
+- **Data de Criação**: 19/06/2025
+
+## ESTRUTURA NARRATIVA
+
+### ABERTURA (0-1s)
+**VISUAL**: Fade in suave revelando a cena principal
+**ÁUDIO**: Música ambiente sutil, crescendo gradualmente
+**NARRAÇÃO**: [Hook inicial que captura atenção]
+
+**DESCRIÇÃO DETALHADA**:
+A cena se abre com uma pessoa caminhando no sol, estabelecendo imediatamente o contexto visual. A composição segue os princípios do realistic, com enquadramento cuidadoso que direciona o olhar do espectador para os elementos-chave.
+
+### DESENVOLVIMENTO (1-4s)
+**VISUAL**: Sequência principal com movimentação dinâmica
+**ÁUDIO**: Pico musical, efeitos sonoros ambientais
+**NARRAÇÃO**: [Desenvolvimento da narrativa principal]
+
+**DESCRIÇÃO DETALHADA**:
+O desenvolvimento visual explora as nuances de uma pessoa caminhando no sol, utilizando movimento de câmera Movimentos suaves com gimbal, alguns planos fixos para criar dinamismo. A narrativa visual se aprofunda nos detalhes específicos da cena.
+
+### FECHAMENTO (4-5s)
+**VISUAL**: Transição para finalização impactante
+**ÁUDIO**: Resolução musical, fade out gradual
+**NARRAÇÃO**: [Conclusão memorável]
+
+**DESCRIÇÃO DETALHADA**:
+A finalização consolida a narrativa visual de uma pessoa caminhando no sol, criando um fechamento impactante que ressoa com o estilo realistic estabelecido desde o início.
+
+## ESPECIFICAÇÕES TÉCNICAS DE FILMAGEM
+
+### CÂMERA
+- **Tipo**: DSLR/Mirrorless Full Frame (Canon R5, Sony A7S III)
+- **Lentes**: 24-70mm f/2.8, 85mm f/1.4 para retratos
+- **Movimento**: Movimentos suaves com gimbal, alguns planos fixos
+
+### ILUMINAÇÃO
+- **Setup**: Iluminação natural + fill light, key light suave
+- **Temperatura de Cor**: 5600K (daylight) / 3200K (tungsten)
+- **Intensidade**: Moderada, evitando sombras duras
+
+### ÁUDIO
+- **Microfones**: Rode VideoMic Pro Plus, Zoom H5 para backup, monitoramento com fones profissionais
+- **Ambiente**: Áudio ambiente específico para uma pessoa caminhando no sol, captação de room tone, efeitos sonoros naturais
+- **Música**: Música sutil e orgânica, instrumentos acústicos
+
+## DIREÇÃO DE ARTE
+
+### CENÁRIO
+Cenário desenvolvido especificamente para Uma pessoa caminhando no sol, seguindo estética realistic. Elementos visuais cuidadosamente selecionados para apoiar narrativa principal.
+
+### FIGURINO
+Figurino alinhado com conceito de Uma pessoa caminhando no sol, respeitando paleta de cores e estilo realistic. Escolhas que complementam sem competir com elementos principais.
+
+### PROPS
+Props funcionais e estéticos para Uma pessoa caminhando no sol, cada elemento com propósito narrativo específico. Objetos que enriquecem a história sem sobrecarregar a cena.
+
+## PÓS-PRODUÇÃO
+
+### EDIÇÃO
+- **Software Recomendado**: Adobe Premiere Pro / DaVinci Resolve
+- **Estilo de Corte**: Cortes naturais, ritmo orgânico
+- **Transições**: Corte seco, algumas dissolvências suaves
+
+### COLORIZAÇÃO
+- **LUT Recomendada**: Rec.709 natural, correção sutil
+- **Contraste**: Contraste moderado, natural
+- **Saturação**: Saturação natural, ligeiramente elevada
+
+### EFEITOS VISUAIS
+Efeitos mínimos, color correction principal
+
+## CRONOGRAMA DE PRODUÇÃO
+
+1. **Pré-produção** (1-2 dias)
+   - Finalização do roteiro
+   - Casting e locações
+   - Preparação de equipamentos
+
+2. **Produção** (1 dia)
+   - Setup e filmagem
+   - Captação de áudio
+   - Material adicional (B-roll)
+
+3. **Pós-produção** (2-3 dias)
+   - Edição e montagem
+   - Colorização e efeitos
+   - Finalização e entrega
+
+## ORÇAMENTO ESTIMADO
+
+### EQUIPAMENTOS
+- Câmera e lentes: R$ 500-1000/dia
+- Iluminação: R$ 300-600/dia
+- Áudio: R$ 200-400/dia
+
+### EQUIPE
+- Diretor: R$ 800-1500/dia
+- Cinegrafista: R$ 600-1200/dia
+- Editor: R$ 400-800/dia
+
+### TOTAL ESTIMADO: R$ 2.800-5.500
+
+---
+*Roteiro gerado pelo Sistema Híbrido IA Board - Pronto para produção profissional*

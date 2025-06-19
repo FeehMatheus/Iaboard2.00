@@ -1,389 +1,343 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
-import { CheckCircle, CreditCard, Shield, Clock, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Brain, ArrowLeft, CreditCard, Building, CheckCircle, Shield, Clock } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-export default function Checkout() {
+export function Checkout() {
+  const [location] = useLocation();
   const [paymentMethod, setPaymentMethod] = useState('credit');
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     document: '',
     cardNumber: '',
-    cardName: '',
-    cardExpiry: '',
-    cardCvv: ''
+    expiryDate: '',
+    cvv: '',
+    cardName: ''
   });
+  const { toast } = useToast();
 
-  const packages = [
-    { item: "Método Máquina Milionária", description: "(acesso de 1 ano)", originalPrice: "R$ 2.997,00", included: true },
-    { item: "FURION.AI", description: "(6 meses de acesso)", originalPrice: "R$ 1.297,00", included: true, free: true },
-    { item: "6 Lives de Acompanhamento", description: "(gravadas)", originalPrice: "R$ 2.497,00", included: true, free: true },
-    { item: "Comunidade Exclusiva", description: "(Circle)", originalPrice: "R$ 997,00", included: true, free: true },
-    { item: "Treinamento IA de Vídeos", description: "(completo)", originalPrice: "R$ 997,00", included: true, free: true }
-  ];
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  useEffect(() => {
+    // Check if boleto was selected from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'boleto') {
+      setPaymentMethod('boleto');
+    }
+  }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsProcessing(true);
+    setLoading(true);
 
-    // Simular processamento de pagamento
-    setTimeout(() => {
-      setIsProcessing(false);
-      // Redirecionar para página de sucesso ou FURION.AI
-      window.location.href = '/furion-ai';
-    }, 3000);
+    try {
+      // Simular processamento do pagamento
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      if (paymentMethod === 'credit') {
+        toast({
+          title: "Pagamento aprovado!",
+          description: "Seu acesso à IA Board foi liberado. Redirecionando...",
+        });
+      } else {
+        toast({
+          title: "Boleto gerado com sucesso!",
+          description: "Você receberá o boleto por email. Acesso liberado após confirmação do pagamento.",
+        });
+      }
+      
+      // Redirect to success page
+      setTimeout(() => {
+        window.location.href = '/success';
+      }, 2000);
+      
+    } catch (error) {
+      toast({
+        title: "Erro no pagamento",
+        description: "Tente novamente ou entre em contato com o suporte.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const formatCardNumber = (value: string) => {
-    return value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
-  };
-
-  const formatExpiry = (value: string) => {
-    return value.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2');
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Header */}
-      <header className="bg-gray-900 border-b border-gray-800">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center space-x-4">
-            <Link href="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar
-              </Button>
-            </Link>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">M</span>
-              </div>
-              <span className="text-white font-bold text-lg">Máquina Milionária</span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-8 px-4">
+      <div className="container mx-auto max-w-6xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link href="/">
+            <Button variant="ghost" className="text-white hover:bg-white/10 mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar ao início
+            </Button>
+          </Link>
+          
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+              <Brain className="w-8 h-8 text-white" />
             </div>
+            <span className="text-2xl font-bold text-white">IA Board by Filippe</span>
           </div>
+          
+          <h1 className="text-3xl font-bold text-white mb-2">Finalizar Compra</h1>
+          <p className="text-gray-400">Falta pouco para transformar sua vida financeira!</p>
         </div>
-      </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Finalize sua Compra</h1>
-            <p className="text-gray-400">Você está a um passo de transformar sua vida financeira</p>
-          </div>
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Payment Form */}
+          <div className="space-y-6">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white">Método de Pagamento</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    variant={paymentMethod === 'credit' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('credit')}
+                    className={paymentMethod === 'credit' ? 'bg-orange-600' : 'border-gray-600 text-white hover:bg-gray-700'}
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Cartão de Crédito
+                  </Button>
+                  <Button
+                    variant={paymentMethod === 'boleto' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('boleto')}
+                    className={paymentMethod === 'boleto' ? 'bg-orange-600' : 'border-gray-600 text-white hover:bg-gray-700'}
+                  >
+                    <Building className="w-4 h-4 mr-2" />
+                    Boleto Bancário
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Formulário de Pagamento */}
-            <div className="space-y-6">
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <CreditCard className="w-5 h-5 text-orange-500" />
-                    <span>Informações de Pagamento</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Dados Pessoais */}
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-orange-500">Dados Pessoais</h3>
-                      
-                      <div>
-                        <Label htmlFor="name">Nome Completo</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => handleInputChange('name', e.target.value)}
-                          className="bg-gray-800 border-gray-700"
-                          required
-                        />
-                      </div>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="email">E-mail</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) => handleInputChange('email', e.target.value)}
-                            className="bg-gray-800 border-gray-700"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone">Telefone</Label>
-                          <Input
-                            id="phone"
-                            value={formData.phone}
-                            onChange={(e) => handleInputChange('phone', e.target.value)}
-                            className="bg-gray-800 border-gray-700"
-                            placeholder="(11) 99999-9999"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="document">CPF</Label>
-                        <Input
-                          id="document"
-                          value={formData.document}
-                          onChange={(e) => handleInputChange('document', e.target.value)}
-                          className="bg-gray-800 border-gray-700"
-                          placeholder="000.000.000-00"
-                          required
-                        />
-                      </div>
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white">Dados Pessoais</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Nome completo</label>
+                      <Input
+                        placeholder="Seu nome completo"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white"
+                        required
+                      />
                     </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Email</label>
+                      <Input
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                    <Separator className="bg-gray-700" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">Telefone</label>
+                      <Input
+                        placeholder="(11) 99999-9999"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-300">CPF</label>
+                      <Input
+                        placeholder="000.000.000-00"
+                        value={formData.document}
+                        onChange={(e) => handleInputChange('document', e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                    {/* Método de Pagamento */}
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-orange-500">Método de Pagamento</h3>
-                      
-                      <div className="grid grid-cols-3 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('credit')}
-                          className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                            paymentMethod === 'credit' 
-                              ? 'border-orange-500 bg-orange-500/20 text-orange-500' 
-                              : 'border-gray-700 bg-gray-800 text-gray-400'
-                          }`}
-                        >
-                          Cartão
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('pix')}
-                          className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                            paymentMethod === 'pix' 
-                              ? 'border-orange-500 bg-orange-500/20 text-orange-500' 
-                              : 'border-gray-700 bg-gray-800 text-gray-400'
-                          }`}
-                        >
-                          PIX
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPaymentMethod('boleto')}
-                          className={`p-3 rounded-lg border text-sm font-medium transition-colors ${
-                            paymentMethod === 'boleto' 
-                              ? 'border-orange-500 bg-orange-500/20 text-orange-500' 
-                              : 'border-gray-700 bg-gray-800 text-gray-400'
-                          }`}
-                        >
-                          Boleto
-                        </button>
-                      </div>
-
-                      {paymentMethod === 'credit' && (
+                  {paymentMethod === 'credit' && (
+                    <>
+                      <div className="pt-4 border-t border-gray-600">
+                        <h3 className="text-lg font-semibold text-white mb-4">Dados do Cartão</h3>
+                        
                         <div className="space-y-4">
                           <div>
-                            <Label htmlFor="cardNumber">Número do Cartão</Label>
+                            <label className="text-sm font-medium text-gray-300">Número do cartão</label>
                             <Input
-                              id="cardNumber"
-                              value={formData.cardNumber}
-                              onChange={(e) => handleInputChange('cardNumber', formatCardNumber(e.target.value))}
-                              className="bg-gray-800 border-gray-700"
                               placeholder="0000 0000 0000 0000"
-                              maxLength={19}
-                              required
-                            />
-                          </div>
-
-                          <div>
-                            <Label htmlFor="cardName">Nome no Cartão</Label>
-                            <Input
-                              id="cardName"
-                              value={formData.cardName}
-                              onChange={(e) => handleInputChange('cardName', e.target.value)}
-                              className="bg-gray-800 border-gray-700"
+                              value={formData.cardNumber}
+                              onChange={(e) => handleInputChange('cardNumber', e.target.value)}
+                              className="bg-gray-700 border-gray-600 text-white"
                               required
                             />
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor="cardExpiry">Validade</Label>
+                              <label className="text-sm font-medium text-gray-300">Validade</label>
                               <Input
-                                id="cardExpiry"
-                                value={formData.cardExpiry}
-                                onChange={(e) => handleInputChange('cardExpiry', formatExpiry(e.target.value))}
-                                className="bg-gray-800 border-gray-700"
                                 placeholder="MM/AA"
-                                maxLength={5}
+                                value={formData.expiryDate}
+                                onChange={(e) => handleInputChange('expiryDate', e.target.value)}
+                                className="bg-gray-700 border-gray-600 text-white"
                                 required
                               />
                             </div>
                             <div>
-                              <Label htmlFor="cardCvv">CVV</Label>
+                              <label className="text-sm font-medium text-gray-300">CVV</label>
                               <Input
-                                id="cardCvv"
-                                value={formData.cardCvv}
-                                onChange={(e) => handleInputChange('cardCvv', e.target.value)}
-                                className="bg-gray-800 border-gray-700"
-                                placeholder="000"
-                                maxLength={4}
+                                placeholder="123"
+                                value={formData.cvv}
+                                onChange={(e) => handleInputChange('cvv', e.target.value)}
+                                className="bg-gray-700 border-gray-600 text-white"
                                 required
                               />
                             </div>
                           </div>
-                        </div>
-                      )}
 
-                      {paymentMethod === 'pix' && (
-                        <div className="text-center py-8">
-                          <div className="w-32 h-32 bg-gray-800 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                            <span className="text-4xl">📱</span>
+                          <div>
+                            <label className="text-sm font-medium text-gray-300">Nome no cartão</label>
+                            <Input
+                              placeholder="Nome como aparece no cartão"
+                              value={formData.cardName}
+                              onChange={(e) => handleInputChange('cardName', e.target.value)}
+                              className="bg-gray-700 border-gray-600 text-white"
+                              required
+                            />
                           </div>
-                          <p className="text-sm text-gray-400">
-                            Após finalizar, você receberá o código PIX para pagamento
-                          </p>
-                        </div>
-                      )}
-
-                      {paymentMethod === 'boleto' && (
-                        <div className="text-center py-8">
-                          <div className="w-32 h-32 bg-gray-800 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                            <span className="text-4xl">🧾</span>
-                          </div>
-                          <p className="text-sm text-gray-400">
-                            O boleto será enviado por email e pode levar até 2 dias úteis para processar
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    <Button 
-                      type="submit"
-                      disabled={isProcessing}
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 h-12 text-lg font-bold"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Clock className="w-5 h-5 mr-2 animate-spin" />
-                          Processando...
-                        </>
-                      ) : (
-                        `Finalizar Compra - ${paymentMethod === 'credit' ? '12x de R$ 309,96' : 'R$ 3.719,52'}`
-                      )}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              {/* Segurança */}
-              <Card className="bg-gray-900 border-gray-800">
-                <CardContent className="py-4">
-                  <div className="flex items-center space-x-4 text-sm text-gray-400">
-                    <Shield className="w-5 h-5 text-green-500" />
-                    <span>Pagamento 100% seguro e criptografado</span>
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-400 mt-2">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Garantia de 7 dias - Satisfação total ou seu dinheiro de volta</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Resumo do Pedido */}
-            <div className="space-y-6">
-              <Card className="bg-gray-900 border-gray-800">
-                <CardHeader>
-                  <CardTitle>Resumo do Pedido</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {packages.map((pkg, index) => (
-                    <div key={index} className="flex items-center justify-between py-2">
-                      <div className="flex items-center space-x-3">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                        <div>
-                          <div className="font-medium">{pkg.item}</div>
-                          <div className="text-sm text-gray-400">{pkg.description}</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className={`${pkg.free ? 'line-through text-gray-500' : 'text-white font-medium'}`}>
-                          {pkg.originalPrice}
-                        </div>
-                        {pkg.free && <div className="text-green-400 font-bold text-sm">GRÁTIS</div>}
-                      </div>
-                    </div>
-                  ))}
+                    </>
+                  )}
 
-                  <Separator className="bg-gray-700" />
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 py-4 text-lg font-bold"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      paymentMethod === 'credit' ? "Processando pagamento..." : "Gerando boleto..."
+                    ) : (
+                      paymentMethod === 'credit' ? "🚀 FINALIZAR COMPRA" : "📄 GERAR BOLETO"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
 
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Subtotal:</span>
-                      <span className="line-through text-gray-500">R$ 8.785,00</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Desconto:</span>
-                      <span className="text-green-400">-R$ 5.065,48</span>
-                    </div>
-                    <div className="flex justify-between text-xl font-bold">
+          {/* Order Summary */}
+          <div className="space-y-6">
+            <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-orange-500">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  Resumo do Pedido
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-white">IA Board Milionária - ACESSO COMPLETO</h3>
+                    <p className="text-sm text-gray-400">Método completo + IA + Bônus + Suporte</p>
+                  </div>
+                  <Badge className="bg-green-600">MELHOR OFERTA</Badge>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between text-gray-300">
+                    <span>Valor original:</span>
+                    <span className="line-through">R$ 5.997,00</span>
+                  </div>
+                  <div className="flex justify-between text-gray-300">
+                    <span>Desconto especial:</span>
+                    <span className="text-green-400">-R$ 2.800,00</span>
+                  </div>
+                  <div className="border-t border-gray-600 pt-2">
+                    <div className="flex justify-between text-lg font-bold text-white">
                       <span>Total:</span>
-                      <span className="text-orange-500">R$ 3.719,52</span>
+                      <span>R$ 3.197,00</span>
                     </div>
-                    <div className="text-center text-sm text-gray-400">
-                      ou 12x de R$ 309,96 sem juros
+                    <div className="text-center text-yellow-400 font-semibold">
+                      ou 12x de R$ 309,96
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              {/* Garantias */}
-              <Card className="bg-gradient-to-r from-green-600/20 to-blue-600/20 border-green-500/30">
-                <CardContent className="py-6">
-                  <h3 className="font-bold text-green-400 mb-4">🛡️ Suas Garantias</h3>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span>7 dias de garantia incondicional</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span>Acesso imediato após aprovação</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span>Suporte dedicado</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span>Sem pegadinhas ou taxas ocultas</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              {/* Cartões Aceitos */}
-              <Card className="bg-gray-900 border-gray-800">
-                <CardContent className="py-4">
-                  <h4 className="font-medium mb-3">Formas de Pagamento Aceitas</h4>
-                  <div className="flex items-center space-x-2">
-                    <img src="https://maquinamilionaria.com/images/bandeiras.png" alt="Cartões aceitos" className="h-8" />
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                  <div className="flex items-center gap-2 text-yellow-300 text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span className="font-semibold">Oferta por tempo limitado!</span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2">
-                    Visa, Mastercard, Elo, PIX, Boleto, PayPal e mais
+                  <p className="text-xs text-yellow-200 mt-1">
+                    Este preço especial expira em breve. Garante já sua vaga!
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-green-400" />
+                  Suas Garantias
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-gray-300">30 dias de garantia total</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-gray-300">Acesso imediato após pagamento</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-gray-300">Suporte premium incluído</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-gray-300">Pagamento 100% seguro</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-gray-300">Certificado SSL</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="bg-gray-800 rounded-lg p-4 text-center">
+              <p className="text-gray-300 text-sm mb-2">
+                🔒 Seus dados estão protegidos
+              </p>
+              <p className="text-gray-400 text-xs">
+                Utilizamos criptografia de nível bancário para proteger suas informações
+              </p>
             </div>
           </div>
         </div>
