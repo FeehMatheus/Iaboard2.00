@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
+import { aiPerformanceTracker } from './ai-performance-tracker';
 
 interface ChatRequest {
   model: string;
@@ -54,15 +55,38 @@ export class RealChatService {
       }
 
       response.processingTime = Date.now() - startTime;
+      
+      // Record performance metrics
+      aiPerformanceTracker.recordMetric({
+        modelId: request.model,
+        responseTime: response.processingTime,
+        tokensUsed: response.tokensUsed || 0,
+        timestamp: Date.now(),
+        success: response.success
+      });
+
       return response;
 
     } catch (error) {
       console.error('Erro no chat service:', error);
+      
+      const processingTime = Date.now() - startTime;
+      
+      // Record failed metric
+      aiPerformanceTracker.recordMetric({
+        modelId: request.model,
+        responseTime: processingTime,
+        tokensUsed: 0,
+        timestamp: Date.now(),
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Erro desconhecido',
         model: request.model,
-        processingTime: Date.now() - startTime
+        processingTime
       };
     }
   }

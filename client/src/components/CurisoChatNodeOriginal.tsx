@@ -3,7 +3,7 @@ import { Handle, Position, NodeProps, useReactFlow, NodeResizer } from 'reactflo
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Trash2, Loader2, Copy, Check, X } from 'lucide-react';
+import { Send, Trash2, Loader2, Copy, Check, X, BarChart3, Zap, Clock, Target } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReactMarkdown from 'react-markdown';
 import {
@@ -26,6 +26,22 @@ const availableModels = [
   { id: 'claude-3-5-haiku-20241022', name: '📝 Claude 3.5 Haiku (Criativo)', provider: 'anthropic' },
 ];
 
+interface ModelStats {
+  modelId: string;
+  totalCalls: number;
+  successRate: number;
+  averageResponseTime: number;
+  totalTokensUsed: number;
+  lastUsed: number;
+}
+
+interface PerformanceData {
+  modelStats: ModelStats[];
+  bestPerformingModel: string | null;
+  recentMetrics: any[];
+  totalCalls: number;
+}
+
 export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>(data?.messages || []);
@@ -33,6 +49,9 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>({});
+  const [showMetrics, setShowMetrics] = useState(false);
+  const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null);
+  const [lastResponseTime, setLastResponseTime] = useState<number | null>(null);
   
   const { getNode, getEdges, setNodes } = useReactFlow();
   const { toast } = useToast();
@@ -63,6 +82,28 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
       )
     );
   }, [messages, model, id, setNodes]);
+
+  // Fetch performance data
+  const fetchPerformanceData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/ai/models/stats');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setPerformanceData(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch performance data:', error);
+    }
+  }, []);
+
+  // Auto-refresh performance data
+  useEffect(() => {
+    fetchPerformanceData();
+    const interval = setInterval(fetchPerformanceData, 10000); // Every 10 seconds
+    return () => clearInterval(interval);
+  }, [fetchPerformanceData]);
 
   const copyToClipboard = async (text: string, messageId: string) => {
     try {
@@ -181,6 +222,10 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
         };
 
         setMessages(prev => [...prev, assistantMessage]);
+        setLastResponseTime(result.processingTime);
+        
+        // Refresh performance data after successful response
+        fetchPerformanceData();
         
         toast({
           title: "✅ Resposta gerada",
@@ -235,6 +280,29 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
   };
 
   const selectedModel = availableModels.find(m => m.id === model);
+  const currentModelStats = performanceData?.modelStats.find(s => s.modelId === model);
+
+  const getModelRecommendation = () => {
+    if (!performanceData || performanceData.modelStats.length === 0) return null;
+    
+    const currentStats = performanceData.modelStats.find(s => s.modelId === model);
+    const bestModel = performanceData.bestPerformingModel;
+    
+    if (bestModel && bestModel !== model) {
+      const bestStats = performanceData.modelStats.find(s => s.modelId === bestModel);
+      if (bestStats && currentStats) {
+        const improvement = bestStats.averageResponseTime < currentStats.averageResponseTime;
+        return {
+          modelId: bestModel,
+          reason: improvement ? 'melhor performance' : 'maior confiabilidade',
+          modelName: availableModels.find(m => m.id === bestModel)?.name || bestModel
+        };
+      }
+    }
+    return null;
+  };
+
+  const recommendation = getModelRecommendation();
 
   return (
     <div className={`relative ${isResizing ? 'select-none' : ''}`}>
@@ -255,15 +323,30 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
               <span className="text-sm font-medium text-muted-foreground">
                 💬 Chat IA {isLoading ? '(Processando...)' : '(Pronto)'}
               </span>
+              {lastResponseTime && (
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                  {lastResponseTime}ms
+                </span>
+              )}
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={deleteNode}
-              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-            >
-              <X className="h-3 w-3" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowMetrics(!showMetrics)}
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-primary"
+              >
+                <BarChart3 className="h-3 w-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={deleteNode}
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
 
           <Select value={model} onValueChange={setModel}>
@@ -271,13 +354,90 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {availableModels.map(modelOption => (
-                <SelectItem key={modelOption.id} value={modelOption.id}>
-                  {modelOption.name}
-                </SelectItem>
-              ))}
+              {availableModels.map(modelOption => {
+                const stats = performanceData?.modelStats.find(s => s.modelId === modelOption.id);
+                const isBest = performanceData?.bestPerformingModel === modelOption.id;
+                return (
+                  <SelectItem key={modelOption.id} value={modelOption.id}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>{modelOption.name}</span>
+                      {isBest && (
+                        <span className="ml-2 text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
+                          ⚡ Melhor
+                        </span>
+                      )}
+                      {stats && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          {Math.round(stats.averageResponseTime)}ms
+                        </span>
+                      )}
+                    </div>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
+
+          {/* Performance Recommendation */}
+          {recommendation && (
+            <div className="text-xs bg-blue-50 border border-blue-200 rounded-lg p-2">
+              <div className="flex items-center gap-1 mb-1">
+                <Target className="h-3 w-3 text-blue-500" />
+                <span className="font-medium text-blue-700">Recomendação</span>
+              </div>
+              <p className="text-blue-600">
+                {recommendation.modelName} oferece {recommendation.reason}
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setModel(recommendation.modelId)}
+                className="mt-1 h-6 text-xs border-blue-300 text-blue-600 hover:bg-blue-50"
+              >
+                Trocar Modelo
+              </Button>
+            </div>
+          )}
+
+          {/* Performance Metrics Panel */}
+          {showMetrics && performanceData && (
+            <div className="text-xs bg-muted rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-1 mb-2">
+                <BarChart3 className="h-3 w-3" />
+                <span className="font-medium">Métricas de Performance</span>
+              </div>
+              
+              {currentModelStats ? (
+                <div className="space-y-1">
+                  <div className="flex justify-between">
+                    <span>Taxa de Sucesso:</span>
+                    <span className="font-medium">{Math.round(currentModelStats.successRate)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tempo Médio:</span>
+                    <span className="font-medium">{Math.round(currentModelStats.averageResponseTime)}ms</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Total de Chamadas:</span>
+                    <span className="font-medium">{currentModelStats.totalCalls}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tokens Usados:</span>
+                    <span className="font-medium">{currentModelStats.totalTokensUsed.toLocaleString()}</span>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">Nenhum dado disponível para este modelo</p>
+              )}
+
+              <div className="pt-2 border-t border-border/50">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Total Geral:</span>
+                  <span>{performanceData.totalCalls} chamadas</span>
+                </div>
+              </div>
+            </div>
+          )}
         </CardHeader>
 
         <CardContent className="flex-1 p-4 space-y-3">
