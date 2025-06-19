@@ -5,6 +5,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide React Flow Attribution */
+.react-flow__attribution {
+  display: none !important;
+}
+
 @layer base {
   :root {
     --background: 240 10% 3.9%;

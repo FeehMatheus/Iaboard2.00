@@ -634,6 +634,13 @@ function Flow() {
         showFitView={true}
         showInteractive={true}
       />
+      
+      {/* Hide React Flow Attribution */}
+      <style jsx global>{`
+        .react-flow__attribution {
+          display: none !important;
+        }
+      `}</style>
       {/* Hamburger Menu Button */}
       <Panel 
         position="top-left" 
