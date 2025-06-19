@@ -79,8 +79,29 @@ const defaultBoard: Board = {
 };
 
 const defaultSettings: GlobalSettings = {
+  boards: [
+    {
+      id: 'default',
+      name: 'Funil Principal',
+      nodes: [],
+      edges: [],
+      viewport: { x: 0, y: 0, zoom: 1 },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      description: 'Seu primeiro funil de vendas',
+      folderId: 'default-folder',
+      color: '#10b981'
+    },
+  ],
+  folders: [
+    {
+      id: 'default-folder',
+      name: 'Meus Funis',
+      color: '#3b82f6',
+      createdAt: Date.now()
+    }
+  ],
   currentBoardId: 'default',
-  boards: [defaultBoard],
   customModels: [],
   primaryColor: '#00d9ff',
   apiKeys: {},
