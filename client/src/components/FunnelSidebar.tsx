@@ -6,7 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { FunnelOptimizer } from '@/components/FunnelOptimizer';
 import { AdvancedAnalytics } from '@/components/AdvancedAnalytics';
-import { Plus, Folder, FolderOpen, Edit3, Copy, Trash2, MoreVertical, ChevronDown, ChevronRight, Star, Archive, Settings, Brain, BarChart3 } from 'lucide-react';
+import { PerformanceSnapshot } from '@/components/PerformanceSnapshot';
+import { AdaptivePersonalization } from '@/components/AdaptivePersonalization';
+import { ColorPaletteGenerator } from '@/components/ColorPaletteGenerator';
+import { Plus, Folder, FolderOpen, Edit3, Copy, Trash2, MoreVertical, ChevronDown, ChevronRight, Star, Archive, Settings, Brain, BarChart3, Camera, User, Palette } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { useToast } from '@/hooks/use-toast';
 import { IntelligentTooltip, generateContextTooltip } from '@/components/IntelligentTooltip';
@@ -38,6 +41,9 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
   const [editingItem, setEditingItem] = useState<{type: 'board' | 'folder', id: string} | null>(null);
   const [showOptimizer, setShowOptimizer] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showSnapshot, setShowSnapshot] = useState(false);
+  const [showPersonalization, setShowPersonalization] = useState(false);
+  const [showColorGenerator, setShowColorGenerator] = useState(false);
 
   const colors = [
     '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', 
@@ -480,6 +486,30 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
                 {showAnalytics ? 'Ocultar Analytics' : 'Analytics Avançados'}
               </Button>
             </IntelligentTooltip>
+            
+            <Button
+              onClick={() => setShowSnapshot(!showSnapshot)}
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              {showSnapshot ? 'Ocultar Snapshot' : 'Performance Snapshot'}
+            </Button>
+            
+            <Button
+              onClick={() => setShowPersonalization(!showPersonalization)}
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+            >
+              <User className="h-4 w-4 mr-2" />
+              {showPersonalization ? 'Ocultar Personalização' : 'Personalização IA'}
+            </Button>
+            
+            <Button
+              onClick={() => setShowColorGenerator(!showColorGenerator)}
+              className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700"
+            >
+              <Palette className="h-4 w-4 mr-2" />
+              {showColorGenerator ? 'Ocultar Cores' : 'Gerador de Cores IA'}
+            </Button>
           </div>
           
           {showOptimizer && (
@@ -491,6 +521,24 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
           {showAnalytics && (
             <div className="mt-4">
               <AdvancedAnalytics currentBoard={currentBoard} />
+            </div>
+          )}
+          
+          {showSnapshot && (
+            <div className="mt-4">
+              <PerformanceSnapshot currentBoard={currentBoard} />
+            </div>
+          )}
+          
+          {showPersonalization && (
+            <div className="mt-4">
+              <AdaptivePersonalization />
+            </div>
+          )}
+          
+          {showColorGenerator && (
+            <div className="mt-4">
+              <ColorPaletteGenerator />
             </div>
           )}
         </div>
