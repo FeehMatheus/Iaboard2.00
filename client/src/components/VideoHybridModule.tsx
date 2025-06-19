@@ -26,13 +26,13 @@ export function VideoHybridModule({ data, isConnectable }: VideoHybridModuleProp
   const { toast } = useToast();
 
   const { data: providerStatus } = useQuery({
-    queryKey: ['/api/video-hybrid/status'],
+    queryKey: ['/api/video-enhanced/status'],
     refetchInterval: 30000, // Check status every 30 seconds
   });
 
   const generateVideoMutation = useMutation({
     mutationFn: async (params: { prompt: string; duration: number; style: string }) => {
-      const response = await fetch('/api/real-video/generate', {
+      const response = await fetch('/api/video-enhanced/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),

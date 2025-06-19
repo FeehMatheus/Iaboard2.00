@@ -23,6 +23,7 @@ import intelligentContentWorkflow from "./intelligent-content-workflow";
 import apiConnectionFix from "./api-connection-fix";
 import realApiValidator from "./real-api-validator";
 import authenticVideoGenerator from "./authentic-video-generator";
+import enhancedHybridSystem from "./enhanced-hybrid-system";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Load environment variables
@@ -95,6 +96,9 @@ app.use((req, res, next) => {
   
   // Add authentic video generator (top priority)
   app.use(authenticVideoGenerator);
+  
+  // Add enhanced hybrid system (ultimate priority)
+  app.use(enhancedHybridSystem);
   
   // Add high-performance AI routes
   app.use(highPerformanceAI);
