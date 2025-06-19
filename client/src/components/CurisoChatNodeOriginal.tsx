@@ -20,12 +20,10 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 
 const availableModels = [
-  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai' },
-  { id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'openai' },
-  { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', provider: 'anthropic' },
-  { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', provider: 'anthropic' },
-  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', provider: 'google' },
-  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', provider: 'google' },
+  { id: 'gpt-4o', name: '🚀 GPT-4o (Mais Inteligente)', provider: 'openai' },
+  { id: 'gpt-4o-mini', name: '⚡ GPT-4o Mini (Mais Rápido)', provider: 'openai' },
+  { id: 'claude-3-5-sonnet-20241022', name: '🧠 Claude 3.5 Sonnet (Analítico)', provider: 'anthropic' },
+  { id: 'claude-3-5-haiku-20241022', name: '📝 Claude 3.5 Haiku (Criativo)', provider: 'anthropic' },
 ];
 
 export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
@@ -133,10 +131,22 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
     const allMessages = [...contextMessages, ...messages, userMessage];
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input.trim();
     setInput('');
     setIsLoading(true);
 
+    // Add typing indicator
+    const typingMessage: Message = {
+      id: `${Date.now()}-typing`,
+      role: 'assistant',
+      content: '⌨️ Digitando...',
+      timestamp: Date.now(),
+    };
+    setMessages(prev => [...prev, typingMessage]);
+
     try {
+      console.log(`[Chat Node] Enviando mensagem para modelo: ${model}`);
+      
       const response = await fetch('/api/ai/execute', {
         method: 'POST',
         headers: {
@@ -144,17 +154,25 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
         },
         body: JSON.stringify({
           model,
-          prompt: input.trim(),
-          systemPrompt: 'You are a helpful AI assistant.',
-          context: allMessages.slice(-10), // Last 10 messages for context
+          prompt: currentInput,
+          systemPrompt: 'Você é um assistente de IA especializado, útil e inteligente. Responda de forma clara, detalhada e profissional.',
+          context: allMessages.slice(-8), // Last 8 messages for context
           temperature: 0.7,
           maxTokens: 2000,
         }),
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
-      if (result.success) {
+      const result = await response.json();
+      console.log(`[Chat Node] Resposta recebida:`, result);
+
+      // Remove typing indicator
+      setMessages(prev => prev.filter(msg => msg.id !== typingMessage.id));
+
+      if (result.success && result.content) {
         const assistantMessage: Message = {
           id: `${Date.now()}-assistant`,
           role: 'assistant',
@@ -165,17 +183,31 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
         setMessages(prev => [...prev, assistantMessage]);
         
         toast({
-          title: "Response generated",
-          description: `Using ${model}`,
+          title: "✅ Resposta gerada",
+          description: `Modelo: ${selectedModel?.name} (${result.processingTime}ms)`,
         });
       } else {
-        throw new Error(result.error || 'Failed to generate response');
+        throw new Error(result.error || 'Falha ao gerar resposta');
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Erro ao enviar mensagem:', error);
+      
+      // Remove typing indicator on error
+      setMessages(prev => prev.filter(msg => msg.id !== typingMessage.id));
+      
+      // Add error message
+      const errorMessage: Message = {
+        id: `${Date.now()}-error`,
+        role: 'assistant',
+        content: `❌ **Erro**: ${error instanceof Error ? error.message : 'Falha na comunicação'}\n\nTente novamente ou verifique sua conexão.`,
+        timestamp: Date.now(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send message",
+        title: "❌ Erro no Chat",
+        description: error instanceof Error ? error.message : "Falha ao enviar mensagem",
         variant: "destructive",
       });
     } finally {
@@ -219,9 +251,9 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
         <CardHeader className="pb-3 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+              <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-orange-500 animate-pulse' : 'bg-green-500'}`} />
               <span className="text-sm font-medium text-muted-foreground">
-                Chat Node
+                💬 Chat IA {isLoading ? '(Processando...)' : '(Pronto)'}
               </span>
             </div>
             <Button
@@ -253,8 +285,9 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
           <div className="overflow-y-auto space-y-3 max-h-64">
             {messages.length === 0 ? (
               <div className="text-center text-muted-foreground py-8">
-                <div className="text-lg mb-2">💬</div>
-                <p className="text-sm">Start a conversation</p>
+                <div className="text-2xl mb-3">🤖</div>
+                <p className="text-sm font-medium">Converse com IA em tempo real</p>
+                <p className="text-xs mt-1">Digite sua mensagem para começar</p>
               </div>
             ) : (
               messages.map((message) => (
