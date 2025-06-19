@@ -583,6 +583,22 @@ function Flow() {
 
   const selectedNodes = currentBoard.nodes.filter(node => node.selected);
 
+  const switchToBoard = useCallback((boardId: string) => {
+    setSettings({
+      ...settings,
+      currentBoardId: boardId,
+      boards: settings.boards.map(board =>
+        board.id === boardId ? { ...board, updatedAt: Date.now() } : board
+      )
+    });
+
+    const board = settings.boards.find(b => b.id === boardId);
+    toast({
+      title: "Funil carregado",
+      description: `Agora editando: ${board?.name}`,
+    });
+  }, [settings, setSettings, toast]);
+
   return (
     <div className="relative w-full h-full" onContextMenu={handleContextMenu}>
       <ReactFlow
