@@ -116,9 +116,11 @@ export function VideoHybridModule({ data, isConnectable }: VideoHybridModuleProp
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="3">3 segundos</SelectItem>
                   <SelectItem value="5">5 segundos</SelectItem>
                   <SelectItem value="10">10 segundos</SelectItem>
+                  <SelectItem value="15">15 segundos</SelectItem>
+                  <SelectItem value="30">30 segundos</SelectItem>
+                  <SelectItem value="60">60 segundos</SelectItem>
                 </SelectContent>
               </Select>
             </div>
