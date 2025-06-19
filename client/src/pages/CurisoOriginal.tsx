@@ -19,6 +19,7 @@ import 'reactflow/dist/style.css';
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Settings, MessageCirclePlus, Trash2, Brain, Zap, Video, Search, Package, PenTool, Target, BarChart, BarChart3, Sparkles, Menu, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
@@ -42,6 +43,7 @@ function Flow() {
   const { settings, setSettings } = useStore();
   const { getViewport, screenToFlowPosition } = useReactFlow();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const currentBoard = settings.boards.find(b => b.id === settings.currentBoardId)!;
 
