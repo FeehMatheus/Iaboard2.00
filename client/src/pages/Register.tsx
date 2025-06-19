@@ -51,7 +51,7 @@ export function Register() {
       
       // Redirect to main app
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/board';
       }, 1000);
       
     } catch (error) {

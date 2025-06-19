@@ -12,7 +12,7 @@ export function Success() {
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          window.location.href = '/';
+          window.location.href = '/board';
           return 0;
         }
         return prev - 1;
@@ -82,7 +82,7 @@ export function Success() {
             </div>
 
             <div className="space-y-4">
-              <Link href="/">
+              <Link href="/board">
                 <Button 
                   size="lg" 
                   className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 text-lg"

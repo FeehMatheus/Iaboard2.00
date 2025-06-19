@@ -27,7 +27,7 @@ export function Login() {
       
       // Redirect to main app after successful login
       setTimeout(() => {
-        window.location.href = '/';
+        window.location.href = '/board';
       }, 1000);
       
     } catch (error) {

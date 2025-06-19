@@ -17,6 +17,11 @@ export function LandingSimple() {
           </div>
           
           <div className="flex items-center gap-3">
+            <Link href="/board">
+              <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-700">
+                Demo Gratuito
+              </Button>
+            </Link>
             <Link href="/login">
               <Button variant="ghost" className="text-white hover:bg-white/10">
                 Entrar
@@ -65,6 +70,19 @@ export function LandingSimple() {
           <div className="flex items-center justify-center gap-4 mb-8">
             <Users className="w-6 h-6 text-orange-400" />
             <span className="text-lg font-semibold">+ de 50.000 alunos desde 2021</span>
+          </div>
+
+          {/* Demo CTA */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 max-w-2xl mx-auto mb-8">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold mb-2">Teste Gratuitamente Agora!</h3>
+              <p className="text-lg mb-4">Experimente a IA Board sem compromisso</p>
+              <Link href="/board">
+                <Button size="lg" className="bg-white text-black hover:bg-gray-100 font-bold px-8">
+                  🎯 TESTAR DEMO GRATUITO
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Pricing CTA */}
