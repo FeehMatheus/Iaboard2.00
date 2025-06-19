@@ -9,6 +9,8 @@ import { AdvancedAnalytics } from '@/components/AdvancedAnalytics';
 import { Plus, Folder, FolderOpen, Edit3, Copy, Trash2, MoreVertical, ChevronDown, ChevronRight, Star, Archive, Settings, Brain, BarChart3 } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { useToast } from '@/hooks/use-toast';
+import { IntelligentTooltip, generateContextTooltip } from '@/components/IntelligentTooltip';
+import { useTooltipContext } from '@/hooks/useTooltipContext';
 
 interface FunnelSidebarProps {
   sidebarOpen: boolean;
@@ -30,6 +32,7 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
   setExpandedFolders
 }) => {
   const { toast } = useToast();
+  const { trackFeatureInteraction, getAdaptiveDelay } = useTooltipContext();
   const [newItemDialog, setNewItemDialog] = useState<{type: 'board' | 'folder', parentId?: string} | null>(null);
   const [newItemForm, setNewItemForm] = useState({name: '', description: '', color: '#3b82f6'});
   const [editingItem, setEditingItem] = useState<{type: 'board' | 'folder', id: string} | null>(null);
@@ -431,21 +434,52 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
         {/* AI Tools */}
         <div className="pt-4 border-t border-slate-700/50">
           <div className="space-y-2">
-            <Button
-              onClick={() => setShowOptimizer(!showOptimizer)}
-              className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
+            <IntelligentTooltip
+              content={generateContextTooltip('funnel-optimizer')}
+              trigger="hover"
+              delay={getAdaptiveDelay('funnel-optimizer')}
+              placement="right"
             >
-              <Brain className="h-4 w-4 mr-2" />
-              {showOptimizer ? 'Ocultar Otimizador' : 'Otimizador IA'}
-            </Button>
+              <Button
+                onClick={() => {
+                  setShowOptimizer(!showOptimizer);
+                  trackFeatureInteraction('funnel-optimizer');
+                }}
+                className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
+              >
+                <Brain className="h-4 w-4 mr-2" />
+                {showOptimizer ? 'Ocultar Otimizador' : 'Otimizador IA'}
+              </Button>
+            </IntelligentTooltip>
             
-            <Button
-              onClick={() => setShowAnalytics(!showAnalytics)}
-              className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+            <IntelligentTooltip
+              content={{
+                title: 'Analytics Avançados',
+                description: 'Análise detalhada de performance com insights, tendências e benchmarks da indústria.',
+                type: 'feature',
+                category: 'Analytics',
+                examples: [
+                  'Heatmap de engajamento',
+                  'Análise de tendências',
+                  'Comparação com benchmarks'
+                ],
+                relatedFeatures: ['Performance Tracking', 'AI Insights']
+              }}
+              trigger="hover"
+              delay={getAdaptiveDelay('advanced-analytics')}
+              placement="right"
             >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              {showAnalytics ? 'Ocultar Analytics' : 'Analytics Avançados'}
-            </Button>
+              <Button
+                onClick={() => {
+                  setShowAnalytics(!showAnalytics);
+                  trackFeatureInteraction('advanced-analytics');
+                }}
+                className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                {showAnalytics ? 'Ocultar Analytics' : 'Analytics Avançados'}
+              </Button>
+            </IntelligentTooltip>
           </div>
           
           {showOptimizer && (

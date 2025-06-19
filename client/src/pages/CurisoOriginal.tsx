@@ -24,6 +24,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { IntelligentTooltip, generateContextTooltip } from '@/components/IntelligentTooltip';
+import { useTooltipContext } from '@/hooks/useTooltipContext';
 import { CurisoChatNodeOriginal } from '@/components/CurisoChatNodeOriginal';
 import { AIModuleNode } from '@/components/AIModuleNode';
 import { PikaVideoNode } from '@/components/PikaVideoNode';
@@ -635,12 +637,7 @@ function Flow() {
         showInteractive={true}
       />
       
-      {/* Hide React Flow Attribution */}
-      <style jsx global>{`
-        .react-flow__attribution {
-          display: none !important;
-        }
-      `}</style>
+
       {/* Hamburger Menu Button */}
       <Panel 
         position="top-left" 
@@ -648,14 +645,24 @@ function Flow() {
           sidebarOpen ? 'ml-80' : 'ml-0'
         }`}
       >
-        <Button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          size="sm"
-          variant="secondary"
-          className="bg-background/80 backdrop-blur-sm border hover:bg-background/90 transition-all duration-200"
+        <IntelligentTooltip
+          content={generateContextTooltip('sidebar-toggle')}
+          trigger="hover"
+          delay={getAdaptiveDelay('sidebar-toggle')}
+          placement="right"
         >
-          <Menu className="h-4 w-4" />
-        </Button>
+          <Button
+            onClick={() => {
+              setSidebarOpen(!sidebarOpen);
+              trackFeatureInteraction('sidebar-toggle');
+            }}
+            size="sm"
+            variant="secondary"
+            className="bg-background/80 backdrop-blur-sm border hover:bg-background/90 transition-all duration-200"
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
+        </IntelligentTooltip>
       </Panel>
 
       <FunnelSidebar
@@ -677,9 +684,16 @@ function Flow() {
           {contextMenu.nodeId ? (
             <>
               {/* Node Actions Header */}
-              <div className="px-4 py-2 border-b border-border/30">
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Ações do Módulo</h4>
-              </div>
+              <IntelligentTooltip
+                content={generateContextTooltip('context-menu')}
+                trigger="hover"
+                delay={500}
+                placement="right"
+              >
+                <div className="px-4 py-2 border-b border-border/30">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Ações do Módulo</h4>
+                </div>
+              </IntelligentTooltip>
               
               {/* Node Manipulation */}
               <button 

@@ -4,6 +4,8 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Trash2, Loader2, Copy, Check, X, BarChart3, Zap, Clock, Target } from 'lucide-react';
+import { IntelligentTooltip, generateContextTooltip } from '@/components/IntelligentTooltip';
+import { useTooltipContext } from '@/hooks/useTooltipContext';
 import { useToast } from '@/hooks/use-toast';
 import ReactMarkdown from 'react-markdown';
 import {
@@ -55,6 +57,7 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
   
   const { getNode, getEdges, setNodes } = useReactFlow();
   const { toast } = useToast();
+  const { trackFeatureInteraction, getAdaptiveDelay } = useTooltipContext();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea
@@ -330,14 +333,24 @@ export const CurisoChatNodeOriginal = memo(({ id, data }: NodeProps) => {
               )}
             </div>
             <div className="flex items-center gap-1">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowMetrics(!showMetrics)}
-                className="h-6 w-6 p-0 text-muted-foreground hover:text-primary"
+              <IntelligentTooltip
+                content={generateContextTooltip('performance-metrics')}
+                trigger="hover"
+                delay={getAdaptiveDelay('performance-metrics')}
+                placement="bottom"
               >
-                <BarChart3 className="h-3 w-3" />
-              </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setShowMetrics(!showMetrics);
+                    trackFeatureInteraction('performance-metrics');
+                  }}
+                  className="h-6 w-6 p-0 text-muted-foreground hover:text-primary"
+                >
+                  <BarChart3 className="h-3 w-3" />
+                </Button>
+              </IntelligentTooltip>
               <Button
                 size="sm"
                 variant="ghost"
