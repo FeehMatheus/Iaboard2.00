@@ -4,7 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Folder, FolderOpen, Edit3, Copy, Trash2, MoreVertical, ChevronDown, ChevronRight, Star, Archive, Settings } from 'lucide-react';
+import { FunnelOptimizer } from '@/components/FunnelOptimizer';
+import { Plus, Folder, FolderOpen, Edit3, Copy, Trash2, MoreVertical, ChevronDown, ChevronRight, Star, Archive, Settings, Brain } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,6 +32,7 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
   const [newItemDialog, setNewItemDialog] = useState<{type: 'board' | 'folder', parentId?: string} | null>(null);
   const [newItemForm, setNewItemForm] = useState({name: '', description: '', color: '#3b82f6'});
   const [editingItem, setEditingItem] = useState<{type: 'board' | 'folder', id: string} | null>(null);
+  const [showOptimizer, setShowOptimizer] = useState(false);
 
   const colors = [
     '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', 
@@ -422,6 +424,23 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
           <div className="space-y-2">
             {getSubFolders().map(folder => renderFolder(folder))}
           </div>
+        </div>
+
+        {/* AI Optimizer */}
+        <div className="pt-4 border-t border-slate-700/50">
+          <Button
+            onClick={() => setShowOptimizer(!showOptimizer)}
+            className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 mb-3"
+          >
+            <Brain className="h-4 w-4 mr-2" />
+            {showOptimizer ? 'Ocultar Otimizador' : 'Otimizador IA'}
+          </Button>
+          
+          {showOptimizer && (
+            <div className="mb-4">
+              <FunnelOptimizer currentBoard={currentBoard} />
+            </div>
+          )}
         </div>
 
         {/* Statistics */}
