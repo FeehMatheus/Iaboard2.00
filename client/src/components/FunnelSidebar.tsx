@@ -51,7 +51,7 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
 
     setSettings({
       ...settings,
-      folders: [...settings.folders, newFolder]
+      folders: [...(settings.folders || []), newFolder]
     });
 
     setExpandedFolders(prev => new Set([...prev, folderId]));
@@ -106,11 +106,11 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
   };
 
   const getBoardsByFolder = (folderId: string) => {
-    return settings.boards.filter((board: any) => board.folderId === folderId);
+    return settings.boards?.filter((board: any) => board.folderId === folderId) || [];
   };
 
   const getSubFolders = (parentId?: string) => {
-    return settings.folders.filter((folder: any) => folder.parentId === parentId);
+    return settings.folders?.filter((folder: any) => folder.parentId === parentId) || [];
   };
 
   const duplicateBoard = (boardId: string) => {
@@ -128,7 +128,7 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
 
     setSettings({
       ...settings,
-      boards: [...settings.boards, duplicatedBoard]
+      boards: [...(settings.boards || []), duplicatedBoard]
     });
 
     toast({
@@ -142,7 +142,7 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
     if (!board) return;
 
     if (confirm(`Excluir funil "${board.name}"?`)) {
-      const newBoards = settings.boards.filter((b: any) => b.id !== boardId);
+      const newBoards = (settings.boards || []).filter((b: any) => b.id !== boardId);
       let newCurrentId = settings.currentBoardId;
 
       if (boardId === settings.currentBoardId && newBoards.length > 0) {
@@ -296,7 +296,7 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
                 Gerenciador de Funis
               </h2>
               <p className="text-xs text-slate-400">
-                {settings.boards.length} funis • {settings.folders.length} pastas
+                {settings.boards?.length || 0} funis • {settings.folders?.length || 0} pastas
               </p>
             </div>
           </div>
@@ -450,12 +450,12 @@ export const FunnelSidebar: React.FC<FunnelSidebarProps> = ({
             <div className="space-y-1 text-xs text-slate-400">
               <div className="flex justify-between">
                 <span>Funis Ativos:</span>
-                <span className="text-emerald-400 font-medium">{settings.boards.length}</span>
+                <span className="text-emerald-400 font-medium">{settings.boards?.length || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span>Módulos Totais:</span>
                 <span className="text-emerald-400 font-medium">
-                  {settings.boards.reduce((sum: number, board: any) => sum + board.nodes.length, 0)}
+                  {(settings.boards || []).reduce((sum: number, board: any) => sum + (board.nodes?.length || 0), 0)}
                 </span>
               </div>
               <div className="flex justify-between">
