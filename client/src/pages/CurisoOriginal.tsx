@@ -51,6 +51,7 @@ function Flow() {
   const { getViewport, screenToFlowPosition } = useReactFlow();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { getAdaptiveDelay, trackFeatureInteraction } = useTooltipContext();
 
   const currentBoard = settings.boards.find(b => b.id === settings.currentBoardId)!;
 
