@@ -1,6 +1,8 @@
+import { config } from "dotenv";
+config();
+
 import express, { type Request, Response, NextFunction, type Express } from "express";
 import { createServer, type Server } from "http";
-import { config } from "dotenv";
 import youtubeRoutes from "./routes";
 import enhancedRoutes from "./enhanced-routes";
 import iaBoardModules from "./ia-board-modules";
@@ -25,12 +27,12 @@ import authenticVideoGenerator from "./authentic-video-generator";
 import enhancedHybridSystem from "./enhanced-hybrid-system";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Load environment variables
-config();
-
 const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+const portArg = process.argv.indexOf('--port');
+const port = portArg !== -1 && process.argv[portArg + 1] ? parseInt(process.argv[portArg + 1], 10) : 5000;
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -133,7 +135,6 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  const port = 5000;
   httpServer.listen({
     port,
     host: "0.0.0.0",

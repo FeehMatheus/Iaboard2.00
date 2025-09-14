@@ -41,6 +41,9 @@ export class AIEngineSupreme {
   private config: AIEngineConfig;
 
   constructor() {
+    console.log("Attempting to read OPENAI_API_KEY from environment variables...");
+    console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "found" : "missing or empty");
+    
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
