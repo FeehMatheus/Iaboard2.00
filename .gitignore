@@ -1,6 +1,10 @@
-node_modules
-dist
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+# Ignore environment files
+.env
+
+# Ignore log files
+firebase-debug.log
+firestore-debug.log
+logs/
+
+# Ignore build output
+dist/
