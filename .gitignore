@@ -8,3 +8,4 @@ logs/
 
 # Ignore build output
 dist/
+node_modules
